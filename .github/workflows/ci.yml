@@ -38,6 +38,10 @@ jobs:
       - name: Configurar Gradle (con caché)
         uses: gradle/actions/setup-gradle@v6
 
+      # Desde Windows el permiso de ejecución de gradlew se puede perder al hacer commit.
+      - name: Dar permiso de ejecución a gradlew
+        run: chmod +x ./gradlew
+
       - name: Estilo (ktlint)
         run: ./gradlew ktlintCheck
 
