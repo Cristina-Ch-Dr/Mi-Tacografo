@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">Mi Tacografo</string>
+    <string name="app_name">Mi Tacógrafo</string>
+
+    <!-- Navegación -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_historial">Historial</string>
+    <string name="nav_viajes">Viajes</string>
+    <string name="nav_resumen">Resumen</string>
+    <string name="nav_ajustes">Ajustes</string>
+
+    <!-- Acciones -->
+    <string name="accion_volver">Volver</string>
+    <string name="accion_iniciar_jornada">Iniciar jornada</string>
+
+    <!-- Inicio -->
+    <string name="inicio_sin_jornada">Sin jornada en curso</string>
+
+    <!-- Genérico -->
+    <string name="pantalla_pendiente">Próximamente</string>
 </resources>
