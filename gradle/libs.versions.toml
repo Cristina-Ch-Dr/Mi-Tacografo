@@ -14,6 +14,7 @@ hilt = "2.60.1"
 androidxHilt = "1.4.0"
 navigationCompose = "2.10.2"
 kotlinxSerialization = "1.12.0"
+kotlinxCoroutines = "1.11.0"
 materialIconsCore = "1.7.8"
 ktlintGradle = "14.2.0"
 ktlint = "1.8.0"
@@ -39,6 +40,9 @@ androidx-compose-material-icons-core = { group = "androidx.compose.material", na
 # Navegación
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+# Corrutinas y Flow (el dominio solo usa el núcleo, sin Android)
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 
 # Inyección de dependencias (Hilt)
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

@@ -71,8 +71,10 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 ## E1 · MVP: jornada y avisos → **v0.1**
 
 ### MT-07 · Modelo de dominio Jornada + puertos · M · deps: MT-03
-- [ ] `Jornada`, `Clock`, `JornadaRepository`, `SettingsRepository` y `AlarmScheduler` (interfaces).
-- [ ] Tests de `kmRecorridos` y de duración con cambio de hora y zonas distintas (T18, T19).
+- [x] `Jornada`, `Clock`, `JornadaRepository`, `SettingsRepository` y `AlarmScheduler` (interfaces).
+  - Como `Clock` se usa `java.time.Clock` (JDK puro, `Clock.fixed` en los tests): no hace falta una interfaz propia.
+- [x] Tests de `kmRecorridos` y de duración con cambio de hora y zonas distintas (T18, T19).
+- [x] `calcularAvisos`: horas de los avisos a partir del inicio, sin los desactivados ni los ya pasados.
 
 ### MT-08 · Room: base de datos y Jornada · M · deps: MT-07
 - [ ] `AppDatabase` v1, `JornadaEntity`, `JornadaDao` (Flow), conversores `Instant`/`ZoneId` y mappers.

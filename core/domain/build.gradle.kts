@@ -9,6 +9,9 @@ kotlin {
 }
 
 dependencies {
+    // Flow para los puertos que observan datos (Room los emitirá al cambiar).
+    api(libs.kotlinx.coroutines.core)
+
     testImplementation(platform(libs.junit5.bom))
     testImplementation(libs.junit5.jupiter)
     testRuntimeOnly(libs.junit5.platform.launcher)
