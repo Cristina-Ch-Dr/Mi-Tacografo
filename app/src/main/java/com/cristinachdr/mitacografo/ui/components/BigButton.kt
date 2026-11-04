@@ -36,9 +36,10 @@ fun BigButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = BigButtonMinHeight),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = BigButtonMinHeight),
     ) {
         if (icon != null) {
             Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(28.dp))

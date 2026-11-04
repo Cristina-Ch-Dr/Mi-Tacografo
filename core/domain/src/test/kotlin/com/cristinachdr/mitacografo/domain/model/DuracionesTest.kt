@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 class DuracionesTest {
-
     private val madrid = ZoneId.of("Europe/Madrid")
     private val kyiv = ZoneId.of("Europe/Kyiv")
 

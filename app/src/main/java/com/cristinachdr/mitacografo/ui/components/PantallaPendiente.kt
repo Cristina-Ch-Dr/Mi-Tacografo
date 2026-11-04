@@ -16,11 +16,15 @@ import com.cristinachdr.mitacografo.R
 
 /** Contenido provisional para las pantallas que aún no están implementadas. */
 @Composable
-fun PantallaPendiente(titulo: String, modifier: Modifier = Modifier) {
+fun PantallaPendiente(
+    titulo: String,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

@@ -8,7 +8,11 @@ import kotlinx.serialization.Serializable
  * una `data class` en lugar de un `object`.
  */
 @Serializable data object RutaInicio
+
 @Serializable data object RutaHistorial
+
 @Serializable data object RutaViajes
+
 @Serializable data object RutaResumen
+
 @Serializable data object RutaAjustes

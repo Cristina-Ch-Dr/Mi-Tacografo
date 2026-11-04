@@ -16,9 +16,10 @@ data class HomeUiState(
  * el [Clock] (igual que un `@Service` con inyección por constructor en Spring).
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    clock: Clock,
-) : ViewModel() {
-
-    val uiState: HomeUiState = HomeUiState(hoy = LocalDate.now(clock))
-}
+class HomeViewModel
+    @Inject
+    constructor(
+        clock: Clock,
+    ) : ViewModel() {
+        val uiState: HomeUiState = HomeUiState(hoy = LocalDate.now(clock))
+    }

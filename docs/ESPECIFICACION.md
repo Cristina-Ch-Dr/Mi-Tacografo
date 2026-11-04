@@ -74,7 +74,7 @@ App Android **personal y sin conexión** para que un conductor profesional de ca
 | PDF | **`android.graphics.pdf.PdfDocument`** (API nativa de Android, desde API 19) | Sin dependencias ni licencias. Se dibuja con `Canvas`. ❌ No usar iText: su licencia AGPL obligaría a publicar todo bajo AGPL. Ver §11. |
 | Alarmas | **AlarmManager** (`setExactAndAllowWhileIdle`) + **NotificationCompat** | WorkManager **no** es puntual. Ver §9. |
 | Tests | **JUnit 5** (dominio) · **MockK** · **Turbine** · **Truth/AssertK** · Room in-memory · Compose UI test | |
-| Calidad | **ktlint** + **detekt** | Se ejecutan en la CI. |
+| Calidad | **ktlint** (estilo `ktlint_official` + reglas de Compose de `io.nlopez.compose.rules`) + **Android Lint** | Se ejecutan en la CI. detekt 1.23 no es compatible con JDK 25 y detekt 2 sigue en alfa: reevaluar cuando salga detekt 2 estable. |
 | Build | **Gradle Kotlin DSL + Version Catalog** (`libs.versions.toml`) | |
 | CI/CD | **GitHub Actions** | Tests en cada PR. APK firmado en cada tag `v*`. |
 
@@ -595,7 +595,7 @@ Con un toque se crea el descanso. Es el usuario quien lo confirma, así que no s
 - 🔒 **Nunca subir** el keystore, sus contraseñas ni datos reales del conductor.
 
 **GitHub Actions**
-- `ci.yml` (en cada push o PR): `./gradlew ktlintCheck detekt test lint assembleDebug`.
+- `ci.yml` (en cada push o PR a `develop`/`main`): `ktlintCheck`, tests unitarios, `lintDebug` y `assembleDebug`, y sube los informes como artefacto.
 - `release.yml` (en cada tag `v*`): decodificar el keystore desde un *Secret* en Base64 → `assembleRelease` → subir el APK a la **GitHub Release**.
 - Versionado: `versionName` = tag (semver), `versionCode` incremental.
 

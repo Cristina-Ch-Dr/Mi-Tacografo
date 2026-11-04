@@ -1,0 +1,62 @@
+name: CI
+
+# Se ejecuta en cada PR hacia develop/main y en cada push a esas ramas.
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+# Si llega un push nuevo al mismo PR, se cancela la ejecución anterior.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Estilo, tests, lint y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      # JDK 17 para el módulo de dominio (jvmToolchain) y JDK 25 para el daemon de Gradle.
+      # El último de la lista queda como JAVA_HOME.
+      - name: Instalar JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            25
+
+      - name: Configurar Gradle (con caché)
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Estilo (ktlint)
+        run: ./gradlew ktlintCheck
+
+      - name: Tests unitarios
+        run: ./gradlew :core:domain:test :app:testDebugUnitTest
+
+      - name: Android Lint
+        run: ./gradlew :app:lintDebug
+
+      - name: Compilar APK debug
+        run: ./gradlew :app:assembleDebug
+
+      # Informes descargables desde la pestaña "Actions" si algo falla.
+      - name: Guardar informes
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: informes
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          retention-days: 7
