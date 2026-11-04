@@ -1,0 +1,128 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "cdd3b260f230d43126e5acb2bb7cbe76",
+    "entities": [
+      {
+        "tableName": "jornada",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `inicio_epoch_ms` INTEGER NOT NULL, `zona_inicio` TEXT NOT NULL, `km_inicio` INTEGER NOT NULL, `pais_inicio` TEXT, `ciudad_inicio` TEXT, `fin_epoch_ms` INTEGER, `zona_fin` TEXT, `km_fin` INTEGER, `pais_fin` TEXT, `ciudad_fin` TEXT, `conduccion_min` INTEGER, `viaje_id` INTEGER, `observaciones` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inicioEpochMs",
+            "columnName": "inicio_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "zonaInicio",
+            "columnName": "zona_inicio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kmInicio",
+            "columnName": "km_inicio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paisInicio",
+            "columnName": "pais_inicio",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ciudadInicio",
+            "columnName": "ciudad_inicio",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "finEpochMs",
+            "columnName": "fin_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "zonaFin",
+            "columnName": "zona_fin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "kmFin",
+            "columnName": "km_fin",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "paisFin",
+            "columnName": "pais_fin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ciudadFin",
+            "columnName": "ciudad_fin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "conduccionMin",
+            "columnName": "conduccion_min",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "viajeId",
+            "columnName": "viaje_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_jornada_inicio_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "inicio_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_jornada_inicio_epoch_ms` ON `${TABLE_NAME}` (`inicio_epoch_ms`)"
+          },
+          {
+            "name": "index_jornada_fin_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "fin_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_jornada_fin_epoch_ms` ON `${TABLE_NAME}` (`fin_epoch_ms`)"
+          },
+          {
+            "name": "index_jornada_viaje_id",
+            "unique": false,
+            "columnNames": [
+              "viaje_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_jornada_viaje_id` ON `${TABLE_NAME}` (`viaje_id`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cdd3b260f230d43126e5acb2bb7cbe76')"
+    ]
+  }
+}
