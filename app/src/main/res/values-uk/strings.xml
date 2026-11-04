@@ -1,5 +1,5 @@
 <resources>
-    <!-- Traducción provisional: pendiente de revisión por hablante nativo (MT-35) -->
+    <!-- Traducción provisional: pendiente de revisión por hablante nativo (MT-34) -->
     <string name="app_name">Мій Тахограф</string>
 
     <!-- Navegación -->
@@ -12,9 +12,58 @@
     <!-- Acciones -->
     <string name="accion_volver">Назад</string>
     <string name="accion_iniciar_jornada">Почати робочий день</string>
+    <string name="accion_finalizar_jornada">Завершити робочий день</string>
+    <string name="accion_aceptar">Гаразд</string>
+    <string name="accion_cancelar">Скасувати</string>
+    <string name="accion_cambiar">Змінити</string>
 
     <!-- Inicio -->
     <string name="inicio_sin_jornada">Немає активного робочого дня</string>
+    <string name="inicio_jornada_en_curso">Робочий день триває</string>
+    <string name="inicio_desde">З %1$s · %2$s</string>
+    <string name="inicio_km_inicio">Км на початку: %1$s</string>
+    <string name="inicio_proximo_aviso">Наступне нагадування: %1$s (%2$s від початку)</string>
+    <string name="inicio_sin_avisos">Нагадувань на цей робочий день більше немає</string>
+
+    <!-- Formularios de jornada -->
+    <string name="campo_hora_inicio">Час початку</string>
+    <string name="campo_hora_fin">Час завершення</string>
+    <string name="campo_km_inicio">Км вантажівки на початку</string>
+    <string name="campo_km_fin">Км вантажівки в кінці</string>
+    <string name="campo_pais">Країна (ES, FR, UA…)</string>
+    <string name="campo_ciudad">Місто (необовʼязково)</string>
+    <string name="campo_observaciones">Примітки (необовʼязково)</string>
+    <string name="campo_conduccion">Керування за тахографом</string>
+    <string name="campo_horas">Години</string>
+    <string name="campo_minutos">Хвилини</string>
+
+    <!-- Finalizar jornada -->
+    <string name="fin_resumen_inicio">Почався о %1$s · %2$s, %3$s км</string>
+    <string name="fin_conduccion_ayuda">Якщо не вказати, правила покажуть «Не перевірено».</string>
+    <string name="fin_km_recorridos">Пройдено %1$s км</string>
+    <string name="fin_duracion">Тривалість робочого дня: %1$s</string>
+    <string name="fin_sin_jornada">Немає активного робочого дня.</string>
+
+    <!-- Formatos -->
+    <string name="formato_duracion">%1$d год %2$02d хв</string>
+
+    <!-- Errores de campo -->
+    <string name="error_obligatorio">Обовʼязково</string>
+    <string name="error_no_numero">Лише цифри</string>
+    <string name="error_minutos">Від 0 до 59</string>
+
+    <!-- Errores de jornada -->
+    <string name="error_jornada_ya_abierta">Робочий день уже триває. Спочатку завершіть його.</string>
+    <string name="error_sin_jornada_abierta">Немає активного робочого дня.</string>
+    <string name="error_jornada_no_existe">Цього робочого дня вже не існує.</string>
+    <string name="error_km_negativos">Км не можуть бути відʼємними.</string>
+    <string name="error_km_fin_menor">Км у кінці не можуть бути меншими, ніж на початку.</string>
+    <string name="error_inicio_futuro">Час початку не може бути в майбутньому.</string>
+    <string name="error_inicio_antes_fin_anterior">Початок раніше, ніж завершився попередній робочий день.</string>
+    <string name="error_fin_no_posterior">Час завершення має бути пізніше за час початку.</string>
+    <string name="error_fin_futuro">Час завершення не може бути в майбутньому.</string>
+    <string name="error_conduccion_negativa">Керування не може бути відʼємним.</string>
+    <string name="error_conduccion_mayor">Керування довше, ніж робочий день.</string>
 
     <!-- Genérico -->
     <string name="pantalla_pendiente">Незабаром</string>
