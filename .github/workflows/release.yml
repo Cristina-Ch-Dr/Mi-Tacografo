@@ -46,7 +46,7 @@ jobs:
           echo "Versión $NAME (code $CODE)"
 
       - name: Tests antes de publicar
-        run: ./gradlew ktlintCheck :core:domain:test :app:testDebugUnitTest
+        run: ./gradlew ktlintCheck :core:domain:test :core:data:testDebugUnitTest :app:testDebugUnitTest
 
       # El keystore está guardado en Base64 en el secret MT_KEYSTORE_BASE64.
       # Se escribe en una carpeta temporal del runner y nunca se sube a ningún sitio.

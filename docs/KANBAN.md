@@ -77,9 +77,11 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] `calcularAvisos`: horas de los avisos a partir del inicio, sin los desactivados ni los ya pasados.
 
 ### MT-08 · Room: base de datos y Jornada · M · deps: MT-07
-- [ ] `AppDatabase` v1, `JornadaEntity`, `JornadaDao` (Flow), conversores `Instant`/`ZoneId` y mappers.
-- [ ] `exportSchema = true` (carpeta `schemas/` en git).
-- [ ] Test del DAO in-memory.
+- [x] `AppDatabase` v1, `JornadaEntity`, `JornadaDao` (Flow), conversores `Instant`/`ZoneId` y mappers.
+  - La entidad solo usa tipos simples (epoch ms, nombre de zona, minutos) y la conversión está en `JornadaMapper.kt`, sin `TypeConverter`.
+  - `viaje_id` todavía sin clave ajena: se añade con la tabla `viaje` (MT-18).
+- [x] `exportSchema = true` (carpeta `core/data/schemas/` en git).
+- [x] Test del DAO in-memory (Robolectric, sin emulador) y `RoomJornadaRepository` conectado con Hilt.
 
 ### MT-09 · Casos de uso de jornada · M · deps: MT-08
 - [ ] `IniciarJornada`, `FinalizarJornada`, `EditarJornada`, `ObtenerJornadaActual` y `ObtenerUltimoKm`.
