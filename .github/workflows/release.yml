@@ -1,0 +1,91 @@
+name: Release
+
+# Se ejecuta al subir un tag de versión, p. ej.:  git tag v0.1.0 && git push origin v0.1.0
+# Compila el APK firmado y lo publica en GitHub Releases.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write # necesario para crear la Release
+
+jobs:
+  release:
+    name: APK firmado
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Instalar JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            25
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Dar permiso de ejecución a gradlew
+        run: chmod +x ./gradlew
+
+      # v1.2.3 → versionName "1.2.3" y versionCode 10203 (siempre creciente).
+      - name: Calcular versión a partir del tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          NAME="${TAG#v}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${NAME%%-*}"
+          CODE=$(( MAJOR * 10000 + MINOR * 100 + PATCH ))
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Versión $NAME (code $CODE)"
+
+      - name: Tests antes de publicar
+        run: ./gradlew ktlintCheck :core:domain:test :app:testDebugUnitTest
+
+      # El keystore está guardado en Base64 en el secret MT_KEYSTORE_BASE64.
+      # Se escribe en una carpeta temporal del runner y nunca se sube a ningún sitio.
+      - name: Restaurar keystore
+        env:
+          MT_KEYSTORE_BASE64: ${{ secrets.MT_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$MT_KEYSTORE_BASE64" ]; then
+            echo "::error::Falta el secret MT_KEYSTORE_BASE64"
+            exit 1
+          fi
+          echo "$MT_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      - name: Compilar APK release firmado
+        env:
+          MT_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          MT_KEYSTORE_PASSWORD: ${{ secrets.MT_KEYSTORE_PASSWORD }}
+          MT_KEY_ALIAS: ${{ secrets.MT_KEY_ALIAS }}
+          MT_KEY_PASSWORD: ${{ secrets.MT_KEY_PASSWORD }}
+        run: >
+          ./gradlew :app:assembleRelease
+          -PversionName=${{ steps.version.outputs.name }}
+          -PversionCode=${{ steps.version.outputs.code }}
+
+      - name: Renombrar APK
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/mi-tacografo-${GITHUB_REF_NAME}.apk"
+
+      - name: Publicar en GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""
+          if [[ "${GITHUB_REF_NAME}" == v0.* ]]; then PRERELEASE="--prerelease"; fi
+          gh release create "${GITHUB_REF_NAME}" dist/*.apk \
+            --title "Mi Tacógrafo ${GITHUB_REF_NAME}" \
+            --generate-notes $PRERELEASE
+
+      - name: Borrar keystore temporal
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"
