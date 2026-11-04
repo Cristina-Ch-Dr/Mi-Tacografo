@@ -8,7 +8,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 class HomeViewModelTest {
-
     @Test
     fun `la fecha de hoy sale del reloj inyectado`() {
         // 23:30 del 4/11 en UTC ya es 5/11 en Kyiv (UTC+2): la fecha depende de la zona.

@@ -54,26 +54,35 @@ private enum class Pestana(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MiTacografoNavHost() {
+fun MiTacografoNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
     val destinoActual = entradaActual?.destination
 
-    val pestanaActual = Pestana.entries.firstOrNull { pestana ->
-        destinoActual?.hierarchy?.any { it.hasRoute(pestana.clase) } == true
-    }
+    val pestanaActual =
+        Pestana.entries.firstOrNull { pestana ->
+            destinoActual?.hierarchy?.any { it.hasRoute(pestana.clase) } == true
+        }
     val enAjustes = destinoActual?.hasRoute(RutaAjustes::class) == true
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(pestanaActual?.titulo ?: if (enAjustes) R.string.nav_ajustes else R.string.app_name))
+                    Text(
+                        stringResource(
+                            pestanaActual?.titulo ?: if (enAjustes) R.string.nav_ajustes else R.string.app_name,
+                        ),
+                    )
                 },
                 navigationIcon = {
                     if (enAjustes) {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.accion_volver))
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.accion_volver),
+                            )
                         }
                     }
                 },
@@ -103,11 +112,12 @@ fun MiTacografoNavHost() {
                             },
                             icon = { Icon(pestana.icono, contentDescription = null) },
                             label = { Text(stringResource(pestana.titulo)) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                            ),
+                            colors =
+                                NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                ),
                         )
                     }
                 }

@@ -14,7 +14,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object TimeModule {
-
     @Provides
     @Singleton
     fun provideClock(): Clock = Clock.systemDefaultZone()

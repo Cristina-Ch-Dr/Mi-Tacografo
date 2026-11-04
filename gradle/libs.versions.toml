@@ -15,6 +15,9 @@ androidxHilt = "1.4.0"
 navigationCompose = "2.10.2"
 kotlinxSerialization = "1.12.0"
 materialIconsCore = "1.7.8"
+ktlintGradle = "14.2.0"
+ktlint = "1.8.0"
+composeRules = "0.6.8"
 
 [libraries]
 # AndroidX
@@ -48,6 +51,8 @@ junit5-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit5" }
 junit5-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" }
 junit5-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
+# Calidad (reglas extra de ktlint para Compose)
+compose-rules-ktlint = { group = "io.nlopez.compose.rules", name = "ktlint", version.ref = "composeRules" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
@@ -58,3 +63,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }
