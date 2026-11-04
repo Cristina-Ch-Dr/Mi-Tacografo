@@ -1,14 +1,15 @@
 # Mi Tacógrafo — Planificación Kanban
 
 > Las tarjetas están **en orden de ejecución**: se coge siempre la primera de «Por hacer» cuyas dependencias estén hechas.
-> Cada tarjeta = 1 rama `feature/MT-xx-…` = 1 PR. Referencias técnicas en [ESPECIFICACION.md](ESPECIFICACION.md).
+> Cada tarjeta = 1 rama `feature/MT-xx-…` = 1 PR = 1 commit en `develop` (squash). Referencias técnicas en [ESPECIFICACION.md](ESPECIFICACION.md).
+> Desde MT-09 cada tarjeta es una **funcionalidad completa** (dominio + datos + pantalla + tests), no una capa suelta. Las tarjetas absorbidas conservan su número entre paréntesis para no perder la trazabilidad.
 > Se puede pasar tal cual a **GitHub Projects** (1 tarjeta = 1 issue, etiqueta = épica, milestone = hito).
 
 ## Tablero
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E0** MT-01 … MT-06 · **E1** MT-07 … MT-17 | — | — | — |
+| E2 – E7 | **E1** MT-13, MT-16, MT-17 | — | MT-08, MT-09 | MT-01 … MT-07 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -22,7 +23,9 @@
 | **v0.3 — Reglamento** | E4 | ~42–58 h | Motor 561/2006 (nacional e internacional) con «No verificado» y tests. |
 | **v1.0 — Completa** | E5 + E6 + E7 | ~56–80 h | Estadísticas, CSV y PDF, ucraniano revisado, pulido tras el uso real. |
 
-Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 5 h (dividir si se puede).
+Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 5 h.
+
+**Tamaño máximo de una tarjeta:** lo que se pueda revisar con calma en un PR (unos 15–20 archivos). Si una crece más, se divide.
 
 ---
 
@@ -83,40 +86,42 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] `exportSchema = true` (carpeta `core/data/schemas/` en git).
 - [x] Test del DAO in-memory (Robolectric, sin emulador) y `RoomJornadaRepository` conectado con Hilt.
 
-### MT-09 · Casos de uso de jornada · M · deps: MT-08
-- [ ] `IniciarJornada`, `FinalizarJornada`, `EditarJornada`, `ObtenerJornadaActual` y `ObtenerUltimoKm`.
-- [ ] Validaciones: una sola jornada abierta, `fin > inicio`, `kmFin ≥ kmInicio`, conducción ≤ duración.
-- [ ] Tests con MockK.
+### MT-09 · Flujo completo de la jornada · XL · deps: MT-08 · (antes MT-09, MT-10, MT-11 y MT-12)
+**Casos de uso**
+- [x] `IniciarJornada`, `FinalizarJornada`, `EditarJornada`, `ObtenerJornadaActual` y `ObtenerUltimoKm`.
+  - `ObtenerUltimoKm` es `ProponerDatosInicio`: propone km, país y ciudad donde terminó la jornada anterior.
+- [x] Validaciones: una sola jornada abierta, `fin > inicio`, `kmFin ≥ kmInicio`, conducción ≤ duración. Tests con un repositorio falso en memoria.
+  - Además: hora no futura (5 min de margen) y no empezar antes del fin de la jornada anterior. `validarJornada` es pura y la UI la usa en vivo.
+  - `FakeJornadaRepository` en los *test fixtures* de `:core:domain`, compartido con los tests de `:app` (sin MockK).
 
-### MT-10 · Pantalla Iniciar jornada · M · deps: MT-09, MT-04
-- [ ] Hora (por defecto, ahora; selector de fecha y hora), km (por defecto, el último), país, ciudad y observaciones.
-- [ ] ViewModel con `UiState` y validación en vivo.
-- **Criterio:** iniciar una jornada en **≤ 2 toques** con los valores por defecto.
+**Iniciar jornada**
+- [x] Hora (por defecto, ahora; selector de fecha y hora), km (por defecto, el último), país, ciudad y observaciones.
+- [x] ViewModel con `UiState` y validación en vivo.
 
-### MT-11 · Pantalla Inicio (jornada actual) · M · deps: MT-10
-- [ ] Sin jornada: botón «Iniciar jornada».
-- [ ] Con jornada: tiempo transcurrido (se refresca cada minuto), km de inicio, próximo aviso y botón «Finalizar».
+**Inicio (jornada actual)**
+- [x] Sin jornada: botón «Iniciar jornada».
+- [x] Con jornada: tiempo transcurrido (se refresca cada minuto), km de inicio, próximo aviso y botón «Finalizar».
+  - El próximo aviso usa los avisos por defecto hasta que existan los Ajustes (MT-13).
 
-### MT-12 · Pantalla Finalizar jornada · M · deps: MT-11
-- [ ] Hora fin, km final, conducción del tacógrafo (entrada hh:mm cómoda) y km recorridos en vivo.
+**Finalizar jornada**
+- [x] Hora fin, km final, conducción del tacógrafo (entrada hh:mm cómoda) y km recorridos en vivo.
+- **Criterio:** iniciar una jornada en **≤ 2 toques** con los valores por defecto, y finalizarla.
 
-### MT-13 · Ajustes (DataStore) · M · deps: MT-04
-- [ ] `SettingsRepository` con DataStore: avisos activos y sus offsets, idioma, **país de la empresa y de residencia** (necesarios para las reglas internacionales), nombre para el PDF y zona de referencia.
+### MT-13 · Ajustes y avisos · XL · deps: MT-09 · (antes MT-13, MT-14 y MT-15)
+**Ajustes**
+- [ ] `SettingsRepository` con DataStore: avisos activos y sus offsets, **país de la empresa y de residencia** (necesarios para las reglas internacionales), nombre para el PDF y zona de referencia.
 - [ ] Pantalla Ajustes con interruptores de avisos.
 
-### MT-14 · Avisos con AlarmManager · L · deps: MT-12, MT-13
+**Avisos**
 - [ ] Tabla `alarma_programada` (migración 1→2 + test de migración).
 - [ ] `AndroidAlarmScheduler` (exacta con respaldo `setWindow`), `AlarmReceiver` y canal de notificación.
 - [ ] Al iniciar, programar. Al finalizar, **cancelar todo**. Al editar el inicio, reprogramar.
 - [ ] Pedir `POST_NOTIFICATIONS` (solo en 13+) y guiar al usuario para conceder `SCHEDULE_EXACT_ALARM` (12+, denegado por defecto en 14+).
 - [ ] Aviso de optimización de batería (Xiaomi, Samsung, Huawei…).
-- **Criterio:** probado con offsets de 1–2 min en modo debug y con el móvil bloqueado, **en la API mínima y en la última**.
+- [ ] `BootReceiver` reprograma las alarmas futuras de la jornada abierta tras reiniciar.
+- **Criterio:** probado con offsets de 1–2 min en modo debug, con el móvil bloqueado y tras reiniciar, **en la API mínima y en la última**.
 
-### MT-15 · Reprogramar tras reinicio · S · deps: MT-14
-- [ ] `BootReceiver` reprograma las alarmas futuras de la jornada abierta.
-- **Criterio:** reiniciar el móvil con una jornada abierta → el aviso llega igual.
-
-### MT-16 · Historial básico · M · deps: MT-12
+### MT-16 · Historial básico · M · deps: MT-09
 - [ ] Lista de jornadas agrupadas por semana (lunes a domingo) con fecha, km y conducción.
 - [ ] Detalle y edición, y borrado con confirmación.
 
@@ -132,11 +137,9 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E2 · Viajes → **v0.2**
 
-### MT-18 · Dominio y Room de Viaje · M
+### MT-18 · Viajes · L · (antes MT-18 y MT-19)
 - [ ] `Viaje`, `ViajeRepository`, entidad, DAO, migración y FK `jornada.viaje_id` (`SET_NULL`).
 - [ ] km del viaje = suma de las jornadas (test).
-
-### MT-19 · Pantallas de Viajes · M · deps: MT-18
 - [ ] Lista con km acumulados, iniciar y finalizar viaje, y detalle con sus jornadas.
 - [ ] Al iniciar una jornada con un viaje en curso, se asigna automáticamente.
 
@@ -144,19 +147,14 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E3 · Descansos → **v0.2**
 
-### MT-20 · Dominio y Room de Descanso · M
+### MT-20 · Descansos: datos y clasificador (TDD) · L · (antes MT-20 y MT-21)
 - [ ] `Descanso` (pausa/descanso, país), entidad, DAO, migración y validación de solapes.
-- [ ] País prellenado con el país de fin de la última jornada.
-
-### MT-21 · Clasificador de descansos (TDD) · L · deps: MT-20
-- [ ] Diario normal, reducido y fraccionado 3+9 (parte 1 y completo); semanal normal y reducido.
+- [ ] Clasificador: diario normal, reducido y fraccionado 3+9 (parte 1 y completo); semanal normal y reducido.
 - [ ] Tests T7–T10 y T12 (clasificación).
 
-### MT-22 · Pantalla Descansos · M · deps: MT-21
-- [ ] Lista con chip de clasificación, y alta y edición manual.
-
-### MT-23 · «¿Descansaste desde…?» al iniciar jornada · S · deps: MT-22
-- [ ] Si hay un hueco sin descanso registrado, proponerlo prellenado. Se crea con 1 toque y solo si el usuario confirma.
+### MT-22 · Pantalla Descansos · M · deps: MT-20 · (antes MT-22 y MT-23)
+- [ ] Lista con chip de clasificación, y alta y edición manual. País prellenado con el país de fin de la última jornada.
+- [ ] «¿Descansaste desde…?» al iniciar jornada: si hay un hueco sin descanso registrado, proponerlo prellenado. Se crea con 1 toque y solo si el usuario confirma.
 
 > 🏁 **Release v0.2.0**
 
@@ -166,17 +164,13 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 > **TDD estricto:** primero los tests de la tabla §13 de la especificación y luego la regla. Antes de cada tarjeta, **releer el artículo** en EUR-Lex.
 
-### MT-24 · Núcleo del motor · L
+### MT-24 · Núcleo del motor, conducción y pausas · XL · (antes MT-24, MT-25 y MT-26)
 - [ ] `Resultado` (Cumple, Excedido, NoVerificado), `MotivoNoVerificado`, intervalo `[min, max]` y `RuleEngine`.
 - [ ] `AsignadorSemanas`: semana lunes 00:00 en la zona de referencia, reparto de la conducción con intervalos (T20) y asignación de semanales (D-2).
-
-### MT-25 · Reglas de conducción · M · deps: MT-24
 - [ ] R-COND-1/2/3/4. Tests T1–T6 y T21.
-
-### MT-26 · Regla de pausas · S · deps: MT-24
 - [ ] R-PAUSA: ≤ 4 h 30 → Cumple; si no → No verificado. Test T22.
 
-### MT-27 · Reglas de descanso diario · L · deps: MT-24, MT-21
+### MT-27 · Reglas de descanso diario · L · deps: MT-24, MT-20
 - [ ] R-DD-1 (24 h, con huecos → No verificado) y R-DD-3 (máx. 3 reducidos). Tests T11 y T23.
 
 ### MT-28 · Reglas de descanso semanal (nacional e internacional) · XL · deps: MT-27
@@ -190,10 +184,8 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [ ] R-DS-5: tras 2 reducidos consecutivos, el siguiente semanal va precedido de la compensación.
 - [ ] Tests T13, T14, T17e y T24. Resolver D-3.
 
-### MT-30 · Tests con semanas reales · M · deps: MT-29
+### MT-30 · Semanas reales y estados en la UI · L · deps: MT-29 · (antes MT-30 y MT-31)
 - [ ] 2–3 semanas de la libreta, **anonimizadas**, como fixtures JSON. Comparar los resultados con lo que el conductor sabe que pasó.
-
-### MT-31 · Estados en la UI · M · deps: MT-30
 - [ ] Chips ✅⚠️❔ en Historial e Inicio, y el resumen semanal en Inicio (conducción X/56 h, ampliaciones X/2, reducidos X/3, deuda pendiente).
 - [ ] Pantalla de detalle del informe con la explicación de cada regla (textos traducidos).
 
@@ -210,12 +202,9 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [ ] `jornadas.csv`, `viajes.csv` y `descansos.csv` (UTF-8 BOM, `;`, coma decimal). Compartir con `Intent.ACTION_SEND`.
 - [ ] Test del formato (que se abra bien en Excel).
 
-### MT-33B · Modelo de informe (dominio) · M · deps: MT-31
-- [ ] Puerto `ReportRenderer` e `InformeModel` puro: cabecera, resumen, tablas de jornadas y descansos, informe de reglas por semana y deudas.
+### MT-33B · Exportar PDF · XL · deps: MT-30 · (antes MT-33B y MT-33C)
+- [ ] Puerto `ReportRenderer` e `InformeModel` puro: cabecera, resumen, tablas de jornadas y descansos, informe de reglas por semana y deudas. Test T25.
 - [ ] Selección de rango: semana, bisemana, mes, viaje o fechas libres.
-- [ ] Test T25.
-
-### MT-33C · Exportar PDF · L · deps: MT-33B
 - [ ] `PdfReportRenderer` con `PdfDocument`: A4, tablas con paginación y cabecera repetida, «Página X de Y», pie con el aviso legal, y comprobar que el ucraniano (cirílico) se ve bien.
 - [ ] Guardar (`CreateDocument`) o compartir (`FileProvider` + `ACTION_SEND`).
 - [ ] Botón «Exportar → CSV / PDF» en Resumen y en el detalle de un viaje.
@@ -226,10 +215,8 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E6 · Idiomas → **v1.0**
 
-### MT-34 · Selector de idioma · S
+### MT-34 · Idiomas · M · (antes MT-34 y MT-35)
 - [ ] `locales_config.xml`, `setApplicationLocales` y opción en Ajustes.
-
-### MT-35 · Traducción al ucraniano · M
 - [ ] `values-uk/strings.xml` completo. **Revisión por el conductor**, que es hablante nativo.
 - [ ] Lint `MissingTranslation` como error en la CI.
 
@@ -237,16 +224,12 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E7 · Pulido y uso real → **v1.0**
 
-### MT-36 · Aviso legal y primer arranque · S
+### MT-36 · Primer arranque y accesibilidad · M · (antes MT-36 y MT-37)
 - [ ] Pantalla de bienvenida con el aviso legal y la petición de permisos (notificaciones y alarmas exactas).
-
-### MT-37 · Accesibilidad y uso en cabina · M
 - [ ] Revisar tamaños táctiles, contraste y TalkBack. Probar con guantes y de noche con el tema oscuro.
 
-### MT-38 · Test de UI del flujo crítico · M
+### MT-38 · Tests de UI y compatibilidad · L · (antes MT-38 y MT-38B)
 - [ ] Compose UI test: iniciar → finalizar jornada → aparece en el historial.
-
-### MT-38B · Matriz de compatibilidad en la CI · M · deps: MT-38
 - [ ] GitHub Actions con `android-emulator-runner`: tests instrumentados en la **API mínima** y en la **última**.
 - [ ] Prueba manual en horizontal y en tablet o plegable (emulador).
 - [ ] Instalar el APK de la Release en un móvil «limpio» (como el de un amigo) y revisar el primer arranque y los permisos.

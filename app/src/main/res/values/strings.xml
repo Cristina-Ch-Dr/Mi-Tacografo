@@ -11,9 +11,58 @@
     <!-- Acciones -->
     <string name="accion_volver">Volver</string>
     <string name="accion_iniciar_jornada">Iniciar jornada</string>
+    <string name="accion_finalizar_jornada">Finalizar jornada</string>
+    <string name="accion_aceptar">Aceptar</string>
+    <string name="accion_cancelar">Cancelar</string>
+    <string name="accion_cambiar">Cambiar</string>
 
     <!-- Inicio -->
     <string name="inicio_sin_jornada">Sin jornada en curso</string>
+    <string name="inicio_jornada_en_curso">Jornada en curso</string>
+    <string name="inicio_desde">Desde las %1$s · %2$s</string>
+    <string name="inicio_km_inicio">Km de inicio: %1$s</string>
+    <string name="inicio_proximo_aviso">Próximo aviso: %1$s (%2$s de jornada)</string>
+    <string name="inicio_sin_avisos">No quedan avisos en esta jornada</string>
+
+    <!-- Formularios de jornada -->
+    <string name="campo_hora_inicio">Hora de inicio</string>
+    <string name="campo_hora_fin">Hora de fin</string>
+    <string name="campo_km_inicio">Km del camión al empezar</string>
+    <string name="campo_km_fin">Km del camión al terminar</string>
+    <string name="campo_pais">País (ES, FR, UA…)</string>
+    <string name="campo_ciudad">Ciudad (opcional)</string>
+    <string name="campo_observaciones">Observaciones (opcional)</string>
+    <string name="campo_conduccion">Conducción según el tacógrafo</string>
+    <string name="campo_horas">Horas</string>
+    <string name="campo_minutos">Minutos</string>
+
+    <!-- Finalizar jornada -->
+    <string name="fin_resumen_inicio">Empezó a las %1$s · %2$s, con %3$s km</string>
+    <string name="fin_conduccion_ayuda">Si no la apuntas, las reglas dirán «No verificado».</string>
+    <string name="fin_km_recorridos">%1$s km recorridos</string>
+    <string name="fin_duracion">Duración de la jornada: %1$s</string>
+    <string name="fin_sin_jornada">No hay ninguna jornada en curso.</string>
+
+    <!-- Formatos -->
+    <string name="formato_duracion">%1$d h %2$02d min</string>
+
+    <!-- Errores de campo -->
+    <string name="error_obligatorio">Obligatorio</string>
+    <string name="error_no_numero">Escribe solo números</string>
+    <string name="error_minutos">Entre 0 y 59</string>
+
+    <!-- Errores de jornada -->
+    <string name="error_jornada_ya_abierta">Ya hay una jornada en curso. Finalízala primero.</string>
+    <string name="error_sin_jornada_abierta">No hay ninguna jornada en curso.</string>
+    <string name="error_jornada_no_existe">Esta jornada ya no existe.</string>
+    <string name="error_km_negativos">Los km no pueden ser negativos.</string>
+    <string name="error_km_fin_menor">Los km finales no pueden ser menores que los del inicio.</string>
+    <string name="error_inicio_futuro">La hora de inicio no puede ser futura.</string>
+    <string name="error_inicio_antes_fin_anterior">Empieza antes de que terminara la jornada anterior.</string>
+    <string name="error_fin_no_posterior">La hora de fin tiene que ser posterior a la de inicio.</string>
+    <string name="error_fin_futuro">La hora de fin no puede ser futura.</string>
+    <string name="error_conduccion_negativa">La conducción no puede ser negativa.</string>
+    <string name="error_conduccion_mayor">La conducción es mayor que la duración de la jornada.</string>
 
     <!-- Genérico -->
     <string name="pantalla_pendiente">Próximamente</string>

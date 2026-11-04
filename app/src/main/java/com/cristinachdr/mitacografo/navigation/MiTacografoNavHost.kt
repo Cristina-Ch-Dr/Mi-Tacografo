@@ -32,9 +32,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cristinachdr.mitacografo.R
+import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaScreen
 import com.cristinachdr.mitacografo.feature.history.HistoryScreen
 import com.cristinachdr.mitacografo.feature.home.HomeScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
+import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
 import com.cristinachdr.mitacografo.feature.trips.TripsScreen
 import kotlin.reflect.KClass
@@ -63,7 +65,14 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
         Pestana.entries.firstOrNull { pestana ->
             destinoActual?.hierarchy?.any { it.hasRoute(pestana.clase) } == true
         }
-    val enAjustes = destinoActual?.hasRoute(RutaAjustes::class) == true
+    // Las pantallas que no son pestañas (Ajustes, formularios…) tienen flecha atrás y no muestran la barra inferior.
+    val pantallaSecundaria = destinoActual != null && pestanaActual == null
+    val tituloSecundaria =
+        when {
+            destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> R.string.accion_iniciar_jornada
+            destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> R.string.accion_finalizar_jornada
+            else -> R.string.nav_ajustes
+        }
 
     Scaffold(
         modifier = modifier,
@@ -72,12 +81,12 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 title = {
                     Text(
                         stringResource(
-                            pestanaActual?.titulo ?: if (enAjustes) R.string.nav_ajustes else R.string.app_name,
+                            pestanaActual?.titulo ?: if (pantallaSecundaria) tituloSecundaria else R.string.app_name,
                         ),
                     )
                 },
                 navigationIcon = {
-                    if (enAjustes) {
+                    if (pantallaSecundaria) {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
@@ -87,7 +96,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                     }
                 },
                 actions = {
-                    if (!enAjustes) {
+                    if (!pantallaSecundaria) {
                         IconButton(onClick = { navController.navigate(RutaAjustes) { launchSingleTop = true } }) {
                             Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_ajustes))
                         }
@@ -96,7 +105,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             )
         },
         bottomBar = {
-            if (!enAjustes) {
+            if (!pantallaSecundaria) {
                 NavigationBar {
                     Pestana.entries.forEach { pestana ->
                         NavigationBarItem(
@@ -129,11 +138,18 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             startDestination = RutaInicio,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable<RutaInicio> { HomeScreen() }
+            composable<RutaInicio> {
+                HomeScreen(
+                    onIniciarJornada = { navController.navigate(RutaIniciarJornada) { launchSingleTop = true } },
+                    onFinalizarJornada = { navController.navigate(RutaFinalizarJornada) { launchSingleTop = true } },
+                )
+            }
             composable<RutaHistorial> { HistoryScreen() }
             composable<RutaViajes> { TripsScreen() }
             composable<RutaResumen> { StatsScreen() }
             composable<RutaAjustes> { SettingsScreen() }
+            composable<RutaIniciarJornada> { IniciarJornadaScreen(onGuardado = { navController.popBackStack() }) }
+            composable<RutaFinalizarJornada> { FinalizarJornadaScreen(onGuardado = { navController.popBackStack() }) }
         }
     }
 }

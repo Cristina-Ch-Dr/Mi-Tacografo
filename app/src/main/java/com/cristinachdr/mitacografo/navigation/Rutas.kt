@@ -16,3 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object RutaResumen
 
 @Serializable data object RutaAjustes
+
+@Serializable data object RutaIniciarJornada
+
+@Serializable data object RutaFinalizarJornada
