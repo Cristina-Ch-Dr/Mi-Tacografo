@@ -11,7 +11,7 @@
 | E2 – E7 | **E0** MT-01 … MT-06 · **E1** MT-07 … MT-17 | — | — | — |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
-**Definición de Hecho (DoD):** compila · tests en verde · ktlint/detekt sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
+**Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
 
 ## Hitos
 
@@ -55,9 +55,9 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - **Criterio:** se navega entre 4 pantallas vacías.
 
 ### MT-05 · Calidad y CI · M · deps: MT-03
-- [ ] ktlint + detekt configurados.
-- [ ] JUnit 5 en `:core:domain` con un test de ejemplo.
-- [ ] `.github/workflows/ci.yml`: `ktlintCheck detekt test lint assembleDebug`.
+- [x] ktlint (estilo oficial + reglas de Compose) configurado; `.editorconfig`. ~~detekt~~ descartado (incompatible con JDK 25; ver espec. §3).
+- [x] JUnit 5 en `:core:domain` con un test de ejemplo (hecho en MT-03).
+- [x] `.github/workflows/ci.yml`: `ktlintCheck`, tests, `lintDebug` y `assembleDebug`.
 - **Criterio:** el PR muestra el check verde.
 
 ### MT-06 · Firma y release · M · deps: MT-05
@@ -71,8 +71,10 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 ## E1 · MVP: jornada y avisos → **v0.1**
 
 ### MT-07 · Modelo de dominio Jornada + puertos · M · deps: MT-03
-- [ ] `Jornada`, `Clock`, `JornadaRepository`, `SettingsRepository` y `AlarmScheduler` (interfaces).
-- [ ] Tests de `kmRecorridos` y de duración con cambio de hora y zonas distintas (T18, T19).
+- [x] `Jornada`, `Clock`, `JornadaRepository`, `SettingsRepository` y `AlarmScheduler` (interfaces).
+  - Como `Clock` se usa `java.time.Clock` (JDK puro, `Clock.fixed` en los tests): no hace falta una interfaz propia.
+- [x] Tests de `kmRecorridos` y de duración con cambio de hora y zonas distintas (T18, T19).
+- [x] `calcularAvisos`: horas de los avisos a partir del inicio, sin los desactivados ni los ya pasados.
 
 ### MT-08 · Room: base de datos y Jornada · M · deps: MT-07
 - [ ] `AppDatabase` v1, `JornadaEntity`, `JornadaDao` (Flow), conversores `Instant`/`ZoneId` y mappers.

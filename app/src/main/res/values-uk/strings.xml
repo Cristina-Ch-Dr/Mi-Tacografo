@@ -1,0 +1,21 @@
+<resources>
+    <!-- Traducción provisional: pendiente de revisión por hablante nativo (MT-35) -->
+    <string name="app_name">Мій Тахограф</string>
+
+    <!-- Navegación -->
+    <string name="nav_inicio">Головна</string>
+    <string name="nav_historial">Історія</string>
+    <string name="nav_viajes">Поїздки</string>
+    <string name="nav_resumen">Підсумок</string>
+    <string name="nav_ajustes">Налаштування</string>
+
+    <!-- Acciones -->
+    <string name="accion_volver">Назад</string>
+    <string name="accion_iniciar_jornada">Почати робочий день</string>
+
+    <!-- Inicio -->
+    <string name="inicio_sin_jornada">Немає активного робочого дня</string>
+
+    <!-- Genérico -->
+    <string name="pantalla_pendiente">Незабаром</string>
+</resources>

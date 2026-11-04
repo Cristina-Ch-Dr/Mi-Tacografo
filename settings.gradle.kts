@@ -24,3 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mi Tacografo"
 include(":app")
+include(":core:domain")
+include(":core:data")
