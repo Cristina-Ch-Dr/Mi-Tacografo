@@ -27,6 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.ui.components.CampoPais
 import com.cristinachdr.mitacografo.ui.components.CampoTexto
 import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
@@ -45,6 +46,9 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                 onProbarAviso = viewModel::onProbarAviso,
                 onPaisEmpresa = viewModel::onPaisEmpresa,
                 onPaisResidencia = viewModel::onPaisResidencia,
+                onContinente = viewModel::onContinente,
+                onAnadirPaisHabitual = viewModel::onAnadirPaisHabitual,
+                onQuitarPaisHabitual = viewModel::onQuitarPaisHabitual,
                 onNombreConductor = viewModel::onNombreConductor,
             ),
         permisos = { EstadoPermisosAvisos(soloSiFalta = false) },
@@ -56,6 +60,9 @@ data class AccionesAjustes(
     val onProbarAviso: () -> Unit = {},
     val onPaisEmpresa: (String) -> Unit = {},
     val onPaisResidencia: (String) -> Unit = {},
+    val onContinente: (Continente, Boolean) -> Unit = { _, _ -> },
+    val onAnadirPaisHabitual: (String) -> Unit = {},
+    val onQuitarPaisHabitual: (String) -> Unit = {},
     val onNombreConductor: (String) -> Unit = {},
 )
 
@@ -107,12 +114,18 @@ fun SettingsContent(
             valor = estado.paisEmpresa,
             onCambio = acciones.onPaisEmpresa,
             etiqueta = stringResource(R.string.ajustes_pais_empresa),
+            preferencias = estado.preferenciasPaises,
         )
         CampoPais(
             valor = estado.paisResidencia,
             onCambio = acciones.onPaisResidencia,
             etiqueta = stringResource(R.string.ajustes_pais_residencia),
+            preferencias = estado.preferenciasPaises,
         )
+
+        HorizontalDivider()
+        Seccion(stringResource(R.string.ajustes_seccion_paises))
+        PaisesBuscador(estado = estado, acciones = acciones)
 
         HorizontalDivider()
         Seccion(stringResource(R.string.ajustes_seccion_informes))
@@ -172,7 +185,14 @@ private fun FilaAviso(
 private fun SettingsPreview() {
     MiTacografoTheme {
         SettingsContent(
-            estado = AjustesUiState(paisEmpresa = "ES", paisResidencia = "ES", cargando = false),
+            estado =
+                AjustesUiState(
+                    paisEmpresa = "ES",
+                    paisResidencia = "ES",
+                    paisesHabituales = setOf("DE", "FR"),
+                    continentes = setOf(Continente.EUROPA),
+                    cargando = false,
+                ),
             acciones = AccionesAjustes(),
         )
     }

@@ -1,11 +1,16 @@
 package com.cristinachdr.mitacografo.data.datastore
 
+import androidx.datastore.core.okio.OkioStorage
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.PreferencesSerializer
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.Continente
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -15,14 +20,23 @@ import java.io.File
 import java.time.Duration
 import java.time.ZoneId
 
-/** DataStore no necesita Android: se prueba con un archivo temporal, sin Robolectric. */
+/**
+ * DataStore no necesita Android: se prueba con un archivo temporal, sin Robolectric.
+ *
+ * Se guarda con [OkioStorage] en vez de con el almacenamiento de Android: el de Android renombra el
+ * archivo con `File.renameTo`, que en Windows no puede sobrescribir uno que ya existe, y la segunda
+ * escritura fallaba al pasar los tests en el PC. En el móvil (Linux) los dos funcionan igual.
+ */
 class DataStoreSettingsRepositoryTest {
     @get:Rule
     val carpeta = TemporaryFolder()
 
     private fun TestScope.repositorio(archivo: File = carpeta.newFile("ajustes.preferences_pb").also { it.delete() }) =
         DataStoreSettingsRepository(
-            PreferenceDataStoreFactory.create(scope = backgroundScope) { archivo },
+            PreferenceDataStoreFactory.create(
+                storage = OkioStorage(FileSystem.SYSTEM, PreferencesSerializer) { archivo.toOkioPath() },
+                scope = backgroundScope,
+            ),
         )
 
     @Test
@@ -46,11 +60,24 @@ class DataStoreSettingsRepositoryTest {
                     paisResidencia = "UA",
                     nombreConductor = "Conductor de prueba",
                     zonaReferencia = ZoneId.of("Europe/Madrid"),
+                    paisesHabituales = setOf("DE", "FR"),
+                    continentes = setOf(Continente.EUROPA, Continente.ASIA),
                 )
 
             repo.actualizar { nuevos }
 
             assertEquals(nuevos, repo.observar().first())
+        }
+
+    @Test
+    fun `quitar todos los paises y continentes vuelve a dejarlos vacios`() =
+        runTest {
+            val repo = repositorio()
+            repo.actualizar { it.copy(paisesHabituales = setOf("DE"), continentes = setOf(Continente.AFRICA)) }
+
+            repo.actualizar { it.copy(paisesHabituales = emptySet(), continentes = emptySet()) }
+
+            assertEquals(Ajustes(), repo.observar().first())
         }
 
     @Test

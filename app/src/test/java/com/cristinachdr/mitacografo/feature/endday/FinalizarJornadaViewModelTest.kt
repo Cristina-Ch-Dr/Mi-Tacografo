@@ -9,6 +9,8 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -44,6 +46,7 @@ class FinalizarJornadaViewModelTest {
         FinalizarJornadaViewModel(
             FinalizarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
             ObtenerJornadaActual(repo),
+            ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
             reloj,
         )
 

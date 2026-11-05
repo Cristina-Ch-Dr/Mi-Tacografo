@@ -83,7 +83,12 @@ fun IniciarJornadaContent(
             etiqueta = stringResource(R.string.campo_km_inicio),
             error = estado.errorKm.takeUnless { estado.km.isEmpty() },
         )
-        CampoPais(valor = estado.pais, onCambio = onPais, etiqueta = stringResource(R.string.campo_pais))
+        CampoPais(
+            valor = estado.pais,
+            onCambio = onPais,
+            etiqueta = stringResource(R.string.campo_pais),
+            preferencias = estado.paises,
+        )
         CampoTexto(valor = estado.ciudad, onCambio = onCiudad, etiqueta = stringResource(R.string.campo_ciudad))
         CampoTexto(
             valor = estado.observaciones,

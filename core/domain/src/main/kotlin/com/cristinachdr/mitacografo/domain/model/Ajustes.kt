@@ -19,6 +19,10 @@ data class Ajustes(
     val nombreConductor: String? = null,
     /** Zona que marca el lunes 00:00 de la semana legal. `null` = la del móvil. */
     val zonaReferencia: ZoneId? = null,
+    /** Países donde suele cargar y descargar: salen primero en el selector. Vacío = ninguno elegido. */
+    val paisesHabituales: Set<String> = emptySet(),
+    /** Continentes por los que suele trabajar: sus países salen primero. Vacío = todos. */
+    val continentes: Set<Continente> = emptySet(),
 )
 
 /**

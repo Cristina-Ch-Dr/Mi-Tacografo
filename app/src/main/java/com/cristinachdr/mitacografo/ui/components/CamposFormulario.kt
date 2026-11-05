@@ -61,34 +61,6 @@ fun CampoNumero(
     )
 }
 
-/**
- * País en 2 letras ("ES", "UA"…).
- *
- * El texto no se transforma mientras se escribe (cambiarlo a mayúsculas "en caliente"
- * confunde al teclado cuando está componiendo una palabra y se pierden letras).
- * El teclado se abre en mayúsculas y el dominio guarda siempre el país en mayúsculas.
- */
-@Composable
-fun CampoPais(
-    valor: String,
-    onCambio: (String) -> Unit,
-    etiqueta: String,
-    modifier: Modifier = Modifier,
-) {
-    CampoTexto(
-        valor = valor,
-        onCambio = { nuevo -> onCambio(nuevo.take(2)) },
-        etiqueta = etiqueta,
-        teclado =
-            KeyboardOptions(
-                capitalization = KeyboardCapitalization.Characters,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Ascii,
-            ),
-        modifier = modifier,
-    )
-}
-
 /** Lista de errores del dominio, en rojo, encima del botón de guardar. */
 @Composable
 fun ListaErrores(

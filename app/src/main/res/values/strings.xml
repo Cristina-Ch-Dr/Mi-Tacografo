@@ -29,7 +29,24 @@
     <string name="campo_hora_fin">Hora de fin</string>
     <string name="campo_km_inicio">Km del camión al empezar</string>
     <string name="campo_km_fin">Km del camión al terminar</string>
-    <string name="campo_pais">País (ES, FR, UA…)</string>
+    <string name="campo_pais">País</string>
+    <!-- Idioma de los nombres de países (código ISO). Debe coincidir con el idioma de esta carpeta. -->
+    <string name="idioma_paises">es</string>
+    <string name="pais_buscar">Escribe el país o su código (DE…)</string>
+    <string name="pais_sin_resultados">Ningún país con ese nombre</string>
+    <string name="pais_ninguno">Sin país</string>
+    <string name="pais_otros">Otros países</string>
+    <string name="ajustes_seccion_paises">Países en el buscador</string>
+    <string name="ajustes_paises_buscador_ayuda">Elige dónde sueles trabajar: esos países saldrán primero al buscar. Los demás se pueden seguir buscando en «Otros países».</string>
+    <string name="ajustes_continentes">Continentes</string>
+    <string name="ajustes_paises_habituales">Países donde sueles cargar o descargar</string>
+    <string name="ajustes_anadir_pais_habitual">Añadir país</string>
+    <string name="ajustes_quitar_pais">Quitar %1$s</string>
+    <string name="continente_europa">Europa</string>
+    <string name="continente_asia">Asia</string>
+    <string name="continente_africa">África</string>
+    <string name="continente_america">América</string>
+    <string name="continente_oceania">Oceanía</string>
     <string name="campo_ciudad">Ciudad (opcional)</string>
     <string name="campo_observaciones">Observaciones (opcional)</string>
     <string name="campo_conduccion">Conducción según el tacógrafo</string>
@@ -91,8 +108,8 @@
     <string name="ajustes_prueba_programada">Llegará un aviso de prueba en 1 minuto. Puedes bloquear el móvil.</string>
     <string name="ajustes_seccion_reglas">Reglamento</string>
     <string name="ajustes_paises_ayuda">Necesarios para las reglas del transporte internacional (descansos semanales reducidos fuera de casa).</string>
-    <string name="ajustes_pais_empresa">País de la empresa (ES, UA…)</string>
-    <string name="ajustes_pais_residencia">País donde vives (ES, UA…)</string>
+    <string name="ajustes_pais_empresa">País de la empresa</string>
+    <string name="ajustes_pais_residencia">País donde vives</string>
     <string name="ajustes_seccion_informes">Informes</string>
     <string name="ajustes_nombre_conductor">Tu nombre (sale en el PDF)</string>
 

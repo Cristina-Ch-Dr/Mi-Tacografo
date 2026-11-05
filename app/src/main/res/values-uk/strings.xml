@@ -30,7 +30,23 @@
     <string name="campo_hora_fin">Час завершення</string>
     <string name="campo_km_inicio">Км вантажівки на початку</string>
     <string name="campo_km_fin">Км вантажівки в кінці</string>
-    <string name="campo_pais">Країна (ES, FR, UA…)</string>
+    <string name="campo_pais">Країна</string>
+    <string name="idioma_paises">uk</string>
+    <string name="pais_buscar">Введіть країну або її код (DE…)</string>
+    <string name="pais_sin_resultados">Немає країни з такою назвою</string>
+    <string name="pais_ninguno">Без країни</string>
+    <string name="pais_otros">Інші країни</string>
+    <string name="ajustes_seccion_paises">Країни в пошуку</string>
+    <string name="ajustes_paises_buscador_ayuda">Виберіть, де ви зазвичай працюєте: ці країни будуть першими в пошуку. Інші можна знайти в розділі «Інші країни».</string>
+    <string name="ajustes_continentes">Континенти</string>
+    <string name="ajustes_paises_habituales">Країни, де ви зазвичай завантажуєтесь або розвантажуєтесь</string>
+    <string name="ajustes_anadir_pais_habitual">Додати країну</string>
+    <string name="ajustes_quitar_pais">Видалити %1$s</string>
+    <string name="continente_europa">Європа</string>
+    <string name="continente_asia">Азія</string>
+    <string name="continente_africa">Африка</string>
+    <string name="continente_america">Америка</string>
+    <string name="continente_oceania">Океанія</string>
     <string name="campo_ciudad">Місто (необовʼязково)</string>
     <string name="campo_observaciones">Примітки (необовʼязково)</string>
     <string name="campo_conduccion">Керування за тахографом</string>
@@ -92,8 +108,8 @@
     <string name="ajustes_prueba_programada">Тестове нагадування надійде через 1 хвилину. Можна заблокувати телефон.</string>
     <string name="ajustes_seccion_reglas">Регламент</string>
     <string name="ajustes_paises_ayuda">Потрібно для правил міжнародних перевезень (скорочений щотижневий відпочинок поза домом).</string>
-    <string name="ajustes_pais_empresa">Країна компанії (ES, UA…)</string>
-    <string name="ajustes_pais_residencia">Країна проживання (ES, UA…)</string>
+    <string name="ajustes_pais_empresa">Країна компанії</string>
+    <string name="ajustes_pais_residencia">Країна проживання</string>
     <string name="ajustes_seccion_informes">Звіти</string>
     <string name="ajustes_nombre_conductor">Ваше імʼя (для PDF)</string>
 

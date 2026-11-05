@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E1** MT-16, MT-17, MT-41, MT-42 | — | MT-13 | MT-01 … MT-09 |
+| E2 – E7 | **E1** MT-16, MT-17, MT-42 | — | MT-13, MT-41, MT-43 | MT-01 … MT-09 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -134,16 +134,25 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [ ] Test: exportar → importar = datos idénticos.
 
 ### MT-41 · Selector de país con autocompletado · M · deps: MT-09 · *(propuesta de Cristina)*
-- [ ] Desplegable con búsqueda en lugar de escribir el código: se puede buscar «Alem…» o «DE» y se guarda «DE».
-- [ ] Lista de países ISO de `java.util.Locale`, con el nombre en el idioma del móvil (español o ucraniano) sin mantener ninguna lista a mano. Los países europeos y los últimos usados, arriba.
-- [ ] Usarlo en Iniciar jornada, Finalizar jornada y Ajustes (país de la empresa y de residencia).
-- [ ] Test: buscar por nombre, por código y sin tildes («Espana» → ES).
+- [x] Desplegable con búsqueda en lugar de escribir el código: se puede buscar «Alem…» o «DE» y se guarda «DE».
+  - También busca por una palabra del medio («Unido»), en inglés («Germany») y con los códigos de carretera «UK» y «EL».
+  - «Hecho» en el teclado elige el primer resultado. Si se sale sin elegir, se queda el país que había. Opción «Sin país» para borrarlo.
+- [x] Lista de países ISO de `java.util.Locale`, con el nombre en el idioma **de la app** (español o ucraniano; si el móvil está en inglés, la app y los países salen en español) sin mantener ninguna lista a mano. Los últimos usados (`ObtenerPaisesRecientes`) y los europeos, arriba.
+- [x] Usarlo en Iniciar jornada, Finalizar jornada y Ajustes (país de la empresa y de residencia).
+- [x] Test: buscar por nombre, por código y sin tildes («Espana» → ES), y nombres en ucraniano.
 
 ### MT-42 · Avisos configurables · M · deps: MT-13 · *(propuesta de Cristina)*
 - [ ] Cambiar la hora de cada aviso (p. ej. 12 h 30 → 12 h 00) y añadir o quitar avisos propios, además de los 4 de por defecto.
 - [ ] Botón «Restaurar los avisos por defecto».
 - [ ] Explicar en la pantalla de dónde salen los 4 de por defecto (24 h − 11 h de descanso = 13 h; 24 h − 9 h = 15 h).
 - [ ] El modelo (`AvisoConfig`) y DataStore ya guardan cualquier hora: solo falta la pantalla y sus validaciones (entre 1 h y 24 h, sin repetir).
+
+### MT-43 · Países habituales en Ajustes · M · deps: MT-41 · *(propuesta de Cristina)*
+- [x] En Ajustes, elegir **continentes** (Europa, Asia, África, América, Oceanía) y **países habituales** (donde suele cargar y descargar). Por defecto, ninguno: salen todos igual.
+- [x] Los elegidos salen arriba en el selector, después de los recientes. Los demás **no se esconden**: la búsqueda los sigue encontrando debajo, en «Otros países». Escribir el código exacto («US») lo pone arriba igualmente.
+- [x] ~~Continentes con `android.icu.util.Region`~~: no está en la API pública de Android. Tabla de la ONU (M49) en `Continentes.kt`, con un test que comprueba que todos los países ISO tienen continente (menos la Antártida). Turquía y Chipre cuentan como Europa.
+- [x] Guardar en DataStore (`paises_habituales`, `continentes`) y test de la búsqueda con y sin filtro.
+- [x] El test de DataStore usa `OkioStorage`: el almacenamiento de Android falla en Windows al sobrescribir el archivo (en el móvil y en el CI funciona igual).
 
 > 🏁 **Release v0.1.0** → instalar en el móvil del conductor. **Usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
 
