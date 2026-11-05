@@ -5,11 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Continente
+import com.cristinachdr.mitacografo.domain.model.ErrorAviso
 import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
+import com.cristinachdr.mitacografo.domain.model.conAviso
+import com.cristinachdr.mitacografo.domain.model.errorAviso
+import com.cristinachdr.mitacografo.domain.model.sinAviso
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.usecase.CambiarAjustes
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
 import com.cristinachdr.mitacografo.platform.ProbadorAvisos
+import com.cristinachdr.mitacografo.ui.ErrorCampo
+import com.cristinachdr.mitacografo.ui.casillasConduccion
+import com.cristinachdr.mitacografo.ui.errorMinutos
+import com.cristinachdr.mitacografo.ui.leerConduccion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,8 +30,24 @@ import kotlinx.coroutines.sync.withLock
 import java.time.Duration
 import javax.inject.Inject
 
+/**
+ * Diálogo para poner la hora de un aviso.
+ *
+ * @param indice posición del aviso que se cambia, o `null` si se está añadiendo uno.
+ */
+data class EditorAviso(
+    val indice: Int?,
+    val horas: String = "",
+    val minutos: String = "",
+    val error: ErrorAviso? = null,
+) {
+    val errorMinutos: ErrorCampo? get() = errorMinutos(minutos)
+}
+
 data class AjustesUiState(
     val avisos: List<AvisoConfig> = AvisoConfig.POR_DEFECTO,
+    /** Diálogo abierto para cambiar o añadir un aviso; `null` si no hay ninguno. */
+    val editorAviso: EditorAviso? = null,
     val paisEmpresa: String = "",
     val paisResidencia: String = "",
     /** Los últimos países usados, para ponerlos arriba en el selector. */
@@ -35,6 +59,9 @@ data class AjustesUiState(
     /** `true` justo después de pulsar «Probar aviso», para mostrar «Llegará en 1 minuto». */
     val pruebaProgramada: Boolean = false,
 ) {
+    val avisosPorDefecto: Boolean get() = avisos == AvisoConfig.POR_DEFECTO
+    val caben: Boolean get() = avisos.size < AvisoConfig.MAX_AVISOS
+
     /** Para los selectores de país de esta pantalla: se actualiza al momento al cambiar los filtros. */
     val preferenciasPaises: PreferenciasPaises
         get() = PreferenciasPaises(paisesRecientes, paisesHabituales, continentes)
@@ -88,6 +115,51 @@ class SettingsViewModel
             _uiState.update { it.copy(avisos = avisos) }
             guardar { it.copy(avisos = avisos) }
         }
+
+        fun onEditarAviso(indice: Int) {
+            val (horas, minutos) = casillasConduccion(_uiState.value.avisos[indice].desdeInicio)
+            _uiState.update { it.copy(editorAviso = EditorAviso(indice, horas, minutos)) }
+        }
+
+        fun onNuevoAviso() {
+            if (!_uiState.value.caben) return
+            _uiState.update { it.copy(editorAviso = EditorAviso(indice = null)) }
+        }
+
+        fun onEditorHoras(valor: String) = editor { it.copy(horas = valor, error = null) }
+
+        fun onEditorMinutos(valor: String) = editor { it.copy(minutos = valor, error = null) }
+
+        fun onCancelarAviso() = _uiState.update { it.copy(editorAviso = null) }
+
+        fun onGuardarAviso() {
+            val estado = _uiState.value
+            val editor = estado.editorAviso ?: return
+            if (editor.errorMinutos != null) return
+            val desdeInicio = leerConduccion(editor.horas, editor.minutos) ?: Duration.ZERO
+            val error = estado.avisos.errorAviso(desdeInicio, editor.indice)
+            if (error != null) {
+                _uiState.update { it.copy(editorAviso = editor.copy(error = error)) }
+                return
+            }
+            cambiarAvisos(estado.avisos.conAviso(desdeInicio, editor.indice))
+        }
+
+        fun onBorrarAviso() {
+            val estado = _uiState.value
+            val indice = estado.editorAviso?.indice ?: return
+            cambiarAvisos(estado.avisos.sinAviso(indice))
+        }
+
+        fun onRestaurarAvisos() = cambiarAvisos(AvisoConfig.POR_DEFECTO)
+
+        private fun cambiarAvisos(avisos: List<AvisoConfig>) {
+            _uiState.update { it.copy(avisos = avisos, editorAviso = null) }
+            guardar { it.copy(avisos = avisos) }
+        }
+
+        private fun editor(cambio: (EditorAviso) -> EditorAviso) =
+            _uiState.update { estado -> estado.copy(editorAviso = estado.editorAviso?.let(cambio)) }
 
         fun onPaisEmpresa(valor: String) {
             _uiState.update { it.copy(paisEmpresa = valor) }

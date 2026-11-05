@@ -100,6 +100,11 @@ class DataStoreSettingsRepositoryTest {
     }
 
     @Test
+    fun `sin avisos se queda sin avisos (no vuelven los de por defecto)`() {
+        assertEquals(emptyList<AvisoConfig>(), decodificarAvisos(codificarAvisos(emptyList())))
+    }
+
+    @Test
     fun `un texto de avisos estropeado no rompe la app`() {
         assertNull(decodificarAvisos("esto:no:vale"))
         assertNull(decodificarAvisos("abc:1"))

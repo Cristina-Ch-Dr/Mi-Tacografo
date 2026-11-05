@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.AvisoProgramado
 import com.cristinachdr.mitacografo.domain.port.AlarmScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -82,8 +83,8 @@ class AndroidAlarmScheduler
         }
 
         private companion object {
-            /** Más que de sobra para los 4 avisos por defecto. */
-            const val MAX_AVISOS = 8
+            /** Un hueco por aviso: los que deja configurar Ajustes. */
+            const val MAX_AVISOS = AvisoConfig.MAX_AVISOS
             const val HUECO_PRUEBA = 99
             val MARGEN_SIN_PERMISO: Duration = Duration.ofMinutes(10)
         }

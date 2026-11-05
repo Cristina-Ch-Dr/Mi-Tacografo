@@ -84,7 +84,7 @@
 
     <!-- Avisos (notificaciones) -->
     <string name="canal_avisos_nombre">Нагадування робочого дня</string>
-    <string name="canal_avisos_descripcion">Нагадування через 12 год 30, 13 год, 14 год 30 і 15 год від початку робочого дня.</string>
+    <string name="canal_avisos_descripcion">Нагадування через стільки годин роботи, скільки ви оберете в Налаштуваннях (стандартно 12 год 30, 13 год, 14 год 30 і 15 год).</string>
     <string name="aviso_titulo">Робочий день триває %1$d год %2$02d хв</string>
     <string name="aviso_texto">Особисте нагадування: перевірте, коли вам потрібно відпочити. Це не повідомлення про порушення.</string>
     <string name="aviso_prueba_titulo">Тестове нагадування</string>
@@ -100,11 +100,30 @@
 
     <!-- Ajustes -->
     <string name="ajustes_seccion_avisos">Нагадування</string>
-    <string name="ajustes_avisos_ayuda">Час від початку робочого дня. Це особисті нагадування.</string>
+    <string name="ajustes_avisos_ayuda">Час від початку робочого дня. Це особисті нагадування. Торкніться часу, щоб його змінити.</string>
     <string name="aviso_explicacion_1230">За 30 хв до межі зі звичайним відпочинком (11 год)</string>
     <string name="aviso_explicacion_13">Межа зі звичайним відпочинком (11 год)</string>
     <string name="aviso_explicacion_1430">За 30 хв до межі зі скороченим відпочинком (9 год)</string>
     <string name="aviso_explicacion_15">Межа зі скороченим відпочинком (9 год)</string>
+    <string name="aviso_explicacion_propio">Власне нагадування</string>
+    <string name="ajustes_avisos_por_defecto">Стандартні нагадування — це 24 години доби мінус щоденний відпочинок: 24 год − 11 год звичайного відпочинку = 13 год роботи; 24 год − 9 год скороченого відпочинку = 15 год. Нагадування о 12 год 30 і 14 год 30 спрацьовують за пів години до цього.</string>
+    <string name="ajustes_sin_avisos">Нагадувань немає: протягом робочого дня нічого не спрацює.</string>
+    <string name="ajustes_anadir_aviso">Додати нагадування</string>
+    <plurals name="ajustes_maximo_avisos">
+        <item quantity="one">Можна мати не більше %1$d нагадування.</item>
+        <item quantity="few">Можна мати не більше %1$d нагадувань.</item>
+        <item quantity="many">Можна мати не більше %1$d нагадувань.</item>
+        <item quantity="other">Можна мати не більше %1$d нагадування.</item>
+    </plurals>
+    <string name="ajustes_restaurar_avisos">Повернути стандартні нагадування</string>
+    <string name="ajustes_cambiar_hora_aviso">Змінити час</string>
+    <string name="aviso_nuevo_titulo">Нове нагадування</string>
+    <string name="aviso_editar_titulo">Змінити нагадування</string>
+    <string name="aviso_editor_ayuda">Через скільки часу від початку робочого дня? Від 1 до 24 год.</string>
+    <string name="aviso_borrar">Видалити це нагадування</string>
+    <string name="error_aviso_rango">Має бути від 1 до 24 год.</string>
+    <string name="error_aviso_repetido">Нагадування на цей час уже є.</string>
+    <string name="error_aviso_demasiados">Більше нагадувань додати не можна.</string>
     <string name="ajustes_probar_aviso">Перевірити нагадування</string>
     <string name="ajustes_prueba_programada">Тестове нагадування надійде через 1 хвилину. Можна заблокувати телефон.</string>
     <string name="ajustes_seccion_reglas">Регламент</string>

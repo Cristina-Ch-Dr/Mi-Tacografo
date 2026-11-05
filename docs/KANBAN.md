@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E1** MT-42 | MT-17 | — | MT-01 … MT-16, MT-41, MT-43 |
+| E2 – E7 | **E0** MT-06 | MT-42 | — | MT-01 … MT-05, MT-07 … MT-17, MT-41, MT-43 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -152,10 +152,12 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Test: buscar por nombre, por código y sin tildes («Espana» → ES), y nombres en ucraniano.
 
 ### MT-42 · Avisos configurables · M · deps: MT-13 · *(propuesta de Cristina)*
-- [ ] Cambiar la hora de cada aviso (p. ej. 12 h 30 → 12 h 00) y añadir o quitar avisos propios, además de los 4 de por defecto.
-- [ ] Botón «Restaurar los avisos por defecto».
-- [ ] Explicar en la pantalla de dónde salen los 4 de por defecto (24 h − 11 h de descanso = 13 h; 24 h − 9 h = 15 h).
-- [ ] El modelo (`AvisoConfig`) y DataStore ya guardan cualquier hora: solo falta la pantalla y sus validaciones (entre 1 h y 24 h, sin repetir).
+- [x] Cambiar la hora de cada aviso (p. ej. 12 h 30 → 12 h 00) y añadir o quitar avisos propios, además de los 4 de por defecto.
+  - Se toca la hora para abrir un diálogo con horas y minutos; desde ahí también se borra. La lista se mantiene ordenada.
+  - Como mucho 8 avisos (un hueco de alarma por aviso). Si se borran todos, no vuelven solos los de por defecto.
+- [x] Botón «Restaurar los avisos por defecto» (solo sale si se ha cambiado algo).
+- [x] Explicar en la pantalla de dónde salen los 4 de por defecto (24 h − 11 h de descanso = 13 h; 24 h − 9 h = 15 h).
+- [x] Validaciones en el dominio (`errorAviso`): entre 1 h y 24 h, sin repetir, máximo 8. Con una jornada en curso, los avisos se reprograman al momento.
 
 ### MT-43 · Países habituales en Ajustes · M · deps: MT-41 · *(propuesta de Cristina)*
 - [x] En Ajustes, elegir **continentes** (Europa, Asia, África, América, Oceanía) y **países habituales** (donde suele cargar y descargar). Por defecto, ninguno: salen todos igual.
