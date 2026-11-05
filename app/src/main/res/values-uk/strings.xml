@@ -65,6 +65,38 @@
     <string name="error_conduccion_negativa">Керування не може бути відʼємним.</string>
     <string name="error_conduccion_mayor">Керування довше, ніж робочий день.</string>
 
+    <!-- Avisos (notificaciones) -->
+    <string name="canal_avisos_nombre">Нагадування робочого дня</string>
+    <string name="canal_avisos_descripcion">Нагадування через 12 год 30, 13 год, 14 год 30 і 15 год від початку робочого дня.</string>
+    <string name="aviso_titulo">Робочий день триває %1$d год %2$02d хв</string>
+    <string name="aviso_texto">Особисте нагадування: перевірте, коли вам потрібно відпочити. Це не повідомлення про порушення.</string>
+    <string name="aviso_prueba_titulo">Тестове нагадування</string>
+    <string name="aviso_prueba_texto">Нагадування «Мій Тахограф» надходять на цей телефон.</string>
+
+    <!-- Permisos -->
+    <string name="accion_activar">Увімкнути</string>
+    <string name="permisos_titulo_falta">Нагадування можуть не надходити</string>
+    <string name="permiso_notificaciones">Сповіщення</string>
+    <string name="permiso_alarmas_exactas">Будильники точно вчасно</string>
+    <string name="permiso_bateria">Без обмежень батареї</string>
+    <string name="permiso_bateria_ayuda">Рекомендовано: деякі телефони (Xiaomi, Samsung, Huawei…) закривають програми, щоб заощадити батарею, і нагадування не спрацьовують. Знайдіть «Мій Тахограф» у списку й виберіть «Не оптимізувати».</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_seccion_avisos">Нагадування</string>
+    <string name="ajustes_avisos_ayuda">Час від початку робочого дня. Це особисті нагадування.</string>
+    <string name="aviso_explicacion_1230">За 30 хв до межі зі звичайним відпочинком (11 год)</string>
+    <string name="aviso_explicacion_13">Межа зі звичайним відпочинком (11 год)</string>
+    <string name="aviso_explicacion_1430">За 30 хв до межі зі скороченим відпочинком (9 год)</string>
+    <string name="aviso_explicacion_15">Межа зі скороченим відпочинком (9 год)</string>
+    <string name="ajustes_probar_aviso">Перевірити нагадування</string>
+    <string name="ajustes_prueba_programada">Тестове нагадування надійде через 1 хвилину. Можна заблокувати телефон.</string>
+    <string name="ajustes_seccion_reglas">Регламент</string>
+    <string name="ajustes_paises_ayuda">Потрібно для правил міжнародних перевезень (скорочений щотижневий відпочинок поза домом).</string>
+    <string name="ajustes_pais_empresa">Країна компанії (ES, UA…)</string>
+    <string name="ajustes_pais_residencia">Країна проживання (ES, UA…)</string>
+    <string name="ajustes_seccion_informes">Звіти</string>
+    <string name="ajustes_nombre_conductor">Ваше імʼя (для PDF)</string>
+
     <!-- Genérico -->
     <string name="pantalla_pendiente">Незабаром</string>
 </resources>

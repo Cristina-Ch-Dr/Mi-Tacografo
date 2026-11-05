@@ -25,11 +25,13 @@ data class DatosInicio(
  *
  * Reglas: no puede haber otra jornada abierta, la hora no puede ser futura
  * y no puede empezar antes de que terminara la anterior.
+ * Al guardarla se programan sus avisos (12 h 30, 13 h…).
  */
 class IniciarJornada
     @Inject
     constructor(
         private val repository: JornadaRepository,
+        private val avisos: GestorAvisos,
         private val clock: Clock,
     ) {
         /** @return el id de la jornada creada. */
@@ -49,6 +51,8 @@ class IniciarJornada
             val errores = validarJornada(jornada, clock.instant(), finAnterior)
             if (errores.isNotEmpty()) return ResultadoJornada.Invalida(errores)
 
-            return ResultadoJornada.Ok(repository.guardar(jornada))
+            val id = repository.guardar(jornada)
+            avisos.reprogramar(jornada.copy(id = id))
+            return ResultadoJornada.Ok(id)
         }
     }

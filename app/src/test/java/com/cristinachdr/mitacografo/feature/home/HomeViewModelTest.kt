@@ -2,6 +2,7 @@ package com.cristinachdr.mitacografo.feature.home
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +35,7 @@ class HomeViewModelTest {
     private fun viewModel(
         reloj: Clock,
         vararg jornadas: Jornada,
-    ) = HomeViewModel(ObtenerJornadaActual(FakeJornadaRepository(jornadas.toList())), reloj)
+    ) = HomeViewModel(ObtenerJornadaActual(FakeJornadaRepository(jornadas.toList())), FakeSettingsRepository(), reloj)
 
     /** Se suscribe al estado (como haría la pantalla) para que el ViewModel empiece a emitir. */
     @OptIn(ExperimentalCoroutinesApi::class)

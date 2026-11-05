@@ -31,6 +31,7 @@ import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.ui.FormatoFecha
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
+import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.textoKm
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
@@ -49,7 +50,12 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeContent(state = estado, onIniciarJornada = onIniciarJornada, onFinalizarJornada = onFinalizarJornada)
+    HomeContent(
+        state = estado,
+        onIniciarJornada = onIniciarJornada,
+        onFinalizarJornada = onFinalizarJornada,
+        permisos = { EstadoPermisosAvisos(soloSiFalta = true) },
+    )
 }
 
 /** Versión "sin estado": solo pinta. Se puede previsualizar y testear sin Hilt. */
@@ -59,6 +65,7 @@ fun HomeContent(
     onIniciarJornada: () -> Unit,
     onFinalizarJornada: () -> Unit,
     modifier: Modifier = Modifier,
+    permisos: @Composable () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -69,6 +76,9 @@ fun HomeContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        // Solo aparece si faltan permisos para que los avisos lleguen.
+        permisos()
+        Spacer(Modifier.height(16.dp))
         Text(
             text = state.hoy.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
             style = MaterialTheme.typography.titleMedium,

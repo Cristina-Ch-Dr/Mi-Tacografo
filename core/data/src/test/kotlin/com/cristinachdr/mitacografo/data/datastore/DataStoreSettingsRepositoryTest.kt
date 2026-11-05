@@ -1,0 +1,80 @@
+package com.cristinachdr.mitacografo.data.datastore
+
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.cristinachdr.mitacografo.domain.model.Ajustes
+import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import java.io.File
+import java.time.Duration
+import java.time.ZoneId
+
+/** DataStore no necesita Android: se prueba con un archivo temporal, sin Robolectric. */
+class DataStoreSettingsRepositoryTest {
+    @get:Rule
+    val carpeta = TemporaryFolder()
+
+    private fun TestScope.repositorio(archivo: File = carpeta.newFile("ajustes.preferences_pb").also { it.delete() }) =
+        DataStoreSettingsRepository(
+            PreferenceDataStoreFactory.create(scope = backgroundScope) { archivo },
+        )
+
+    @Test
+    fun `sin nada guardado se usan los ajustes por defecto`() =
+        runTest {
+            assertEquals(Ajustes(), repositorio().observar().first())
+        }
+
+    @Test
+    fun `los ajustes se guardan y se leen igual`() =
+        runTest {
+            val repo = repositorio()
+            val nuevos =
+                Ajustes(
+                    avisos =
+                        listOf(
+                            AvisoConfig(Duration.ofMinutes(750), activo = false),
+                            AvisoConfig(Duration.ofHours(15)),
+                        ),
+                    paisEmpresa = "ES",
+                    paisResidencia = "UA",
+                    nombreConductor = "Conductor de prueba",
+                    zonaReferencia = ZoneId.of("Europe/Madrid"),
+                )
+
+            repo.actualizar { nuevos }
+
+            assertEquals(nuevos, repo.observar().first())
+        }
+
+    @Test
+    fun `un texto vacio borra el valor`() =
+        runTest {
+            val repo = repositorio()
+            repo.actualizar { it.copy(nombreConductor = "Nombre") }
+
+            repo.actualizar { it.copy(nombreConductor = "  ") }
+
+            assertNull(repo.observar().first().nombreConductor)
+        }
+
+    @Test
+    fun `los avisos se codifican como texto y vuelven igual`() {
+        val texto = codificarAvisos(AvisoConfig.POR_DEFECTO.mapIndexed { i, a -> a.copy(activo = i != 1) })
+
+        assertEquals("750:1,780:0,870:1,900:1", texto)
+        assertEquals(AvisoConfig.POR_DEFECTO.mapIndexed { i, a -> a.copy(activo = i != 1) }, decodificarAvisos(texto))
+    }
+
+    @Test
+    fun `un texto de avisos estropeado no rompe la app`() {
+        assertNull(decodificarAvisos("esto:no:vale"))
+        assertNull(decodificarAvisos("abc:1"))
+    }
+}

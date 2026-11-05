@@ -17,6 +17,7 @@ class EditarJornada
     @Inject
     constructor(
         private val repository: JornadaRepository,
+        private val avisos: GestorAvisos,
         private val clock: Clock,
     ) {
         suspend operator fun invoke(jornada: Jornada): ResultadoJornada<Jornada> {
@@ -42,6 +43,7 @@ class EditarJornada
             if (errores.isNotEmpty()) return ResultadoJornada.Invalida(errores)
 
             repository.guardar(limpia)
+            avisos.reprogramar(limpia) // si se cambió la hora de inicio, los avisos se mueven
             return ResultadoJornada.Ok(limpia)
         }
     }

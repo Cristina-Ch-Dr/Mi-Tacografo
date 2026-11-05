@@ -1,9 +1,12 @@
 package com.cristinachdr.mitacografo.feature.startday
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
+import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.IniciarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ProponerDatosInicio
 import com.cristinachdr.mitacografo.ui.ErrorCampo
@@ -40,7 +43,11 @@ class IniciarJornadaViewModelTest {
         )
 
     private fun viewModel(repo: FakeJornadaRepository) =
-        IniciarJornadaViewModel(IniciarJornada(repo, reloj), ProponerDatosInicio(repo), reloj)
+        IniciarJornadaViewModel(
+            IniciarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
+            ProponerDatosInicio(repo),
+            reloj,
+        )
 
     @Test
     fun `se rellena con la hora actual y donde termino la jornada anterior`() {

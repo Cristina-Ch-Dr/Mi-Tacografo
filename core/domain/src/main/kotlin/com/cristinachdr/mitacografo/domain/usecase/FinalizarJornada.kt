@@ -33,6 +33,7 @@ class FinalizarJornada
     @Inject
     constructor(
         private val repository: JornadaRepository,
+        private val avisos: GestorAvisos,
         private val clock: Clock,
     ) {
         /** @return la jornada ya finalizada. */
@@ -55,6 +56,7 @@ class FinalizarJornada
             if (errores.isNotEmpty()) return ResultadoJornada.Invalida(errores)
 
             repository.guardar(finalizada)
+            avisos.reprogramar(finalizada) // jornada cerrada → cancela todos sus avisos
             return ResultadoJornada.Ok(finalizada)
         }
     }
