@@ -88,6 +88,31 @@ class RoomJornadaRepositoryTest {
         }
 
     @Test
+    fun `reemplazar todas deja solo las nuevas con sus mismos ids`() =
+        runTest {
+            repository.guardar(finalizada(1, 100_000, 100_400))
+            val copia = listOf(finalizada(2, 200_000, 200_500).copy(id = 40), abierta(3, 200_500).copy(id = 41))
+
+            repository.reemplazarTodas(copia)
+
+            assertEquals(copia.sortedByDescending { it.inicio }, repository.observarTodas().first())
+            // Lo siguiente que se guarde no choca con los ids de la copia.
+            assertEquals(42L, repository.guardar(finalizada(4, 200_500, 200_900)))
+        }
+
+    @Test
+    fun `si reemplazar falla a mitad no se pierde lo que habia`() =
+        runTest {
+            val existente = repository.guardar(finalizada(1, 100_000, 100_400))
+            // Dos jornadas con el mismo id: la segunda inserción falla.
+            val rota = listOf(finalizada(2, 1, 2).copy(id = 5), finalizada(3, 3, 4).copy(id = 5))
+
+            runCatching { repository.reemplazarTodas(rota) }
+
+            assertEquals(listOf(existente), repository.observarTodas().first().map { it.id })
+        }
+
+    @Test
     fun `guardar una jornada que ya existe la actualiza`() =
         runTest {
             val id = repository.guardar(abierta())

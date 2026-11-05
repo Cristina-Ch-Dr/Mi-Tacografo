@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.data.room.jornada
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
@@ -34,4 +35,17 @@ interface JornadaDao {
 
     @Query("DELETE FROM jornada WHERE id = :id")
     suspend fun borrar(id: Long)
+
+    @Query("DELETE FROM jornada")
+    suspend fun borrarTodas()
+
+    @Insert
+    suspend fun insertarTodas(jornadas: List<JornadaEntity>)
+
+    /** Las dos cosas o ninguna: si falla al insertar, no se queda la tabla vacía. */
+    @Transaction
+    suspend fun reemplazarTodas(jornadas: List<JornadaEntity>) {
+        borrarTodas()
+        insertarTodas(jornadas)
+    }
 }

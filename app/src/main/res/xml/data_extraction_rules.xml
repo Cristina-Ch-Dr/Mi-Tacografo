@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copia automática de Android (Android 12 y posteriores).
+    Si el conductor tiene activada la copia de Google, las jornadas y los ajustes se guardan solos
+    y vuelven al instalar la app en un móvil nuevo. Es un extra: la copia de verdad es el archivo
+    de Ajustes → Copia de seguridad, que no depende de tener una cuenta de Google configurada.
+    https://developer.android.com/about/versions/12/backup-restore#xml-changes
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <!-- Base de datos de jornadas (Room) y ajustes (DataStore). -->
+        <include domain="database" path="." />
+        <include domain="file" path="datastore/" />
     </cloud-backup>
-    <!--
+    <!-- Al pasar los datos de un móvil a otro con cable o con el asistente de Android. -->
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <include domain="database" path="." />
+        <include domain="file" path="datastore/" />
     </device-transfer>
-    -->
 </data-extraction-rules>

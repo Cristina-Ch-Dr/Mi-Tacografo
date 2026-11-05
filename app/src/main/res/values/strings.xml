@@ -140,4 +140,32 @@
     <string name="accion_borrar">Borrar</string>
     <string name="borrar_titulo">¿Borrar esta jornada?</string>
     <string name="borrar_texto">Se borrará para siempre y no se puede deshacer.</string>
+
+    <!-- Copia de seguridad -->
+    <string name="ajustes_seccion_copia">Copia de seguridad</string>
+    <string name="copia_ayuda">Guarda todas tus jornadas y ajustes en un archivo. Mándalo fuera del móvil (Google Drive, correo, ordenador): si pierdes o cambias de móvil, lo restauras aquí.</string>
+    <string name="copia_guardar">Guardar copia</string>
+    <string name="copia_restaurar">Restaurar copia</string>
+    <string name="copia_guardada">Copia guardada.</string>
+    <string name="copia_restaurada">Copia restaurada.</string>
+    <string name="copia_error_guardar">No se pudo guardar el archivo. Prueba en otra carpeta.</string>
+    <string name="copia_error_leer">No se pudo abrir el archivo.</string>
+    <string name="copia_error_no_es_copia">Ese archivo no es una copia de Mi Tacógrafo.</string>
+    <string name="copia_error_version">Esta copia es de una versión más nueva de la app. Actualiza la app y vuelve a intentarlo.</string>
+    <string name="copia_error_datos">La copia está dañada: no se ha cambiado nada.</string>
+    <string name="copia_confirmar_titulo">¿Restaurar esta copia?</string>
+    <string name="copia_confirmar">Restaurar</string>
+    <string name="copia_resumen_creada">Copia del %1$s.</string>
+    <string name="copia_resumen_rango">(del %1$s al %2$s)</string>
+    <plurals name="copia_resumen_jornadas">
+        <item quantity="one">%d jornada</item>
+        <item quantity="many">%d jornadas</item>
+        <item quantity="other">%d jornadas</item>
+    </plurals>
+    <string name="copia_aviso_sin_jornadas">Ahora no hay jornadas en el móvil. Se cambiarán tus ajustes por los de la copia.</string>
+    <plurals name="copia_aviso_reemplazar">
+        <item quantity="one">Se borrará la jornada que hay ahora en el móvil y tus ajustes actuales.</item>
+        <item quantity="many">Se borrarán las %d jornadas que hay ahora en el móvil y tus ajustes actuales.</item>
+        <item quantity="other">Se borrarán las %d jornadas que hay ahora en el móvil y tus ajustes actuales.</item>
+    </plurals>
 </resources>
