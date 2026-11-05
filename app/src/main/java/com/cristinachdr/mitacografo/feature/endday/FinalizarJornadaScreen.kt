@@ -151,7 +151,12 @@ fun FinalizarJornadaContent(
 
         ResumenEnVivo(kmRecorridos = estado.kmRecorridos, duracion = estado.duracion)
 
-        CampoPais(valor = estado.pais, onCambio = acciones.onPais, etiqueta = stringResource(R.string.campo_pais))
+        CampoPais(
+            valor = estado.pais,
+            onCambio = acciones.onPais,
+            etiqueta = stringResource(R.string.campo_pais),
+            preferencias = estado.paises,
+        )
         CampoTexto(
             valor = estado.ciudad,
             onCambio = acciones.onCiudad,

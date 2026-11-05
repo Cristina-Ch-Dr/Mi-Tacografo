@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.usecase.DatosInicio
 import com.cristinachdr.mitacografo.domain.usecase.IniciarJornada
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.domain.usecase.ProponerDatosInicio
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +29,8 @@ data class IniciarJornadaUiState(
     val zona: ZoneId,
     val km: String = "",
     val pais: String = "",
+    /** Qué países salen primero en el selector (recientes y lo elegido en Ajustes). */
+    val paises: PreferenciasPaises = PreferenciasPaises(),
     val ciudad: String = "",
     val observaciones: String = "",
     val errorKm: ErrorCampo? = ErrorCampo.OBLIGATORIO,
@@ -45,6 +49,7 @@ class IniciarJornadaViewModel
     constructor(
         private val iniciarJornada: IniciarJornada,
         private val proponerDatosInicio: ProponerDatosInicio,
+        private val obtenerPreferenciasPaises: ObtenerPreferenciasPaises,
         private val clock: Clock,
     ) : ViewModel() {
         private val _uiState =
@@ -60,10 +65,12 @@ class IniciarJornadaViewModel
             // Se rellena con lo que dejó la jornada anterior: normalmente basta con pulsar "Iniciar".
             viewModelScope.launch {
                 val propuesta = proponerDatosInicio()
+                val paises = obtenerPreferenciasPaises()
                 actualizar {
                     copy(
                         km = propuesta.kmInicio?.toString().orEmpty(),
                         pais = propuesta.pais.orEmpty(),
+                        paises = paises,
                         ciudad = propuesta.ciudad.orEmpty(),
                         cargando = false,
                     )

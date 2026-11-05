@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,6 +36,8 @@ internal class DataStoreSettingsRepository
                 preferencias.guardar(Claves.PAIS_RESIDENCIA, nuevos.paisResidencia)
                 preferencias.guardar(Claves.NOMBRE_CONDUCTOR, nuevos.nombreConductor)
                 preferencias.guardar(Claves.ZONA_REFERENCIA, nuevos.zonaReferencia?.id)
+                preferencias.guardar(Claves.PAISES_HABITUALES, nuevos.paisesHabituales.sorted().joinToString(","))
+                preferencias.guardar(Claves.CONTINENTES, nuevos.continentes.sorted().joinToString(",") { it.name })
             }
         }
 
@@ -44,6 +47,8 @@ internal class DataStoreSettingsRepository
             val PAIS_RESIDENCIA = stringPreferencesKey("pais_residencia")
             val NOMBRE_CONDUCTOR = stringPreferencesKey("nombre_conductor")
             val ZONA_REFERENCIA = stringPreferencesKey("zona_referencia")
+            val PAISES_HABITUALES = stringPreferencesKey("paises_habituales")
+            val CONTINENTES = stringPreferencesKey("continentes")
         }
 
         private fun Preferences.aAjustes(): Ajustes =
@@ -53,6 +58,12 @@ internal class DataStoreSettingsRepository
                 paisResidencia = this[Claves.PAIS_RESIDENCIA],
                 nombreConductor = this[Claves.NOMBRE_CONDUCTOR],
                 zonaReferencia = this[Claves.ZONA_REFERENCIA]?.let { runCatching { ZoneId.of(it) }.getOrNull() },
+                paisesHabituales = lista(this[Claves.PAISES_HABITUALES]).map { it.uppercase() }.toSet(),
+                // Un continente que ya no existe (p. ej. tras cambiar el enum) se ignora.
+                continentes =
+                    lista(this[Claves.CONTINENTES])
+                        .mapNotNull { nombre -> Continente.entries.find { it.name == nombre } }
+                        .toSet(),
             )
 
         private fun androidx.datastore.preferences.core.MutablePreferences.guardar(
@@ -75,3 +86,11 @@ internal fun decodificarAvisos(texto: String): List<AvisoConfig>? =
             AvisoConfig(Duration.ofMinutes(minutos.trim().toLong()), activo.trim() == "1")
         }
     }.getOrNull()
+
+/** "DE,FR" → [DE, FR]. `null` o vacío → lista vacía. */
+private fun lista(texto: String?): List<String> =
+    texto
+        .orEmpty()
+        .split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }

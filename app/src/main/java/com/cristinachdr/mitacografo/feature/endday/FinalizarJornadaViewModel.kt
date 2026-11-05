@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.usecase.DatosFin
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +35,8 @@ data class FinalizarJornadaUiState(
     val conduccionHoras: String = "",
     val conduccionMinutos: String = "",
     val pais: String = "",
+    /** Qué países salen primero en el selector (recientes y lo elegido en Ajustes). */
+    val paises: PreferenciasPaises = PreferenciasPaises(),
     val ciudad: String = "",
     val observaciones: String = "",
     val errorKm: ErrorCampo? = ErrorCampo.OBLIGATORIO,
@@ -58,6 +62,7 @@ class FinalizarJornadaViewModel
     constructor(
         private val finalizarJornada: FinalizarJornada,
         private val obtenerJornadaActual: ObtenerJornadaActual,
+        private val obtenerPreferenciasPaises: ObtenerPreferenciasPaises,
         private val clock: Clock,
     ) : ViewModel() {
         private val _uiState =
@@ -72,11 +77,13 @@ class FinalizarJornadaViewModel
         init {
             viewModelScope.launch {
                 val abierta = obtenerJornadaActual().first()
+                val paises = obtenerPreferenciasPaises()
                 actualizar {
                     copy(
                         jornada = abierta,
                         // Normalmente se termina en el mismo país en el que se empezó.
                         pais = abierta?.paisInicio.orEmpty(),
+                        paises = paises,
                         observaciones = abierta?.observaciones.orEmpty(),
                         cargando = false,
                     )

@@ -5,8 +5,10 @@ import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -265,6 +267,36 @@ class CasosDeUsoJornadaTest {
         fun `sin jornadas anteriores no hay propuesta`() =
             runTest {
                 assertEquals(PropuestaInicio(), ProponerDatosInicio(FakeJornadaRepository())())
+            }
+
+        @Test
+        fun `los paises recientes van del mas nuevo al mas antiguo y sin repetir`() =
+            runTest {
+                val antes =
+                    ayer.copy(
+                        id = 2,
+                        inicio = hora(1, 6).minusSeconds(86_400),
+                        paisInicio = "es",
+                        paisFin = "FR",
+                    )
+                val hoy = Jornada(id = 3, inicio = hora(2, 6), zonaInicio = madrid, kmInicio = 0, paisInicio = "DE")
+                val repo = FakeJornadaRepository(listOf(antes, ayer.copy(paisInicio = " ", paisFin = "FR"), hoy))
+
+                assertEquals(listOf("DE", "FR", "ES"), ObtenerPaisesRecientes(repo)())
+                assertEquals(listOf("DE"), ObtenerPaisesRecientes(repo)(maximo = 1))
+            }
+
+        @Test
+        fun `las preferencias de pais juntan los recientes y lo elegido en Ajustes`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer))
+                val ajustes = Ajustes(paisesHabituales = setOf("DE"), continentes = setOf(Continente.EUROPA))
+                val preferencias =
+                    ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository(ajustes))()
+
+                assertEquals(PreferenciasPaises(listOf("FR"), setOf("DE"), setOf(Continente.EUROPA)), preferencias)
+                assertTrue(preferencias.hayFiltro)
+                assertTrue(!PreferenciasPaises(recientes = listOf("FR")).hayFiltro)
             }
 
         @Test

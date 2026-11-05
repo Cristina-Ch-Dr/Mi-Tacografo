@@ -8,6 +8,8 @@ import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.IniciarJornada
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.domain.usecase.ProponerDatosInicio
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import kotlinx.coroutines.test.runTest
@@ -46,6 +48,7 @@ class IniciarJornadaViewModelTest {
         IniciarJornadaViewModel(
             IniciarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
             ProponerDatosInicio(repo),
+            ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
             reloj,
         )
 
@@ -56,6 +59,7 @@ class IniciarJornadaViewModelTest {
         assertEquals(ahora, estado.fechaHora)
         assertEquals("100480", estado.km)
         assertEquals("FR", estado.pais)
+        assertEquals(listOf("FR"), estado.paises.recientes)
         assertEquals("Lyon", estado.ciudad)
         assertTrue(estado.puedeGuardar)
     }

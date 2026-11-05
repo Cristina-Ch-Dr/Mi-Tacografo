@@ -5,9 +5,11 @@ import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.model.Ajustes
+import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.CambiarAjustes
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -26,15 +28,22 @@ class SettingsViewModelTest {
     private val ahora = LocalDateTime.of(2026, 11, 2, 10, 0).atZone(madrid).toInstant()
     private val reloj = Clock.fixed(ahora, madrid)
 
-    private val abierta = Jornada(id = 1, inicio = ahora.minusSeconds(3600), zonaInicio = madrid, kmInicio = 0)
+    private val abierta =
+        Jornada(id = 1, inicio = ahora.minusSeconds(3600), zonaInicio = madrid, kmInicio = 0, paisInicio = "UA")
 
     private val settings = FakeSettingsRepository(Ajustes(paisEmpresa = "ES"))
     private val alarmas = FakeAlarmScheduler()
     private var pruebas = mutableListOf<Duration>()
 
     private fun viewModel(): SettingsViewModel {
-        val gestor = GestorAvisos(FakeJornadaRepository(listOf(abierta)), settings, alarmas, reloj)
-        return SettingsViewModel(settings, CambiarAjustes(settings, gestor)) { pruebas += it }
+        val repo = FakeJornadaRepository(listOf(abierta))
+        val gestor = GestorAvisos(repo, settings, alarmas, reloj)
+        return SettingsViewModel(
+            settings,
+            CambiarAjustes(settings, gestor),
+            { pruebas += it },
+            ObtenerPaisesRecientes(repo),
+        )
     }
 
     @Test
@@ -43,6 +52,7 @@ class SettingsViewModelTest {
 
         assertEquals("ES", estado.paisEmpresa)
         assertEquals(4, estado.avisos.size)
+        assertEquals(listOf("UA"), estado.paisesRecientes)
     }
 
     @Test
@@ -68,6 +78,26 @@ class SettingsViewModelTest {
             listOf(Duration.ofHours(13), Duration.ofMinutes(870), Duration.ofHours(15)),
             alarmas.programados.map { it.desdeInicio },
         )
+    }
+
+    @Test
+    fun `elegir continentes y paises habituales se guarda y cambia el selector`() {
+        val vm = viewModel()
+
+        vm.onContinente(Continente.EUROPA, elegido = true)
+        vm.onContinente(Continente.ASIA, elegido = true)
+        vm.onContinente(Continente.ASIA, elegido = false)
+        vm.onAnadirPaisHabitual("ma")
+        vm.onAnadirPaisHabitual("DE")
+        vm.onQuitarPaisHabitual("DE")
+        vm.onAnadirPaisHabitual("")
+
+        assertEquals(setOf(Continente.EUROPA), settings.actuales.continentes)
+        assertEquals(setOf("MA"), settings.actuales.paisesHabituales)
+        val preferencias = vm.uiState.value.preferenciasPaises
+        assertEquals(listOf("UA"), preferencias.recientes)
+        assertEquals(setOf("MA"), preferencias.habituales)
+        assertEquals(setOf(Continente.EUROPA), preferencias.continentes)
     }
 
     @Test
