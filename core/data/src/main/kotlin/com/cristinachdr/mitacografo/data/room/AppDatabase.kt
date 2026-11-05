@@ -2,6 +2,7 @@ package com.cristinachdr.mitacografo.data.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.cristinachdr.mitacografo.data.room.descanso.DescansoEntity
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaDao
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaEntity
 
@@ -13,7 +14,9 @@ import com.cristinachdr.mitacografo.data.room.jornada.JornadaEntity
  * queda guardado en `core/data/schemas/`.
  */
 @Database(
-    entities = [JornadaEntity::class],
+    // La tabla `descanso` está vacía hasta MT-20: se añade ya para no tener que migrar
+    // la base de datos del conductor (aún no tenía la app instalada).
+    entities = [JornadaEntity::class, DescansoEntity::class],
     version = 1,
     exportSchema = true,
 )

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cdd3b260f230d43126e5acb2bb7cbe76",
+    "identityHash": "27a684a3f93dc9db80b9151f2a6c506d",
     "entities": [
       {
         "tableName": "jornada",
@@ -118,11 +118,87 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_jornada_viaje_id` ON `${TABLE_NAME}` (`viaje_id`)"
           }
         ]
+      },
+      {
+        "tableName": "descanso",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `inicio_epoch_ms` INTEGER NOT NULL, `zona_inicio` TEXT NOT NULL, `fin_epoch_ms` INTEGER, `zona_fin` TEXT, `tipo` TEXT NOT NULL, `pais` TEXT, `observaciones` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inicioEpochMs",
+            "columnName": "inicio_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "zonaInicio",
+            "columnName": "zona_inicio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "finEpochMs",
+            "columnName": "fin_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "zonaFin",
+            "columnName": "zona_fin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pais",
+            "columnName": "pais",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_descanso_inicio_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "inicio_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_descanso_inicio_epoch_ms` ON `${TABLE_NAME}` (`inicio_epoch_ms`)"
+          },
+          {
+            "name": "index_descanso_fin_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "fin_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_descanso_fin_epoch_ms` ON `${TABLE_NAME}` (`fin_epoch_ms`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cdd3b260f230d43126e5acb2bb7cbe76')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '27a684a3f93dc9db80b9151f2a6c506d')"
     ]
   }
 }
