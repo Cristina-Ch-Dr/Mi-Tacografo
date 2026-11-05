@@ -84,7 +84,7 @@
 
     <!-- Avisos (notificaciones) -->
     <string name="canal_avisos_nombre">Avisos de jornada</string>
-    <string name="canal_avisos_descripcion">Recordatorios a las 12 h 30, 13 h, 14 h 30 y 15 h desde el inicio de la jornada.</string>
+    <string name="canal_avisos_descripcion">Recordatorios a las horas de jornada que elijas en Ajustes (por defecto, 12 h 30, 13 h, 14 h 30 y 15 h).</string>
     <string name="aviso_titulo">Llevas %1$d h %2$02d min de jornada</string>
     <string name="aviso_texto">Recordatorio personal: revisa cuándo te toca descansar. No es un aviso de incumplimiento.</string>
     <string name="aviso_prueba_titulo">Aviso de prueba</string>
@@ -100,11 +100,28 @@
 
     <!-- Ajustes -->
     <string name="ajustes_seccion_avisos">Avisos</string>
-    <string name="ajustes_avisos_ayuda">Tiempo desde que empieza la jornada. Son recordatorios personales.</string>
+    <string name="ajustes_avisos_ayuda">Tiempo desde que empieza la jornada. Son recordatorios personales. Toca la hora para cambiarla.</string>
     <string name="aviso_explicacion_1230">30 min antes del límite con descanso normal (11 h)</string>
     <string name="aviso_explicacion_13">Límite con descanso normal (11 h)</string>
     <string name="aviso_explicacion_1430">30 min antes del límite con descanso reducido (9 h)</string>
     <string name="aviso_explicacion_15">Límite con descanso reducido (9 h)</string>
+    <string name="aviso_explicacion_propio">Aviso propio</string>
+    <string name="ajustes_avisos_por_defecto">Los de por defecto salen de restar el descanso diario a las 24 h del día: 24 h − 11 h de descanso normal = 13 h de jornada; 24 h − 9 h de descanso reducido = 15 h. Los de 12 h 30 y 14 h 30 avisan media hora antes.</string>
+    <string name="ajustes_sin_avisos">No hay avisos: no sonará nada durante la jornada.</string>
+    <string name="ajustes_anadir_aviso">Añadir aviso</string>
+    <plurals name="ajustes_maximo_avisos">
+        <item quantity="one">Cabe como mucho %1$d aviso.</item>
+        <item quantity="other">Caben como mucho %1$d avisos.</item>
+    </plurals>
+    <string name="ajustes_restaurar_avisos">Restaurar los avisos por defecto</string>
+    <string name="ajustes_cambiar_hora_aviso">Cambiar la hora</string>
+    <string name="aviso_nuevo_titulo">Nuevo aviso</string>
+    <string name="aviso_editar_titulo">Cambiar aviso</string>
+    <string name="aviso_editor_ayuda">¿Cuánto tiempo después de empezar la jornada? Entre 1 h y 24 h.</string>
+    <string name="aviso_borrar">Borrar este aviso</string>
+    <string name="error_aviso_rango">Tiene que ser entre 1 h y 24 h.</string>
+    <string name="error_aviso_repetido">Ya hay un aviso a esa hora.</string>
+    <string name="error_aviso_demasiados">No caben más avisos.</string>
     <string name="ajustes_probar_aviso">Probar aviso</string>
     <string name="ajustes_prueba_programada">Llegará un aviso de prueba en 1 minuto. Puedes bloquear el móvil.</string>
     <string name="ajustes_seccion_reglas">Reglamento</string>

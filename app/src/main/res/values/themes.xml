@@ -2,4 +2,15 @@
 <resources>
 
     <style name="Theme.MiTacografo" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!--
+        Pantalla de carga (androidx.core:core-splashscreen: igual en Android 8 a 16).
+        Android recorta el icono en un círculo, así que splash_icono.png lleva dentro el cuadrado
+        redondeado y el nombre de la app (una imagen por idioma: drawable-*dpi y drawable-uk-*dpi).
+    -->
+    <style name="Theme.MiTacografo.Arranque" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/fondo_icono</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icono</item>
+        <item name="postSplashScreenTheme">@style/Theme.MiTacografo</item>
+    </style>
 </resources>
