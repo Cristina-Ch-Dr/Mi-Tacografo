@@ -64,6 +64,38 @@
     <string name="error_conduccion_negativa">La conducción no puede ser negativa.</string>
     <string name="error_conduccion_mayor">La conducción es mayor que la duración de la jornada.</string>
 
+    <!-- Avisos (notificaciones) -->
+    <string name="canal_avisos_nombre">Avisos de jornada</string>
+    <string name="canal_avisos_descripcion">Recordatorios a las 12 h 30, 13 h, 14 h 30 y 15 h desde el inicio de la jornada.</string>
+    <string name="aviso_titulo">Llevas %1$d h %2$02d min de jornada</string>
+    <string name="aviso_texto">Recordatorio personal: revisa cuándo te toca descansar. No es un aviso de incumplimiento.</string>
+    <string name="aviso_prueba_titulo">Aviso de prueba</string>
+    <string name="aviso_prueba_texto">Los avisos de Mi Tacógrafo llegan bien a este móvil.</string>
+
+    <!-- Permisos -->
+    <string name="accion_activar">Activar</string>
+    <string name="permisos_titulo_falta">Los avisos pueden no llegar</string>
+    <string name="permiso_notificaciones">Notificaciones</string>
+    <string name="permiso_alarmas_exactas">Alarmas a su hora exacta</string>
+    <string name="permiso_bateria">Sin restricciones de batería</string>
+    <string name="permiso_bateria_ayuda">Recomendado: algunos móviles (Xiaomi, Samsung, Huawei…) cierran las apps para ahorrar batería y los avisos no suenan. Busca «Mi Tacógrafo» en la lista y elige «No optimizar».</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_seccion_avisos">Avisos</string>
+    <string name="ajustes_avisos_ayuda">Tiempo desde que empieza la jornada. Son recordatorios personales.</string>
+    <string name="aviso_explicacion_1230">30 min antes del límite con descanso normal (11 h)</string>
+    <string name="aviso_explicacion_13">Límite con descanso normal (11 h)</string>
+    <string name="aviso_explicacion_1430">30 min antes del límite con descanso reducido (9 h)</string>
+    <string name="aviso_explicacion_15">Límite con descanso reducido (9 h)</string>
+    <string name="ajustes_probar_aviso">Probar aviso</string>
+    <string name="ajustes_prueba_programada">Llegará un aviso de prueba en 1 minuto. Puedes bloquear el móvil.</string>
+    <string name="ajustes_seccion_reglas">Reglamento</string>
+    <string name="ajustes_paises_ayuda">Necesarios para las reglas del transporte internacional (descansos semanales reducidos fuera de casa).</string>
+    <string name="ajustes_pais_empresa">País de la empresa (ES, UA…)</string>
+    <string name="ajustes_pais_residencia">País donde vives (ES, UA…)</string>
+    <string name="ajustes_seccion_informes">Informes</string>
+    <string name="ajustes_nombre_conductor">Tu nombre (sale en el PDF)</string>
+
     <!-- Genérico -->
     <string name="pantalla_pendiente">Próximamente</string>
 </resources>

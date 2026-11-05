@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
+import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -54,16 +55,18 @@ class HomeViewModel
     @Inject
     constructor(
         obtenerJornadaActual: ObtenerJornadaActual,
+        settings: SettingsRepository,
         private val clock: Clock,
     ) : ViewModel() {
         val uiState: StateFlow<HomeUiState> =
-            combine(obtenerJornadaActual(), cadaMinuto(), ::crearEstado)
-                .stateIn(
-                    scope = viewModelScope,
-                    // Deja de contar 5 s después de salir de la pantalla (ahorra batería).
-                    started = SharingStarted.WhileSubscribed(5_000),
-                    initialValue = crearEstado(null, clock.instant()),
-                )
+            combine(obtenerJornadaActual(), settings.observar(), cadaMinuto()) { jornada, ajustes, ahora ->
+                crearEstado(jornada, ajustes.avisos, ahora)
+            }.stateIn(
+                scope = viewModelScope,
+                // Deja de contar 5 s después de salir de la pantalla (ahorra batería).
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = crearEstado(null, emptyList(), clock.instant()),
+            )
 
         /** Emite la hora actual ahora y luego al empezar cada minuto. */
         private fun cadaMinuto(): Flow<Instant> =
@@ -77,19 +80,20 @@ class HomeViewModel
 
         private fun crearEstado(
             jornada: Jornada?,
+            avisos: List<AvisoConfig>,
             ahora: Instant,
         ): HomeUiState =
             HomeUiState(
                 hoy = ahora.atZone(clock.zone).toLocalDate(),
-                jornada = jornada?.let { enCurso(it, ahora) },
+                jornada = jornada?.let { enCurso(it, avisos, ahora) },
             )
 
         private fun enCurso(
             jornada: Jornada,
+            avisos: List<AvisoConfig>,
             ahora: Instant,
         ): JornadaEnCursoUi {
-            // Hasta MT-13 (Ajustes) se usan los avisos por defecto: 12:30, 13:00, 14:30 y 15:00.
-            val proximo = calcularAvisos(jornada, AvisoConfig.POR_DEFECTO, ahora).firstOrNull()
+            val proximo = calcularAvisos(jornada, avisos, ahora).firstOrNull()
             return JornadaEnCursoUi(
                 inicio = jornada.inicio.atZone(jornada.zonaInicio),
                 transcurrido = Duration.between(jornada.inicio, ahora).coerceAtLeast(Duration.ZERO),

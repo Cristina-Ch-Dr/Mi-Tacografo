@@ -1,6 +1,10 @@
 package com.cristinachdr.mitacografo.domain.usecase
 
+import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.model.Ajustes
+import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
@@ -42,6 +46,20 @@ class CasosDeUsoJornadaTest {
             ciudadFin = "Lyon",
         )
 
+    /** Avisos "programados" en el sistema (falso) durante el test. */
+    private val alarmas = FakeAlarmScheduler()
+
+    private fun gestor(
+        repo: FakeJornadaRepository,
+        ajustes: Ajustes = Ajustes(),
+    ) = GestorAvisos(repo, FakeSettingsRepository(ajustes), alarmas, reloj)
+
+    private fun iniciar(repo: FakeJornadaRepository) = IniciarJornada(repo, gestor(repo), reloj)
+
+    private fun finalizar(repo: FakeJornadaRepository) = FinalizarJornada(repo, gestor(repo), reloj)
+
+    private fun editar(repo: FakeJornadaRepository) = EditarJornada(repo, gestor(repo), reloj)
+
     private fun abiertaHoy(id: Long = 2) =
         Jornada(id = id, inicio = hora(2, 6), zonaInicio = madrid, kmInicio = 100_480)
 
@@ -53,7 +71,7 @@ class CasosDeUsoJornadaTest {
                 val repo = FakeJornadaRepository(listOf(ayer))
 
                 val resultado =
-                    IniciarJornada(repo, reloj)(
+                    iniciar(repo)(
                         DatosInicio(hora(2, 6), madrid, 100_480, pais = " fr ", ciudad = "  ", observaciones = "Carga"),
                     )
 
@@ -70,7 +88,7 @@ class CasosDeUsoJornadaTest {
             runTest {
                 val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
 
-                val resultado = IniciarJornada(repo, reloj)(DatosInicio(hora(2, 19), madrid, 100_480))
+                val resultado = iniciar(repo)(DatosInicio(hora(2, 19), madrid, 100_480))
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.JORNADA_YA_ABIERTA), resultado)
                 assertEquals(2, repo.guardadas.size)
@@ -81,7 +99,7 @@ class CasosDeUsoJornadaTest {
             runTest {
                 val repo = FakeJornadaRepository(listOf(ayer))
 
-                val resultado = IniciarJornada(repo, reloj)(DatosInicio(hora(1, 16), madrid, 100_480))
+                val resultado = iniciar(repo)(DatosInicio(hora(1, 16), madrid, 100_480))
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.INICIO_ANTES_DEL_FIN_ANTERIOR), resultado)
             }
@@ -95,7 +113,7 @@ class CasosDeUsoJornadaTest {
                 val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
 
                 val resultado =
-                    FinalizarJornada(repo, reloj)(
+                    finalizar(repo)(
                         DatosFin(
                             hora(2, 17),
                             madrid,
@@ -117,7 +135,7 @@ class CasosDeUsoJornadaTest {
             runTest {
                 val repo = FakeJornadaRepository(listOf(ayer))
 
-                val resultado = FinalizarJornada(repo, reloj)(DatosFin(hora(2, 17), madrid, kmFin = 101_000))
+                val resultado = finalizar(repo)(DatosFin(hora(2, 17), madrid, kmFin = 101_000))
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.SIN_JORNADA_ABIERTA), resultado)
             }
@@ -128,7 +146,7 @@ class CasosDeUsoJornadaTest {
                 val repo = FakeJornadaRepository(listOf(abiertaHoy()))
 
                 val resultado =
-                    FinalizarJornada(repo, reloj)(
+                    finalizar(repo)(
                         DatosFin(hora(2, 7), madrid, kmFin = 1, conduccionTacografo = Duration.ofHours(2)),
                     )
 
@@ -149,7 +167,7 @@ class CasosDeUsoJornadaTest {
             runTest {
                 val repo = FakeJornadaRepository(listOf(ayer))
 
-                val resultado = EditarJornada(repo, reloj)(ayer.copy(kmFin = 100_500, observaciones = " "))
+                val resultado = editar(repo)(ayer.copy(kmFin = 100_500, observaciones = " "))
 
                 assertEquals(ResultadoJornada.Ok(ayer.copy(kmFin = 100_500, observaciones = null)), resultado)
                 assertEquals(500, repo.obtenerPorId(1)?.kmRecorridos)
@@ -160,7 +178,7 @@ class CasosDeUsoJornadaTest {
             runTest {
                 val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
 
-                val resultado = EditarJornada(repo, reloj)(ayer.copy(fin = null, zonaFin = null, kmFin = null))
+                val resultado = editar(repo)(ayer.copy(fin = null, zonaFin = null, kmFin = null))
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.JORNADA_YA_ABIERTA), resultado)
             }
@@ -168,9 +186,68 @@ class CasosDeUsoJornadaTest {
         @Test
         fun `una jornada que no existe no se puede editar`() =
             runTest {
-                val resultado = EditarJornada(FakeJornadaRepository(), reloj)(ayer)
+                val resultado = editar(FakeJornadaRepository())(ayer)
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.JORNADA_NO_EXISTE), resultado)
+            }
+    }
+
+    @Nested
+    inner class Avisos {
+        @Test
+        fun `al iniciar se programan los avisos que aun no han pasado`() =
+            runTest {
+                // Son las 20:00 y la jornada empezó a las 06:00: ya pasaron los de 12 h 30 y 13 h.
+                val repo = FakeJornadaRepository()
+
+                iniciar(repo)(DatosInicio(hora(2, 6), madrid, 0))
+
+                assertEquals(listOf(hora(2, 20, 30), hora(2, 21)), alarmas.programados.map { it.disparo })
+            }
+
+        @Test
+        fun `al finalizar se cancelan todos`() =
+            runTest {
+                val repo = FakeJornadaRepository()
+                iniciar(repo)(DatosInicio(hora(2, 19), madrid, 0))
+
+                finalizar(repo)(DatosFin(hora(2, 20), madrid, 100))
+
+                assertEquals(emptyList<Any>(), alarmas.programados)
+            }
+
+        @Test
+        fun `al cambiar la hora de inicio los avisos se mueven`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(abiertaHoy()))
+                gestor(repo).reprogramarJornadaAbierta()
+
+                editar(repo)(abiertaHoy().copy(inicio = hora(2, 8)))
+
+                // Desde las 08:00: 20:30, 21:00, 22:30 y 23:00.
+                assertEquals(
+                    listOf(hora(2, 20, 30), hora(2, 21), hora(2, 22, 30), hora(2, 23)),
+                    alarmas.programados.map { it.disparo },
+                )
+            }
+
+        @Test
+        fun `al desactivar un aviso en ajustes deja de estar programado`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(abiertaHoy().copy(inicio = hora(2, 9))))
+                val settings = FakeSettingsRepository()
+                val gestor = GestorAvisos(repo, settings, alarmas, reloj)
+                gestor.reprogramarJornadaAbierta()
+
+                CambiarAjustes(settings, gestor)() { ajustes ->
+                    ajustes.copy(avisos = ajustes.avisos.map { it.copy(activo = it != AvisoConfig.POR_DEFECTO[0]) })
+                }
+
+                // Sin el de 12 h 30 (21:30): quedan 13 h, 14 h 30 y 15 h.
+                assertEquals(
+                    listOf(hora(2, 22), hora(2, 23, 30), hora(3, 0)),
+                    alarmas.programados.map { it.disparo },
+                )
             }
     }
 
@@ -197,9 +274,9 @@ class CasosDeUsoJornadaTest {
                 val actual = ObtenerJornadaActual(repo)
 
                 assertNull(actual().first())
-                IniciarJornada(repo, reloj)(DatosInicio(hora(2, 6), madrid, 100_480))
+                iniciar(repo)(DatosInicio(hora(2, 6), madrid, 100_480))
                 assertEquals(hora(2, 6), actual().first()?.inicio)
-                FinalizarJornada(repo, reloj)(DatosFin(hora(2, 16), madrid, 100_900))
+                finalizar(repo)(DatosFin(hora(2, 16), madrid, 100_900))
                 assertNull(actual().first())
             }
     }

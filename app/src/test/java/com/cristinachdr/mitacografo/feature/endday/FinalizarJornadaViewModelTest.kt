@@ -1,10 +1,13 @@
 package com.cristinachdr.mitacografo.feature.endday
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
+import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
+import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import kotlinx.coroutines.test.runTest
@@ -38,7 +41,11 @@ class FinalizarJornadaViewModelTest {
         )
 
     private fun viewModel(repo: FakeJornadaRepository) =
-        FinalizarJornadaViewModel(FinalizarJornada(repo, reloj), ObtenerJornadaActual(repo), reloj)
+        FinalizarJornadaViewModel(
+            FinalizarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
+            ObtenerJornadaActual(repo),
+            reloj,
+        )
 
     @Test
     fun `carga la jornada abierta y propone la hora actual y el mismo pais`() {

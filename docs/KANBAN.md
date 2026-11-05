@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E1** MT-13, MT-16, MT-17 | — | MT-08, MT-09 | MT-01 … MT-07 |
+| E2 – E7 | **E1** MT-16, MT-17, MT-41, MT-42 | — | MT-13 | MT-01 … MT-09 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -109,16 +109,18 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ### MT-13 · Ajustes y avisos · XL · deps: MT-09 · (antes MT-13, MT-14 y MT-15)
 **Ajustes**
-- [ ] `SettingsRepository` con DataStore: avisos activos y sus offsets, **país de la empresa y de residencia** (necesarios para las reglas internacionales), nombre para el PDF y zona de referencia.
-- [ ] Pantalla Ajustes con interruptores de avisos.
+- [x] `SettingsRepository` con DataStore: avisos activos y sus offsets, **país de la empresa y de residencia** (necesarios para las reglas internacionales), nombre para el PDF y zona de referencia.
+  - La zona de referencia se guarda, pero aún no tiene campo en la pantalla (por defecto, la del móvil). Se añadirá con el motor de reglas (MT-24).
+- [x] Pantalla Ajustes con interruptores de avisos y botón «Probar aviso» (llega en 1 minuto).
 
 **Avisos**
-- [ ] Tabla `alarma_programada` (migración 1→2 + test de migración).
-- [ ] `AndroidAlarmScheduler` (exacta con respaldo `setWindow`), `AlarmReceiver` y canal de notificación.
-- [ ] Al iniciar, programar. Al finalizar, **cancelar todo**. Al editar el inicio, reprogramar.
-- [ ] Pedir `POST_NOTIFICATIONS` (solo en 13+) y guiar al usuario para conceder `SCHEDULE_EXACT_ALARM` (12+, denegado por defecto en 14+).
-- [ ] Aviso de optimización de batería (Xiaomi, Samsung, Huawei…).
-- [ ] `BootReceiver` reprograma las alarmas futuras de la jornada abierta tras reiniciar.
+- [x] ~~Tabla `alarma_programada`~~ **descartada**: los avisos se recalculan siempre desde la jornada abierta y los ajustes (`GestorAvisos` + `calcularAvisos`). Menos código, sin migración y sin datos que se puedan desincronizar.
+- [x] `AndroidAlarmScheduler` (exacta con respaldo `setWindow`), `AlarmReceiver` y canal de notificación.
+- [x] Al iniciar, programar. Al finalizar, **cancelar todo**. Al editar el inicio, reprogramar. Al cambiar los avisos en Ajustes, reprogramar.
+- [x] Pedir `POST_NOTIFICATIONS` (solo en 13+) y guiar al usuario para conceder `SCHEDULE_EXACT_ALARM` (12+, denegado por defecto en 14+).
+- [x] Aviso de optimización de batería (Xiaomi, Samsung, Huawei…).
+- [x] `BootReceiver` reprograma las alarmas futuras de la jornada abierta tras reiniciar, actualizar la app o conceder las alarmas exactas.
+- [x] El reloj sigue la zona horaria actual del móvil (antes se quedaba con la del arranque de la app).
 - **Criterio:** probado con offsets de 1–2 min en modo debug, con el móvil bloqueado y tras reiniciar, **en la API mínima y en la última**.
 
 ### MT-16 · Historial básico · M · deps: MT-09
@@ -130,6 +132,18 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [ ] Exportar (CreateDocument) / importar (OpenDocument → resumen → confirmar → transacción → reprogramar alarmas).
 - [ ] Auto Backup (`dataExtractionRules`).
 - [ ] Test: exportar → importar = datos idénticos.
+
+### MT-41 · Selector de país con autocompletado · M · deps: MT-09 · *(propuesta de Cristina)*
+- [ ] Desplegable con búsqueda en lugar de escribir el código: se puede buscar «Alem…» o «DE» y se guarda «DE».
+- [ ] Lista de países ISO de `java.util.Locale`, con el nombre en el idioma del móvil (español o ucraniano) sin mantener ninguna lista a mano. Los países europeos y los últimos usados, arriba.
+- [ ] Usarlo en Iniciar jornada, Finalizar jornada y Ajustes (país de la empresa y de residencia).
+- [ ] Test: buscar por nombre, por código y sin tildes («Espana» → ES).
+
+### MT-42 · Avisos configurables · M · deps: MT-13 · *(propuesta de Cristina)*
+- [ ] Cambiar la hora de cada aviso (p. ej. 12 h 30 → 12 h 00) y añadir o quitar avisos propios, además de los 4 de por defecto.
+- [ ] Botón «Restaurar los avisos por defecto».
+- [ ] Explicar en la pantalla de dónde salen los 4 de por defecto (24 h − 11 h de descanso = 13 h; 24 h − 9 h = 15 h).
+- [ ] El modelo (`AvisoConfig`) y DataStore ya guardan cualquier hora: solo falta la pantalla y sus validaciones (entre 1 h y 24 h, sin repetir).
 
 > 🏁 **Release v0.1.0** → instalar en el móvil del conductor. **Usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
 
