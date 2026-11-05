@@ -1,6 +1,7 @@
 package com.cristinachdr.mitacografo
 
 import android.app.Application
+import com.cristinachdr.mitacografo.platform.Notificaciones
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -8,4 +9,9 @@ import dagger.hilt.android.HiltAndroidApp
  * de dependencias (equivalente al ApplicationContext de Spring).
  */
 @HiltAndroidApp
-class MiTacografoApp : Application()
+class MiTacografoApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Notificaciones.crearCanal(this)
+    }
+}

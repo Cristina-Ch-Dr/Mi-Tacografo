@@ -5,6 +5,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Singleton
 
 /**
@@ -16,5 +18,20 @@ import javax.inject.Singleton
 object TimeModule {
     @Provides
     @Singleton
-    fun provideClock(): Clock = Clock.systemDefaultZone()
+    fun provideClock(): Clock = RelojDelMovil
+}
+
+/**
+ * Reloj que sigue la zona horaria **actual** del móvil.
+ *
+ * `Clock.systemDefaultZone()` se queda con la zona del momento en que se crea: si el conductor
+ * pasa de España a Ucrania sin cerrar la app, seguiría viendo la hora de España.
+ * Este reloj pregunta la zona cada vez.
+ */
+private object RelojDelMovil : Clock() {
+    override fun getZone(): ZoneId = ZoneId.systemDefault()
+
+    override fun withZone(zone: ZoneId): Clock = system(zone)
+
+    override fun instant(): Instant = Instant.now()
 }

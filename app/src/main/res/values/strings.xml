@@ -11,10 +11,178 @@
     <!-- Acciones -->
     <string name="accion_volver">Volver</string>
     <string name="accion_iniciar_jornada">Iniciar jornada</string>
+    <string name="accion_finalizar_jornada">Finalizar jornada</string>
+    <string name="accion_aceptar">Aceptar</string>
+    <string name="accion_cancelar">Cancelar</string>
+    <string name="accion_cambiar">Cambiar</string>
 
     <!-- Inicio -->
     <string name="inicio_sin_jornada">Sin jornada en curso</string>
+    <string name="inicio_jornada_en_curso">Jornada en curso</string>
+    <string name="inicio_desde">Desde las %1$s · %2$s</string>
+    <string name="inicio_km_inicio">Km de inicio: %1$s</string>
+    <string name="inicio_proximo_aviso">Próximo aviso: %1$s (%2$s de jornada)</string>
+    <string name="inicio_sin_avisos">No quedan avisos en esta jornada</string>
+
+    <!-- Formularios de jornada -->
+    <string name="campo_hora_inicio">Hora de inicio</string>
+    <string name="campo_hora_fin">Hora de fin</string>
+    <string name="campo_km_inicio">Km del camión al empezar</string>
+    <string name="campo_km_fin">Km del camión al terminar</string>
+    <string name="campo_pais">País</string>
+    <!-- Idioma en el que se ve la app (código ISO): para los nombres de países, fechas y números. Debe coincidir con el idioma de esta carpeta. -->
+    <string name="idioma_app">es</string>
+    <string name="pais_buscar">Escribe el país o su código (DE…)</string>
+    <string name="pais_sin_resultados">Ningún país con ese nombre</string>
+    <string name="pais_ninguno">Sin país</string>
+    <string name="pais_otros">Otros países</string>
+    <string name="ajustes_seccion_paises">Países en el buscador</string>
+    <string name="ajustes_paises_buscador_ayuda">Elige dónde sueles trabajar: esos países saldrán primero al buscar. Los demás se pueden seguir buscando en «Otros países».</string>
+    <string name="ajustes_continentes">Continentes</string>
+    <string name="ajustes_paises_habituales">Países donde sueles cargar o descargar</string>
+    <string name="ajustes_anadir_pais_habitual">Añadir país</string>
+    <string name="ajustes_quitar_pais">Quitar %1$s</string>
+    <string name="continente_europa">Europa</string>
+    <string name="continente_asia">Asia</string>
+    <string name="continente_africa">África</string>
+    <string name="continente_america">América</string>
+    <string name="continente_oceania">Oceanía</string>
+    <string name="campo_ciudad">Ciudad (opcional)</string>
+    <string name="campo_observaciones">Observaciones (opcional)</string>
+    <string name="campo_conduccion">Conducción según el tacógrafo</string>
+    <string name="campo_horas">Horas</string>
+    <string name="campo_minutos">Minutos</string>
+
+    <!-- Finalizar jornada -->
+    <string name="fin_resumen_inicio">Empezó a las %1$s · %2$s, con %3$s km</string>
+    <string name="fin_conduccion_ayuda">Si no la apuntas, las reglas dirán «No verificado».</string>
+    <string name="fin_km_recorridos">%1$s km recorridos</string>
+    <string name="fin_duracion">Duración de la jornada: %1$s</string>
+    <string name="fin_sin_jornada">No hay ninguna jornada en curso.</string>
+
+    <!-- Formatos -->
+    <string name="formato_duracion">%1$d h %2$02d min</string>
+
+    <!-- Errores de campo -->
+    <string name="error_obligatorio">Obligatorio</string>
+    <string name="error_no_numero">Escribe solo números</string>
+    <string name="error_minutos">Entre 0 y 59</string>
+
+    <!-- Errores de jornada -->
+    <string name="error_jornada_ya_abierta">Ya hay una jornada en curso. Finalízala primero.</string>
+    <string name="error_sin_jornada_abierta">No hay ninguna jornada en curso.</string>
+    <string name="error_jornada_no_existe">Esta jornada ya no existe.</string>
+    <string name="error_km_negativos">Los km no pueden ser negativos.</string>
+    <string name="error_km_fin_menor">Los km finales no pueden ser menores que los del inicio.</string>
+    <string name="error_inicio_futuro">La hora de inicio no puede ser futura.</string>
+    <string name="error_inicio_antes_fin_anterior">Empieza antes de que terminara la jornada anterior.</string>
+    <string name="error_fin_no_posterior">La hora de fin tiene que ser posterior a la de inicio.</string>
+    <string name="error_fin_futuro">La hora de fin no puede ser futura.</string>
+    <string name="error_conduccion_negativa">La conducción no puede ser negativa.</string>
+    <string name="error_conduccion_mayor">La conducción es mayor que la duración de la jornada.</string>
+    <string name="error_solapa">Se solapa con otra jornada: revisa las horas de inicio y fin.</string>
+
+    <!-- Avisos (notificaciones) -->
+    <string name="canal_avisos_nombre">Avisos de jornada</string>
+    <string name="canal_avisos_descripcion">Recordatorios a las horas de jornada que elijas en Ajustes (por defecto, 12 h 30, 13 h, 14 h 30 y 15 h).</string>
+    <string name="aviso_titulo">Llevas %1$d h %2$02d min de jornada</string>
+    <string name="aviso_texto">Recordatorio personal: revisa cuándo te toca descansar. No es un aviso de incumplimiento.</string>
+    <string name="aviso_prueba_titulo">Aviso de prueba</string>
+    <string name="aviso_prueba_texto">Los avisos de Mi Tacógrafo llegan bien a este móvil.</string>
+
+    <!-- Permisos -->
+    <string name="accion_activar">Activar</string>
+    <string name="permisos_titulo_falta">Los avisos pueden no llegar</string>
+    <string name="permiso_notificaciones">Notificaciones</string>
+    <string name="permiso_alarmas_exactas">Alarmas a su hora exacta</string>
+    <string name="permiso_bateria">Sin restricciones de batería</string>
+    <string name="permiso_bateria_ayuda">Recomendado: algunos móviles (Xiaomi, Samsung, Huawei…) cierran las apps para ahorrar batería y los avisos no suenan. Busca «Mi Tacógrafo» en la lista y elige «No optimizar».</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_seccion_avisos">Avisos</string>
+    <string name="ajustes_avisos_ayuda">Tiempo desde que empieza la jornada. Son recordatorios personales. Toca la hora para cambiarla.</string>
+    <string name="aviso_explicacion_1230">30 min antes del límite con descanso normal (11 h)</string>
+    <string name="aviso_explicacion_13">Límite con descanso normal (11 h)</string>
+    <string name="aviso_explicacion_1430">30 min antes del límite con descanso reducido (9 h)</string>
+    <string name="aviso_explicacion_15">Límite con descanso reducido (9 h)</string>
+    <string name="aviso_explicacion_propio">Aviso propio</string>
+    <string name="ajustes_avisos_por_defecto">Los de por defecto salen de restar el descanso diario a las 24 h del día: 24 h − 11 h de descanso normal = 13 h de jornada; 24 h − 9 h de descanso reducido = 15 h. Los de 12 h 30 y 14 h 30 avisan media hora antes.</string>
+    <string name="ajustes_sin_avisos">No hay avisos: no sonará nada durante la jornada.</string>
+    <string name="ajustes_anadir_aviso">Añadir aviso</string>
+    <plurals name="ajustes_maximo_avisos">
+        <item quantity="one">Cabe como mucho %1$d aviso.</item>
+        <item quantity="other">Caben como mucho %1$d avisos.</item>
+    </plurals>
+    <string name="ajustes_restaurar_avisos">Restaurar los avisos por defecto</string>
+    <string name="ajustes_cambiar_hora_aviso">Cambiar la hora</string>
+    <string name="aviso_nuevo_titulo">Nuevo aviso</string>
+    <string name="aviso_editar_titulo">Cambiar aviso</string>
+    <string name="aviso_editor_ayuda">¿Cuánto tiempo después de empezar la jornada? Entre 1 h y 24 h.</string>
+    <string name="aviso_borrar">Borrar este aviso</string>
+    <string name="error_aviso_rango">Tiene que ser entre 1 h y 24 h.</string>
+    <string name="error_aviso_repetido">Ya hay un aviso a esa hora.</string>
+    <string name="error_aviso_demasiados">No caben más avisos.</string>
+    <string name="ajustes_probar_aviso">Probar aviso</string>
+    <string name="ajustes_prueba_programada">Llegará un aviso de prueba en 1 minuto. Puedes bloquear el móvil.</string>
+    <string name="ajustes_seccion_reglas">Reglamento</string>
+    <string name="ajustes_paises_ayuda">Necesarios para las reglas del transporte internacional (descansos semanales reducidos fuera de casa).</string>
+    <string name="ajustes_pais_empresa">País de la empresa</string>
+    <string name="ajustes_pais_residencia">País donde vives</string>
+    <string name="ajustes_seccion_informes">Informes</string>
+    <string name="ajustes_nombre_conductor">Tu nombre (sale en el PDF)</string>
 
     <!-- Genérico -->
     <string name="pantalla_pendiente">Próximamente</string>
+
+    <!-- Historial -->
+    <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí.</string>
+    <string name="historial_semana">Semana del %1$s al %2$s</string>
+    <string name="historial_total_semana">%1$s km · %2$s de conducción</string>
+    <string name="historial_total_semana_incompleta">%1$s km · %2$s de conducción (falta apuntar alguna)</string>
+    <string name="historial_dia">%1$s · %2$s</string>
+    <string name="historial_en_curso">En curso desde las %1$s</string>
+    <string name="historial_horas">%1$s – %2$s</string>
+    <string name="historial_horas_otro_dia">%1$s – %2$s (%3$s)</string>
+    <string name="historial_km">%1$s km</string>
+    <string name="historial_conduccion">Conducción %1$s</string>
+    <string name="historial_sin_conduccion">Conducción sin apuntar</string>
+
+    <!-- Detalle y edición de una jornada -->
+    <string name="editar_titulo">Jornada</string>
+    <string name="editar_seccion_inicio">Inicio</string>
+    <string name="editar_seccion_fin">Fin</string>
+    <string name="editar_en_curso_ayuda">Esta jornada sigue en curso: el fin se apunta con «Finalizar jornada» en Inicio.</string>
+    <string name="accion_guardar_cambios">Guardar cambios</string>
+    <string name="accion_borrar_jornada">Borrar jornada</string>
+    <string name="accion_borrar">Borrar</string>
+    <string name="borrar_titulo">¿Borrar esta jornada?</string>
+    <string name="borrar_texto">Se borrará para siempre y no se puede deshacer.</string>
+
+    <!-- Copia de seguridad -->
+    <string name="ajustes_seccion_copia">Copia de seguridad</string>
+    <string name="copia_ayuda">Guarda todas tus jornadas y ajustes en un archivo. Mándalo fuera del móvil (Google Drive, correo, ordenador): si pierdes o cambias de móvil, lo restauras aquí.</string>
+    <string name="copia_guardar">Guardar copia</string>
+    <string name="copia_restaurar">Restaurar copia</string>
+    <string name="copia_guardada">Copia guardada.</string>
+    <string name="copia_restaurada">Copia restaurada.</string>
+    <string name="copia_error_guardar">No se pudo guardar el archivo. Prueba en otra carpeta.</string>
+    <string name="copia_error_leer">No se pudo abrir el archivo.</string>
+    <string name="copia_error_no_es_copia">Ese archivo no es una copia de Mi Tacógrafo.</string>
+    <string name="copia_error_version">Esta copia es de una versión más nueva de la app. Actualiza la app y vuelve a intentarlo.</string>
+    <string name="copia_error_datos">La copia está dañada: no se ha cambiado nada.</string>
+    <string name="copia_confirmar_titulo">¿Restaurar esta copia?</string>
+    <string name="copia_confirmar">Restaurar</string>
+    <string name="copia_resumen_creada">Copia del %1$s.</string>
+    <string name="copia_resumen_rango">(del %1$s al %2$s)</string>
+    <plurals name="copia_resumen_jornadas">
+        <item quantity="one">%d jornada</item>
+        <item quantity="many">%d jornadas</item>
+        <item quantity="other">%d jornadas</item>
+    </plurals>
+    <string name="copia_aviso_sin_jornadas">Ahora no hay jornadas en el móvil. Se cambiarán tus ajustes por los de la copia.</string>
+    <plurals name="copia_aviso_reemplazar">
+        <item quantity="one">Se borrará la jornada que hay ahora en el móvil y tus ajustes actuales.</item>
+        <item quantity="many">Se borrarán las %d jornadas que hay ahora en el móvil y tus ajustes actuales.</item>
+        <item quantity="other">Se borrarán las %d jornadas que hay ahora en el móvil y tus ajustes actuales.</item>
+    </plurals>
 </resources>

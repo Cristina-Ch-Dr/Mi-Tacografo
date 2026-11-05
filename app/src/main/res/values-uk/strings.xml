@@ -1,5 +1,5 @@
 <resources>
-    <!-- Traducción provisional: pendiente de revisión por hablante nativo (MT-35) -->
+    <!-- Traducción provisional: pendiente de revisión por hablante nativo (MT-34) -->
     <string name="app_name">Мій Тахограф</string>
 
     <!-- Navegación -->
@@ -12,10 +12,181 @@
     <!-- Acciones -->
     <string name="accion_volver">Назад</string>
     <string name="accion_iniciar_jornada">Почати робочий день</string>
+    <string name="accion_finalizar_jornada">Завершити робочий день</string>
+    <string name="accion_aceptar">Гаразд</string>
+    <string name="accion_cancelar">Скасувати</string>
+    <string name="accion_cambiar">Змінити</string>
 
     <!-- Inicio -->
     <string name="inicio_sin_jornada">Немає активного робочого дня</string>
+    <string name="inicio_jornada_en_curso">Робочий день триває</string>
+    <string name="inicio_desde">З %1$s · %2$s</string>
+    <string name="inicio_km_inicio">Км на початку: %1$s</string>
+    <string name="inicio_proximo_aviso">Наступне нагадування: %1$s (%2$s від початку)</string>
+    <string name="inicio_sin_avisos">Нагадувань на цей робочий день більше немає</string>
+
+    <!-- Formularios de jornada -->
+    <string name="campo_hora_inicio">Час початку</string>
+    <string name="campo_hora_fin">Час завершення</string>
+    <string name="campo_km_inicio">Км вантажівки на початку</string>
+    <string name="campo_km_fin">Км вантажівки в кінці</string>
+    <string name="campo_pais">Країна</string>
+    <string name="idioma_app">uk</string>
+    <string name="pais_buscar">Введіть країну або її код (DE…)</string>
+    <string name="pais_sin_resultados">Немає країни з такою назвою</string>
+    <string name="pais_ninguno">Без країни</string>
+    <string name="pais_otros">Інші країни</string>
+    <string name="ajustes_seccion_paises">Країни в пошуку</string>
+    <string name="ajustes_paises_buscador_ayuda">Виберіть, де ви зазвичай працюєте: ці країни будуть першими в пошуку. Інші можна знайти в розділі «Інші країни».</string>
+    <string name="ajustes_continentes">Континенти</string>
+    <string name="ajustes_paises_habituales">Країни, де ви зазвичай завантажуєтесь або розвантажуєтесь</string>
+    <string name="ajustes_anadir_pais_habitual">Додати країну</string>
+    <string name="ajustes_quitar_pais">Видалити %1$s</string>
+    <string name="continente_europa">Європа</string>
+    <string name="continente_asia">Азія</string>
+    <string name="continente_africa">Африка</string>
+    <string name="continente_america">Америка</string>
+    <string name="continente_oceania">Океанія</string>
+    <string name="campo_ciudad">Місто (необовʼязково)</string>
+    <string name="campo_observaciones">Примітки (необовʼязково)</string>
+    <string name="campo_conduccion">Керування за тахографом</string>
+    <string name="campo_horas">Години</string>
+    <string name="campo_minutos">Хвилини</string>
+
+    <!-- Finalizar jornada -->
+    <string name="fin_resumen_inicio">Почався о %1$s · %2$s, %3$s км</string>
+    <string name="fin_conduccion_ayuda">Якщо не вказати, правила покажуть «Не перевірено».</string>
+    <string name="fin_km_recorridos">Пройдено %1$s км</string>
+    <string name="fin_duracion">Тривалість робочого дня: %1$s</string>
+    <string name="fin_sin_jornada">Немає активного робочого дня.</string>
+
+    <!-- Formatos -->
+    <string name="formato_duracion">%1$d год %2$02d хв</string>
+
+    <!-- Errores de campo -->
+    <string name="error_obligatorio">Обовʼязково</string>
+    <string name="error_no_numero">Лише цифри</string>
+    <string name="error_minutos">Від 0 до 59</string>
+
+    <!-- Errores de jornada -->
+    <string name="error_jornada_ya_abierta">Робочий день уже триває. Спочатку завершіть його.</string>
+    <string name="error_sin_jornada_abierta">Немає активного робочого дня.</string>
+    <string name="error_jornada_no_existe">Цього робочого дня вже не існує.</string>
+    <string name="error_km_negativos">Км не можуть бути відʼємними.</string>
+    <string name="error_km_fin_menor">Км у кінці не можуть бути меншими, ніж на початку.</string>
+    <string name="error_inicio_futuro">Час початку не може бути в майбутньому.</string>
+    <string name="error_inicio_antes_fin_anterior">Початок раніше, ніж завершився попередній робочий день.</string>
+    <string name="error_fin_no_posterior">Час завершення має бути пізніше за час початку.</string>
+    <string name="error_fin_futuro">Час завершення не може бути в майбутньому.</string>
+    <string name="error_conduccion_negativa">Керування не може бути відʼємним.</string>
+    <string name="error_conduccion_mayor">Керування довше, ніж робочий день.</string>
+    <string name="error_solapa">Перетинається з іншим робочим днем: перевірте час початку й кінця.</string>
+
+    <!-- Avisos (notificaciones) -->
+    <string name="canal_avisos_nombre">Нагадування робочого дня</string>
+    <string name="canal_avisos_descripcion">Нагадування через стільки годин роботи, скільки ви оберете в Налаштуваннях (стандартно 12 год 30, 13 год, 14 год 30 і 15 год).</string>
+    <string name="aviso_titulo">Робочий день триває %1$d год %2$02d хв</string>
+    <string name="aviso_texto">Особисте нагадування: перевірте, коли вам потрібно відпочити. Це не повідомлення про порушення.</string>
+    <string name="aviso_prueba_titulo">Тестове нагадування</string>
+    <string name="aviso_prueba_texto">Нагадування «Мій Тахограф» надходять на цей телефон.</string>
+
+    <!-- Permisos -->
+    <string name="accion_activar">Увімкнути</string>
+    <string name="permisos_titulo_falta">Нагадування можуть не надходити</string>
+    <string name="permiso_notificaciones">Сповіщення</string>
+    <string name="permiso_alarmas_exactas">Будильники точно вчасно</string>
+    <string name="permiso_bateria">Без обмежень батареї</string>
+    <string name="permiso_bateria_ayuda">Рекомендовано: деякі телефони (Xiaomi, Samsung, Huawei…) закривають програми, щоб заощадити батарею, і нагадування не спрацьовують. Знайдіть «Мій Тахограф» у списку й виберіть «Не оптимізувати».</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_seccion_avisos">Нагадування</string>
+    <string name="ajustes_avisos_ayuda">Час від початку робочого дня. Це особисті нагадування. Торкніться часу, щоб його змінити.</string>
+    <string name="aviso_explicacion_1230">За 30 хв до межі зі звичайним відпочинком (11 год)</string>
+    <string name="aviso_explicacion_13">Межа зі звичайним відпочинком (11 год)</string>
+    <string name="aviso_explicacion_1430">За 30 хв до межі зі скороченим відпочинком (9 год)</string>
+    <string name="aviso_explicacion_15">Межа зі скороченим відпочинком (9 год)</string>
+    <string name="aviso_explicacion_propio">Власне нагадування</string>
+    <string name="ajustes_avisos_por_defecto">Стандартні нагадування — це 24 години доби мінус щоденний відпочинок: 24 год − 11 год звичайного відпочинку = 13 год роботи; 24 год − 9 год скороченого відпочинку = 15 год. Нагадування о 12 год 30 і 14 год 30 спрацьовують за пів години до цього.</string>
+    <string name="ajustes_sin_avisos">Нагадувань немає: протягом робочого дня нічого не спрацює.</string>
+    <string name="ajustes_anadir_aviso">Додати нагадування</string>
+    <plurals name="ajustes_maximo_avisos">
+        <item quantity="one">Можна мати не більше %1$d нагадування.</item>
+        <item quantity="few">Можна мати не більше %1$d нагадувань.</item>
+        <item quantity="many">Можна мати не більше %1$d нагадувань.</item>
+        <item quantity="other">Можна мати не більше %1$d нагадування.</item>
+    </plurals>
+    <string name="ajustes_restaurar_avisos">Повернути стандартні нагадування</string>
+    <string name="ajustes_cambiar_hora_aviso">Змінити час</string>
+    <string name="aviso_nuevo_titulo">Нове нагадування</string>
+    <string name="aviso_editar_titulo">Змінити нагадування</string>
+    <string name="aviso_editor_ayuda">Через скільки часу від початку робочого дня? Від 1 до 24 год.</string>
+    <string name="aviso_borrar">Видалити це нагадування</string>
+    <string name="error_aviso_rango">Має бути від 1 до 24 год.</string>
+    <string name="error_aviso_repetido">Нагадування на цей час уже є.</string>
+    <string name="error_aviso_demasiados">Більше нагадувань додати не можна.</string>
+    <string name="ajustes_probar_aviso">Перевірити нагадування</string>
+    <string name="ajustes_prueba_programada">Тестове нагадування надійде через 1 хвилину. Можна заблокувати телефон.</string>
+    <string name="ajustes_seccion_reglas">Регламент</string>
+    <string name="ajustes_paises_ayuda">Потрібно для правил міжнародних перевезень (скорочений щотижневий відпочинок поза домом).</string>
+    <string name="ajustes_pais_empresa">Країна компанії</string>
+    <string name="ajustes_pais_residencia">Країна проживання</string>
+    <string name="ajustes_seccion_informes">Звіти</string>
+    <string name="ajustes_nombre_conductor">Ваше імʼя (для PDF)</string>
 
     <!-- Genérico -->
     <string name="pantalla_pendiente">Незабаром</string>
+
+    <!-- Історія -->
+    <string name="historial_vacio">Ще немає робочих днів. Коли завершите перший, він з’явиться тут.</string>
+    <string name="historial_semana">Тиждень з %1$s по %2$s</string>
+    <string name="historial_total_semana">%1$s км · %2$s водіння</string>
+    <string name="historial_total_semana_incompleta">%1$s км · %2$s водіння (не все записано)</string>
+    <string name="historial_dia">%1$s · %2$s</string>
+    <string name="historial_en_curso">Триває з %1$s</string>
+    <string name="historial_horas">%1$s – %2$s</string>
+    <string name="historial_horas_otro_dia">%1$s – %2$s (%3$s)</string>
+    <string name="historial_km">%1$s км</string>
+    <string name="historial_conduccion">Водіння %1$s</string>
+    <string name="historial_sin_conduccion">Водіння не записано</string>
+
+    <!-- Деталі та редагування робочого дня -->
+    <string name="editar_titulo">Робочий день</string>
+    <string name="editar_seccion_inicio">Початок</string>
+    <string name="editar_seccion_fin">Кінець</string>
+    <string name="editar_en_curso_ayuda">Цей робочий день ще триває: кінець записується кнопкою «Завершити робочий день» на головній.</string>
+    <string name="accion_guardar_cambios">Зберегти зміни</string>
+    <string name="accion_borrar_jornada">Видалити робочий день</string>
+    <string name="accion_borrar">Видалити</string>
+    <string name="borrar_titulo">Видалити цей робочий день?</string>
+    <string name="borrar_texto">Його буде видалено назавжди, скасувати не можна.</string>
+
+    <!-- Резервна копія -->
+    <string name="ajustes_seccion_copia">Резервна копія</string>
+    <string name="copia_ayuda">Збережіть усі робочі дні та налаштування у файл. Надішліть його за межі телефона (Google Drive, пошта, комп’ютер): якщо загубите або зміните телефон, відновите його тут.</string>
+    <string name="copia_guardar">Зберегти копію</string>
+    <string name="copia_restaurar">Відновити копію</string>
+    <string name="copia_guardada">Копію збережено.</string>
+    <string name="copia_restaurada">Копію відновлено.</string>
+    <string name="copia_error_guardar">Не вдалося зберегти файл. Спробуйте іншу папку.</string>
+    <string name="copia_error_leer">Не вдалося відкрити файл.</string>
+    <string name="copia_error_no_es_copia">Цей файл не є копією Mi Tacógrafo.</string>
+    <string name="copia_error_version">Ця копія з новішої версії застосунку. Оновіть застосунок і спробуйте ще раз.</string>
+    <string name="copia_error_datos">Копія пошкоджена: нічого не змінено.</string>
+    <string name="copia_confirmar_titulo">Відновити цю копію?</string>
+    <string name="copia_confirmar">Відновити</string>
+    <string name="copia_resumen_creada">Копія від %1$s.</string>
+    <string name="copia_resumen_rango">(з %1$s по %2$s)</string>
+    <plurals name="copia_resumen_jornadas">
+        <item quantity="one">%d робочий день</item>
+        <item quantity="few">%d робочі дні</item>
+        <item quantity="many">%d робочих днів</item>
+        <item quantity="other">%d робочого дня</item>
+    </plurals>
+    <string name="copia_aviso_sin_jornadas">Зараз у телефоні немає робочих днів. Налаштування буде замінено на ті, що в копії.</string>
+    <plurals name="copia_aviso_reemplazar">
+        <item quantity="one">Буде видалено %d робочий день, який зараз є в телефоні, і поточні налаштування.</item>
+        <item quantity="few">Буде видалено %d робочі дні, які зараз є в телефоні, і поточні налаштування.</item>
+        <item quantity="many">Буде видалено %d робочих днів, які зараз є в телефоні, і поточні налаштування.</item>
+        <item quantity="other">Буде видалено %d робочого дня, які зараз є в телефоні, і поточні налаштування.</item>
+    </plurals>
 </resources>

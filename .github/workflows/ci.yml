@@ -46,10 +46,10 @@ jobs:
         run: ./gradlew ktlintCheck
 
       - name: Tests unitarios
-        run: ./gradlew :core:domain:test :app:testDebugUnitTest
+        run: ./gradlew :core:domain:test :core:data:testDebugUnitTest :app:testDebugUnitTest
 
       - name: Android Lint
-        run: ./gradlew :app:lintDebug
+        run: ./gradlew :core:data:lintDebug :app:lintDebug
 
       - name: Compilar APK debug
         run: ./gradlew :app:assembleDebug

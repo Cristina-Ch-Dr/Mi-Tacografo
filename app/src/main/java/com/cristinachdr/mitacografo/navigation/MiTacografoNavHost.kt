@@ -1,7 +1,10 @@
 package com.cristinachdr.mitacografo.navigation
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
@@ -22,8 +25,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -32,9 +39,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cristinachdr.mitacografo.R
+import com.cristinachdr.mitacografo.feature.editday.EditarJornadaScreen
+import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaScreen
 import com.cristinachdr.mitacografo.feature.history.HistoryScreen
 import com.cristinachdr.mitacografo.feature.home.HomeScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
+import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
 import com.cristinachdr.mitacografo.feature.trips.TripsScreen
 import kotlin.reflect.KClass
@@ -63,7 +73,15 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
         Pestana.entries.firstOrNull { pestana ->
             destinoActual?.hierarchy?.any { it.hasRoute(pestana.clase) } == true
         }
-    val enAjustes = destinoActual?.hasRoute(RutaAjustes::class) == true
+    // Las pantallas que no son pestañas (Ajustes, formularios…) tienen flecha atrás y no muestran la barra inferior.
+    val pantallaSecundaria = destinoActual != null && pestanaActual == null
+    val tituloSecundaria =
+        when {
+            destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> R.string.accion_iniciar_jornada
+            destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> R.string.accion_finalizar_jornada
+            destinoActual?.hasRoute(RutaJornada::class) == true -> R.string.editar_titulo
+            else -> R.string.nav_ajustes
+        }
 
     Scaffold(
         modifier = modifier,
@@ -72,22 +90,24 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 title = {
                     Text(
                         stringResource(
-                            pestanaActual?.titulo ?: if (enAjustes) R.string.nav_ajustes else R.string.app_name,
+                            pestanaActual?.titulo ?: if (pantallaSecundaria) tituloSecundaria else R.string.app_name,
                         ),
                     )
                 },
                 navigationIcon = {
-                    if (enAjustes) {
+                    if (pantallaSecundaria) {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.accion_volver),
                             )
                         }
+                    } else {
+                        LogoApp(Modifier.padding(start = 12.dp, end = 4.dp))
                     }
                 },
                 actions = {
-                    if (!enAjustes) {
+                    if (!pantallaSecundaria) {
                         IconButton(onClick = { navController.navigate(RutaAjustes) { launchSingleTop = true } }) {
                             Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_ajustes))
                         }
@@ -96,7 +116,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             )
         },
         bottomBar = {
-            if (!enAjustes) {
+            if (!pantallaSecundaria) {
                 NavigationBar {
                     Pestana.entries.forEach { pestana ->
                         NavigationBarItem(
@@ -129,11 +149,42 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             startDestination = RutaInicio,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable<RutaInicio> { HomeScreen() }
-            composable<RutaHistorial> { HistoryScreen() }
+            composable<RutaInicio> {
+                HomeScreen(
+                    onIniciarJornada = { navController.navigate(RutaIniciarJornada) { launchSingleTop = true } },
+                    onFinalizarJornada = { navController.navigate(RutaFinalizarJornada) { launchSingleTop = true } },
+                )
+            }
+            composable<RutaHistorial> { HistoryScreen(onJornada = { navController.navigate(RutaJornada(it)) }) }
             composable<RutaViajes> { TripsScreen() }
             composable<RutaResumen> { StatsScreen() }
             composable<RutaAjustes> { SettingsScreen() }
+            composable<RutaIniciarJornada> { IniciarJornadaScreen(onGuardado = { navController.popBackStack() }) }
+            composable<RutaFinalizarJornada> { FinalizarJornadaScreen(onGuardado = { navController.popBackStack() }) }
+            composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
         }
     }
+}
+
+/**
+ * El icono de la app, cuadrado con las esquinas un poco redondeadas, a la izquierda del título.
+ *
+ * Se usa la capa de primer plano del icono (el icono adaptable de `mipmap` no se puede pintar
+ * en Compose). El dibujo ocupa el centro de esa capa, así que se amplía y se recorta.
+ * Es decorativo: el título de al lado ya dice dónde se está.
+ */
+@Composable
+private fun LogoApp(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(R.drawable.ic_launcher_foreground),
+        contentDescription = null,
+        modifier =
+            modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .graphicsLayer {
+                    scaleX = 1.45f
+                    scaleY = 1.45f
+                },
+    )
 }
