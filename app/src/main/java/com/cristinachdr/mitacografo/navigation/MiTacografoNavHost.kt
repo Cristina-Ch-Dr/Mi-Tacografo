@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cristinachdr.mitacografo.R
+import com.cristinachdr.mitacografo.feature.editday.EditarJornadaScreen
 import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaScreen
 import com.cristinachdr.mitacografo.feature.history.HistoryScreen
 import com.cristinachdr.mitacografo.feature.home.HomeScreen
@@ -71,6 +72,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
         when {
             destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> R.string.accion_iniciar_jornada
             destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> R.string.accion_finalizar_jornada
+            destinoActual?.hasRoute(RutaJornada::class) == true -> R.string.editar_titulo
             else -> R.string.nav_ajustes
         }
 
@@ -144,12 +146,13 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                     onFinalizarJornada = { navController.navigate(RutaFinalizarJornada) { launchSingleTop = true } },
                 )
             }
-            composable<RutaHistorial> { HistoryScreen() }
+            composable<RutaHistorial> { HistoryScreen(onJornada = { navController.navigate(RutaJornada(it)) }) }
             composable<RutaViajes> { TripsScreen() }
             composable<RutaResumen> { StatsScreen() }
             composable<RutaAjustes> { SettingsScreen() }
             composable<RutaIniciarJornada> { IniciarJornadaScreen(onGuardado = { navController.popBackStack() }) }
             composable<RutaFinalizarJornada> { FinalizarJornadaScreen(onGuardado = { navController.popBackStack() }) }
+            composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
         }
     }
 }

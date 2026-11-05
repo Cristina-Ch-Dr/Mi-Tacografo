@@ -28,9 +28,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
+import com.cristinachdr.mitacografo.ui.idiomaApp
 import com.cristinachdr.mitacografo.ui.pais.Pais
 import com.cristinachdr.mitacografo.ui.pais.Paises
-import java.util.Locale
 
 /**
  * Selector de país con búsqueda: se escribe "Alem" o "DE" y se elige "Alemania (DE)".
@@ -166,6 +166,6 @@ private fun OpcionPais(
  */
 @Composable
 fun rememberPaises(): Paises {
-    val idioma = stringResource(R.string.idioma_paises)
-    return remember(idioma) { Paises(Locale.forLanguageTag(idioma)) }
+    val idioma = idiomaApp()
+    return remember(idioma) { Paises(idioma) }
 }

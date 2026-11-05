@@ -29,4 +29,5 @@ val ErrorJornada.mensaje: Int
             ErrorJornada.FIN_EN_EL_FUTURO -> R.string.error_fin_futuro
             ErrorJornada.CONDUCCION_NEGATIVA -> R.string.error_conduccion_negativa
             ErrorJornada.CONDUCCION_MAYOR_QUE_JORNADA -> R.string.error_conduccion_mayor
+            ErrorJornada.SOLAPA_CON_OTRA_JORNADA -> R.string.error_solapa
         }

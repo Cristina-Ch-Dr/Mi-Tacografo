@@ -186,9 +186,58 @@ class CasosDeUsoJornadaTest {
             }
 
         @Test
+        fun `no deja que la jornada corregida se solape con otra`() =
+            runTest {
+                val hoy = abiertaHoy().copy(fin = hora(2, 16), zonaFin = madrid, kmFin = 100_900)
+                val repo = FakeJornadaRepository(listOf(ayer, hoy))
+
+                // Ayer terminaba a las 17:00 del día 1; se corrige a las 07:00 del día 2 (hoy empezó a las 06:00).
+                val resultado = editar(repo)(ayer.copy(fin = hora(2, 7)))
+
+                assertEquals(ResultadoJornada.Invalida(ErrorJornada.SOLAPA_CON_OTRA_JORNADA), resultado)
+                assertEquals(hora(1, 17), repo.obtenerPorId(1)?.fin)
+            }
+
+        @Test
+        fun `una jornada pegada a la siguiente no se solapa`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+
+                val resultado = editar(repo)(ayer.copy(fin = hora(2, 6)))
+
+                assertTrue(resultado is ResultadoJornada.Ok)
+            }
+
+        @Test
         fun `una jornada que no existe no se puede editar`() =
             runTest {
                 val resultado = editar(FakeJornadaRepository())(ayer)
+
+                assertEquals(ResultadoJornada.Invalida(ErrorJornada.JORNADA_NO_EXISTE), resultado)
+            }
+    }
+
+    @Nested
+    inner class Borrar {
+        @Test
+        fun `borra la jornada y quita sus avisos`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer))
+                iniciar(repo)(DatosInicio(hora(2, 19), madrid, 100_480))
+                val abierta = repo.obtenerAbierta()!!
+                assertTrue(alarmas.programados.isNotEmpty())
+
+                val resultado = BorrarJornada(repo, gestor(repo))(abierta.id)
+
+                assertEquals(ResultadoJornada.Ok(Unit), resultado)
+                assertEquals(listOf(ayer), repo.guardadas)
+                assertTrue(alarmas.programados.isEmpty())
+            }
+
+        @Test
+        fun `una jornada que no existe no se puede borrar`() =
+            runTest {
+                val resultado = BorrarJornada(FakeJornadaRepository(), gestor(FakeJornadaRepository()))(7)
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.JORNADA_NO_EXISTE), resultado)
             }

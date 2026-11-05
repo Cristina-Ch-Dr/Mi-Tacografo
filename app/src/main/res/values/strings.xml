@@ -30,8 +30,8 @@
     <string name="campo_km_inicio">Km del camión al empezar</string>
     <string name="campo_km_fin">Km del camión al terminar</string>
     <string name="campo_pais">País</string>
-    <!-- Idioma de los nombres de países (código ISO). Debe coincidir con el idioma de esta carpeta. -->
-    <string name="idioma_paises">es</string>
+    <!-- Idioma en el que se ve la app (código ISO): para los nombres de países, fechas y números. Debe coincidir con el idioma de esta carpeta. -->
+    <string name="idioma_app">es</string>
     <string name="pais_buscar">Escribe el país o su código (DE…)</string>
     <string name="pais_sin_resultados">Ningún país con ese nombre</string>
     <string name="pais_ninguno">Sin país</string>
@@ -80,6 +80,7 @@
     <string name="error_fin_futuro">La hora de fin no puede ser futura.</string>
     <string name="error_conduccion_negativa">La conducción no puede ser negativa.</string>
     <string name="error_conduccion_mayor">La conducción es mayor que la duración de la jornada.</string>
+    <string name="error_solapa">Se solapa con otra jornada: revisa las horas de inicio y fin.</string>
 
     <!-- Avisos (notificaciones) -->
     <string name="canal_avisos_nombre">Avisos de jornada</string>
@@ -115,4 +116,28 @@
 
     <!-- Genérico -->
     <string name="pantalla_pendiente">Próximamente</string>
+
+    <!-- Historial -->
+    <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí.</string>
+    <string name="historial_semana">Semana del %1$s al %2$s</string>
+    <string name="historial_total_semana">%1$s km · %2$s de conducción</string>
+    <string name="historial_total_semana_incompleta">%1$s km · %2$s de conducción (falta apuntar alguna)</string>
+    <string name="historial_dia">%1$s · %2$s</string>
+    <string name="historial_en_curso">En curso desde las %1$s</string>
+    <string name="historial_horas">%1$s – %2$s</string>
+    <string name="historial_horas_otro_dia">%1$s – %2$s (%3$s)</string>
+    <string name="historial_km">%1$s km</string>
+    <string name="historial_conduccion">Conducción %1$s</string>
+    <string name="historial_sin_conduccion">Conducción sin apuntar</string>
+
+    <!-- Detalle y edición de una jornada -->
+    <string name="editar_titulo">Jornada</string>
+    <string name="editar_seccion_inicio">Inicio</string>
+    <string name="editar_seccion_fin">Fin</string>
+    <string name="editar_en_curso_ayuda">Esta jornada sigue en curso: el fin se apunta con «Finalizar jornada» en Inicio.</string>
+    <string name="accion_guardar_cambios">Guardar cambios</string>
+    <string name="accion_borrar_jornada">Borrar jornada</string>
+    <string name="accion_borrar">Borrar</string>
+    <string name="borrar_titulo">¿Borrar esta jornada?</string>
+    <string name="borrar_texto">Se borrará para siempre y no se puede deshacer.</string>
 </resources>

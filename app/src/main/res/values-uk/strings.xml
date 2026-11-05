@@ -31,7 +31,7 @@
     <string name="campo_km_inicio">Км вантажівки на початку</string>
     <string name="campo_km_fin">Км вантажівки в кінці</string>
     <string name="campo_pais">Країна</string>
-    <string name="idioma_paises">uk</string>
+    <string name="idioma_app">uk</string>
     <string name="pais_buscar">Введіть країну або її код (DE…)</string>
     <string name="pais_sin_resultados">Немає країни з такою назвою</string>
     <string name="pais_ninguno">Без країни</string>
@@ -80,6 +80,7 @@
     <string name="error_fin_futuro">Час завершення не може бути в майбутньому.</string>
     <string name="error_conduccion_negativa">Керування не може бути відʼємним.</string>
     <string name="error_conduccion_mayor">Керування довше, ніж робочий день.</string>
+    <string name="error_solapa">Перетинається з іншим робочим днем: перевірте час початку й кінця.</string>
 
     <!-- Avisos (notificaciones) -->
     <string name="canal_avisos_nombre">Нагадування робочого дня</string>
@@ -115,4 +116,28 @@
 
     <!-- Genérico -->
     <string name="pantalla_pendiente">Незабаром</string>
+
+    <!-- Історія -->
+    <string name="historial_vacio">Ще немає робочих днів. Коли завершите перший, він з’явиться тут.</string>
+    <string name="historial_semana">Тиждень з %1$s по %2$s</string>
+    <string name="historial_total_semana">%1$s км · %2$s водіння</string>
+    <string name="historial_total_semana_incompleta">%1$s км · %2$s водіння (не все записано)</string>
+    <string name="historial_dia">%1$s · %2$s</string>
+    <string name="historial_en_curso">Триває з %1$s</string>
+    <string name="historial_horas">%1$s – %2$s</string>
+    <string name="historial_horas_otro_dia">%1$s – %2$s (%3$s)</string>
+    <string name="historial_km">%1$s км</string>
+    <string name="historial_conduccion">Водіння %1$s</string>
+    <string name="historial_sin_conduccion">Водіння не записано</string>
+
+    <!-- Деталі та редагування робочого дня -->
+    <string name="editar_titulo">Робочий день</string>
+    <string name="editar_seccion_inicio">Початок</string>
+    <string name="editar_seccion_fin">Кінець</string>
+    <string name="editar_en_curso_ayuda">Цей робочий день ще триває: кінець записується кнопкою «Завершити робочий день» на головній.</string>
+    <string name="accion_guardar_cambios">Зберегти зміни</string>
+    <string name="accion_borrar_jornada">Видалити робочий день</string>
+    <string name="accion_borrar">Видалити</string>
+    <string name="borrar_titulo">Видалити цей робочий день?</string>
+    <string name="borrar_texto">Його буде видалено назавжди, скасувати не можна.</string>
 </resources>

@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E1** MT-16, MT-17, MT-42 | — | MT-13, MT-41, MT-43 | MT-01 … MT-09 |
+| E2 – E7 | **E1** MT-17, MT-42 | MT-16 | — | MT-01 … MT-13, MT-41, MT-43 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -124,8 +124,14 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - **Criterio:** probado con offsets de 1–2 min en modo debug, con el móvil bloqueado y tras reiniciar, **en la API mínima y en la última**.
 
 ### MT-16 · Historial básico · M · deps: MT-09
-- [ ] Lista de jornadas agrupadas por semana (lunes a domingo) con fecha, km y conducción.
-- [ ] Detalle y edición, y borrado con confirmación.
+- [x] Lista de jornadas agrupadas por semana (lunes a domingo) con fecha, km y conducción.
+  - Total de km y conducción por semana; si a alguna jornada le falta la conducción, lo dice («falta apuntar alguna»).
+  - La semana se cuenta por el día en que **empieza** la jornada, en la zona de referencia de Ajustes o, si no hay, en la del inicio.
+- [x] Detalle y edición, y borrado con confirmación.
+  - Se puede corregir todo (horas, km, países, conducción, observaciones) con la misma validación en vivo. Una jornada en curso solo deja cambiar el inicio.
+  - Nueva regla al editar: la jornada no puede **solaparse** con otra (`SOLAPA_CON_OTRA_JORNADA`).
+  - Borrar quita también los avisos de esa jornada si estaba en curso.
+- [x] Fechas y números en el idioma **de la app** (antes salían en el del móvil: «Wed · Nov 4» con la app en español).
 
 ### MT-17 · Copia de seguridad y restauración JSON · L · deps: MT-16
 - [ ] `BackupPort` + implementación con kotlinx.serialization (`schemaVersion`).

@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
-import com.cristinachdr.mitacografo.ui.FormatoFecha
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
+import com.cristinachdr.mitacografo.ui.formatoFecha
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.textoKm
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
@@ -137,7 +137,7 @@ private fun JornadaEnCursoCard(
                     stringResource(
                         R.string.inicio_desde,
                         jornada.inicio.format(FormatoHora),
-                        jornada.inicio.format(FormatoFecha),
+                        jornada.inicio.format(formatoFecha()),
                     ),
                 style = MaterialTheme.typography.bodyLarge,
             )

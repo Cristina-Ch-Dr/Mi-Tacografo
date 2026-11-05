@@ -20,3 +20,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object RutaIniciarJornada
 
 @Serializable data object RutaFinalizarJornada
+
+/** Detalle de una jornada del historial, para corregirla o borrarla. */
+@Serializable data class RutaJornada(
+    val id: Long,
+)
