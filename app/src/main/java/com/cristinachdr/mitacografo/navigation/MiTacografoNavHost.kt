@@ -1,7 +1,10 @@
 package com.cristinachdr.mitacografo.navigation
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
@@ -22,8 +25,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -95,6 +102,8 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                                 contentDescription = stringResource(R.string.accion_volver),
                             )
                         }
+                    } else {
+                        LogoApp(Modifier.padding(start = 12.dp, end = 4.dp))
                     }
                 },
                 actions = {
@@ -155,4 +164,27 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
         }
     }
+}
+
+/**
+ * El icono de la app, cuadrado con las esquinas un poco redondeadas, a la izquierda del título.
+ *
+ * Se usa la capa de primer plano del icono (el icono adaptable de `mipmap` no se puede pintar
+ * en Compose). El dibujo ocupa el centro de esa capa, así que se amplía y se recorta.
+ * Es decorativo: el título de al lado ya dice dónde se está.
+ */
+@Composable
+private fun LogoApp(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(R.drawable.ic_launcher_foreground),
+        contentDescription = null,
+        modifier =
+            modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .graphicsLayer {
+                    scaleX = 1.45f
+                    scaleY = 1.45f
+                },
+    )
 }

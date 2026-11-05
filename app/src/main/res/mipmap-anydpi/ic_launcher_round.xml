@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Icono adaptable: disco de tacógrafo con anillas de libreta.
+    El primer plano y la capa monocroma son PNG en drawable-*dpi, sacados del dibujo original
+    (reducido al 85 % para que las anillas no se recorten con la máscara redonda).
+    La capa monocroma es la que usa Android 13+ con los iconos temáticos.
+-->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background" />
     <foreground android:drawable="@drawable/ic_launcher_foreground" />
-    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
 </adaptive-icon>
