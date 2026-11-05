@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E0** MT-06 | MT-42 | — | MT-01 … MT-05, MT-07 … MT-17, MT-41, MT-43 |
+| E2 – E7 | — | MT-06 | — | MT-01 … MT-05, MT-07 … MT-17, MT-41 … MT-43 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -32,29 +32,32 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 ## E0 · Preparación (Sprint 0)
 
 ### MT-01 · Entorno y decisiones previas · S
-- [ ] Instalar Android Studio (estable) y crear un emulador.
+- [x] Instalar Android Studio (estable) y crear un emulador.
 - [ ] Activar las opciones de desarrollador y la depuración USB en el móvil del conductor, y anotar su versión de Android (→ D-5).
 - [ ] Crear 3 emuladores: **API 26** (mínima), **API 33** (como el móvil del conductor) y la última estable (espec. §3.1).
-- [ ] Decidir el `applicationId` (D-6). (D-7 está resuelto: transporte internacional y nacional.)
+  - Hecho solo el de la última (API 36). Falta probar en API 33 antes de dar el APK (ver Release v0.1.0).
+- [x] Decidir el `applicationId` (D-6): `com.cristinachdr.mitacografo`. (D-7 está resuelto: transporte internacional y nacional.)
 
 ### MT-02 · Repositorio y Gitflow · S
-- [ ] Repo público en GitHub con `main` y `develop` (por defecto `develop`). Protección de ramas: PR + CI obligatoria.
-- [ ] `.gitignore` de Android, licencia (MIT) y README básico.
-- [ ] Añadir `docs/ESPECIFICACION.md` y `docs/KANBAN.md`. Crear las issues y el Project.
+- [x] Repo público en GitHub con `main` y `develop`.
+- [ ] Rama por defecto `develop` (ahora es `main`) y protección de ramas: PR + CI obligatoria.
+- [x] `.gitignore` de Android, licencia (MIT) y README básico.
+- [x] Añadir `docs/ESPECIFICACION.md` y `docs/KANBAN.md`.
+- [ ] Crear las issues y el Project (opcional: el tablero vive en este archivo).
 - **Criterio:** se puede abrir un PR contra `develop`.
 
 ### MT-03 · Esqueleto multimódulo · M · deps: MT-02
-- [ ] Proyecto «Empty Compose Activity», Kotlin DSL y `libs.versions.toml`.
-- [ ] Módulos `:app`, `:core:domain` (plugin `kotlin("jvm")`) y `:core:data` (Android library).
-- [ ] Dependencias: app → domain y data; data → domain.
-- [ ] `minSdk = 26` y `targetSdk`/`compileSdk` en la última versión estable.
-- [ ] `enableEdgeToEdge()` desde el principio (obligatorio en Android 15+).
+- [x] Proyecto «Empty Compose Activity», Kotlin DSL y `libs.versions.toml`.
+- [x] Módulos `:app`, `:core:domain` (plugin `kotlin("jvm")`) y `:core:data` (Android library).
+- [x] Dependencias: app → domain y data; data → domain.
+- [x] `minSdk = 26` y `targetSdk`/`compileSdk` en la última versión estable.
+- [x] `enableEdgeToEdge()` desde el principio (obligatorio en Android 15+).
 - **Criterio:** `./gradlew build` en verde y la app muestra «Hola» en el móvil del conductor **y** en el emulador más reciente.
 
 ### MT-04 · Hilt + tema + navegación base · M · deps: MT-03
-- [ ] Hilt (`@HiltAndroidApp`, `@AndroidEntryPoint`).
-- [ ] Tema Material 3 claro y oscuro, tipografía grande y componente `BigButton`.
-- [ ] NavHost con barra inferior (Inicio · Historial · Viajes · Resumen) y pantallas vacías.
+- [x] Hilt (`@HiltAndroidApp`, `@AndroidEntryPoint`).
+- [x] Tema Material 3 claro y oscuro, tipografía grande y componente `BigButton`.
+- [x] NavHost con barra inferior (Inicio · Historial · Viajes · Resumen) y pantallas vacías.
 - **Criterio:** se navega entre 4 pantallas vacías.
 
 ### MT-05 · Calidad y CI · M · deps: MT-03
@@ -64,9 +67,11 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - **Criterio:** el PR muestra el check verde.
 
 ### MT-06 · Firma y release · M · deps: MT-05
-- [ ] Generar el keystore y **guardarlo en 2 sitios seguros fuera del repo**.
-- [ ] Secrets en GitHub (keystore en Base64 y contraseñas) y `release.yml` con tag `v*` → APK firmado en la Release.
-- [ ] Tag `v0.0.1` → instalar el APK en el móvil del conductor.
+- [x] Generar el keystore y **guardarlo en 2 sitios seguros fuera del repo**.
+- [x] `release.yml` con tag `v*` → APK firmado en la Release (PR #5). La firma se lee de variables de entorno o de `keystore.properties` (ignorado por git).
+  - Probado en local con una clave de prueba: el APK release (R8) arranca, guarda jornadas y hace y restaura la copia JSON.
+- [x] Secrets en GitHub: `MT_KEYSTORE_BASE64`, `MT_KEYSTORE_PASSWORD`, `MT_KEY_ALIAS` y `MT_KEY_PASSWORD`.
+- [ ] Tag `v0.1.0` en `main` → instalar el APK en el móvil del conductor (se junta con la Release v0.1.0).
 - **Criterio:** el APK firmado se instala desde la Release.
 
 ---
@@ -166,7 +171,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Guardar en DataStore (`paises_habituales`, `continentes`) y test de la búsqueda con y sin filtro.
 - [x] El test de DataStore usa `OkioStorage`: el almacenamiento de Android falla en Windows al sobrescribir el archivo (en el móvil y en el CI funciona igual).
 
-> 🏁 **Release v0.1.0** → instalar en el móvil del conductor. **Usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
+> 🏁 **Release v0.1.0** → antes, probar el APK firmado en un emulador **API 33** (primer arranque, permisos, un aviso). Después, instalar en el móvil del conductor. **Usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
 
 ---
 
@@ -184,6 +189,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ### MT-20 · Descansos: datos y clasificador (TDD) · L · (antes MT-20 y MT-21)
 - [ ] `Descanso` (pausa/descanso, país), entidad, DAO, migración y validación de solapes.
+  - Ya hecho: la tabla `descanso` (vacía) está en la versión 1 de la base de datos, para no tener que migrar. `fin` admite `null` (pausa en curso). Falta el modelo, el DAO y la validación.
 - [ ] Clasificador: diario normal, reducido y fraccionado 3+9 (parte 1 y completo); semanal normal y reducido.
 - [ ] Tests T7–T10 y T12 (clasificación).
 
