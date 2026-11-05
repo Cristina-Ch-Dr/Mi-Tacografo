@@ -27,7 +27,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.Jornada
-import com.cristinachdr.mitacografo.ui.FormatoFecha
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
@@ -35,6 +34,7 @@ import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
 import com.cristinachdr.mitacografo.ui.components.CampoTexto
 import com.cristinachdr.mitacografo.ui.components.ListaErrores
+import com.cristinachdr.mitacografo.ui.formatoFecha
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.textoKm
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
@@ -109,7 +109,7 @@ fun FinalizarJornadaContent(
                 stringResource(
                     R.string.fin_resumen_inicio,
                     jornada.inicio.atZone(jornada.zonaInicio).format(FormatoHora),
-                    jornada.inicio.atZone(jornada.zonaInicio).format(FormatoFecha),
+                    jornada.inicio.atZone(jornada.zonaInicio).format(formatoFecha()),
                     textoKm(jornada.kmInicio),
                 ),
             style = MaterialTheme.typography.bodyLarge,

@@ -5,13 +5,16 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
+import kotlinx.coroutines.flow.first
 import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 
 /**
  * Caso de uso: corregir una jornada ya guardada (desde el historial o la jornada en curso).
  *
- * Aplica las mismas reglas que al crearla y, además, impide dejar dos jornadas abiertas.
+ * Aplica las mismas reglas que al crearla y, además, impide dejar dos jornadas abiertas
+ * o que la jornada corregida se solape con otra.
  */
 class EditarJornada
     @Inject
@@ -39,7 +42,10 @@ class EditarJornada
                     ciudadFin = jornada.ciudadFin.limpio(),
                     observaciones = jornada.observaciones.limpio(),
                 )
-            val errores = validarJornada(limpia, clock.instant())
+            val ahora = clock.instant()
+            val errores = validarJornada(limpia, ahora).toMutableSet()
+            val otras = repository.observarTodas().first().filter { it.id != limpia.id }
+            if (otras.any { it.solapaCon(limpia, ahora) }) errores += ErrorJornada.SOLAPA_CON_OTRA_JORNADA
             if (errores.isNotEmpty()) return ResultadoJornada.Invalida(errores)
 
             repository.guardar(limpia)
@@ -47,3 +53,9 @@ class EditarJornada
             return ResultadoJornada.Ok(limpia)
         }
     }
+
+/** Dos jornadas se solapan si una empieza antes de que termine la otra. Una abierta dura hasta [ahora]. */
+private fun Jornada.solapaCon(
+    otra: Jornada,
+    ahora: Instant,
+): Boolean = inicio < (otra.fin ?: ahora) && otra.inicio < (fin ?: ahora)

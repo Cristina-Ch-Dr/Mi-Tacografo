@@ -16,6 +16,7 @@ enum class ErrorJornada {
     FIN_EN_EL_FUTURO,
     CONDUCCION_NEGATIVA,
     CONDUCCION_MAYOR_QUE_JORNADA,
+    SOLAPA_CON_OTRA_JORNADA,
 }
 
 /**

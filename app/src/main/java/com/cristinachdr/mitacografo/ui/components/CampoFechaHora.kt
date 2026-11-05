@@ -31,8 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.cristinachdr.mitacografo.R
-import com.cristinachdr.mitacografo.ui.FormatoFecha
 import com.cristinachdr.mitacografo.ui.FormatoHora
+import com.cristinachdr.mitacografo.ui.formatoFecha
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -68,7 +68,7 @@ fun CampoFechaHora(
             Column(Modifier.weight(1f)) {
                 Text(etiqueta, style = MaterialTheme.typography.labelMedium)
                 Text(
-                    text = "${valor.format(FormatoHora)} · ${valor.format(FormatoFecha)}",
+                    text = "${valor.format(FormatoHora)} · ${valor.format(formatoFecha())}",
                     style = MaterialTheme.typography.headlineSmall,
                 )
             }

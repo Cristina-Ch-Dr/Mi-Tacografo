@@ -12,6 +12,8 @@ import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.ui.ErrorCampo
+import com.cristinachdr.mitacografo.ui.errorMinutos
+import com.cristinachdr.mitacografo.ui.leerConduccion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -147,8 +149,7 @@ class FinalizarJornadaViewModel
                     kmNumero == null -> ErrorCampo.NO_ES_NUMERO
                     else -> null
                 }
-            val minutos = conduccionMinutos.toIntOrNull()
-            val errorMinutos = if (minutos != null && minutos > 59) ErrorCampo.MINUTOS_INVALIDOS else null
+            val errorMinutos = errorMinutos(conduccionMinutos)
 
             val abierta = jornada ?: return copy(errorKm = errorKm, errorMinutos = errorMinutos)
             val fin = fechaHora.atZone(zona).toInstant()
@@ -170,9 +171,4 @@ class FinalizarJornadaViewModel
     }
 
 /** Conducción escrita en horas y minutos. Si las dos casillas están vacías, `null` (no apuntada). */
-internal fun FinalizarJornadaUiState.conduccion(): Duration? {
-    if (conduccionHoras.isBlank() && conduccionMinutos.isBlank()) return null
-    val horas = conduccionHoras.toLongOrNull() ?: 0
-    val minutos = conduccionMinutos.toLongOrNull() ?: 0
-    return Duration.ofHours(horas).plusMinutes(minutos)
-}
+internal fun FinalizarJornadaUiState.conduccion(): Duration? = leerConduccion(conduccionHoras, conduccionMinutos)

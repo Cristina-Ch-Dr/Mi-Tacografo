@@ -32,6 +32,11 @@ class GestorAvisos
             if (avisos.isNotEmpty()) scheduler.programar(avisos)
         }
 
+        /** Quita los avisos de una jornada (por ejemplo, al borrarla). */
+        suspend fun cancelar(jornadaId: Long) {
+            scheduler.cancelar(jornadaId)
+        }
+
         /** Al reiniciar el móvil, al cambiar los ajustes o al conceder el permiso de alarmas exactas. */
         suspend fun reprogramarJornadaAbierta() {
             repository.obtenerAbierta()?.let { reprogramar(it) }
