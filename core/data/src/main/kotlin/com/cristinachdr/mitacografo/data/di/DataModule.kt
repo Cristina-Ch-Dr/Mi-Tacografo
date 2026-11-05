@@ -6,10 +6,12 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import com.cristinachdr.mitacografo.data.backup.JsonBackup
 import com.cristinachdr.mitacografo.data.datastore.DataStoreSettingsRepository
 import com.cristinachdr.mitacografo.data.room.AppDatabase
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaDao
 import com.cristinachdr.mitacografo.data.room.jornada.RoomJornadaRepository
+import com.cristinachdr.mitacografo.domain.port.BackupPort
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import dagger.Binds
@@ -36,6 +38,9 @@ internal abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
+
+    @Binds
+    abstract fun bindBackupPort(impl: JsonBackup): BackupPort
 
     companion object {
         @Provides

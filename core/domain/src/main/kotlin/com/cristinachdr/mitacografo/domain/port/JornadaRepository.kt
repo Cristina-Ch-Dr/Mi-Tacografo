@@ -31,4 +31,10 @@ interface JornadaRepository {
     suspend fun guardar(jornada: Jornada): Long
 
     suspend fun borrar(id: Long)
+
+    /**
+     * Borra todas las jornadas y guarda estas en su lugar (con sus mismos ids), todo de una vez:
+     * si falla a mitad, no se pierde nada. Lo usa la restauración de la copia de seguridad.
+     */
+    suspend fun reemplazarTodas(jornadas: List<Jornada>)
 }

@@ -52,6 +52,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                 onNombreConductor = viewModel::onNombreConductor,
             ),
         permisos = { EstadoPermisosAvisos(soloSiFalta = false) },
+        copia = { SeccionCopia() },
     )
 }
 
@@ -76,6 +77,7 @@ fun SettingsContent(
     acciones: AccionesAjustes,
     modifier: Modifier = Modifier,
     permisos: @Composable () -> Unit = {},
+    copia: @Composable () -> Unit = {},
 ) {
     Column(
         modifier =
@@ -134,6 +136,10 @@ fun SettingsContent(
             onCambio = acciones.onNombreConductor,
             etiqueta = stringResource(R.string.ajustes_nombre_conductor),
         )
+
+        HorizontalDivider()
+        Seccion(stringResource(R.string.ajustes_seccion_copia))
+        copia()
     }
 }
 

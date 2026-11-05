@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | **E1** MT-17, MT-42 | MT-16 | — | MT-01 … MT-13, MT-41, MT-43 |
+| E2 – E7 | **E1** MT-42 | MT-17 | — | MT-01 … MT-16, MT-41, MT-43 |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -134,10 +134,14 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Fechas y números en el idioma **de la app** (antes salían en el del móvil: «Wed · Nov 4» con la app en español).
 
 ### MT-17 · Copia de seguridad y restauración JSON · L · deps: MT-16
-- [ ] `BackupPort` + implementación con kotlinx.serialization (`schemaVersion`).
-- [ ] Exportar (CreateDocument) / importar (OpenDocument → resumen → confirmar → transacción → reprogramar alarmas).
-- [ ] Auto Backup (`dataExtractionRules`).
-- [ ] Test: exportar → importar = datos idénticos.
+- [x] `BackupPort` + implementación con kotlinx.serialization (`version`, más `app: "mi-tacografo"` para reconocer el archivo).
+  - JSON legible: fechas ISO-8601 y zonas por nombre. Clases DTO aparte del dominio. Campos desconocidos se ignoran.
+  - Errores claros: «no es una copia», «es de una versión más nueva», «está dañada».
+- [x] Exportar (CreateDocument) / importar (OpenDocument → resumen → confirmar → transacción → reprogramar alarmas).
+  - En Ajustes → «Copia de seguridad». Nombre propuesto: `mi-tacografo-AAAA-MM-DD.json`.
+  - El resumen dice cuántas jornadas trae y cuántas se borrarán. Un archivo de más de 20 MB no se lee.
+- [x] Auto Backup (`dataExtractionRules` y `fullBackupContent`): base de datos y DataStore, en la nube y al pasar de móvil.
+- [x] Test: exportar → importar = datos idénticos (JSON real y casos de uso), una copia v1 escrita a mano se sigue leyendo, y si la transacción de Room falla no se pierde nada.
 
 ### MT-41 · Selector de país con autocompletado · M · deps: MT-09 · *(propuesta de Cristina)*
 - [x] Desplegable con búsqueda en lugar de escribir el código: se puede buscar «Alem…» o «DE» y se guarda «DE».

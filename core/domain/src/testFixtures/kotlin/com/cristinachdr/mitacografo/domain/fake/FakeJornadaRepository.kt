@@ -48,5 +48,10 @@ class FakeJornadaRepository(
 
     override suspend fun borrar(id: Long) = jornadas.update { lista -> lista.filterNot { it.id == id } }
 
+    override suspend fun reemplazarTodas(jornadas: List<Jornada>) {
+        this.jornadas.value = jornadas
+        siguienteId = (jornadas.maxOfOrNull { it.id } ?: 0) + 1
+    }
+
     private fun List<Jornada>.abierta() = filter { it.abierta }.maxByOrNull { it.inicio }
 }

@@ -140,4 +140,34 @@
     <string name="accion_borrar">Видалити</string>
     <string name="borrar_titulo">Видалити цей робочий день?</string>
     <string name="borrar_texto">Його буде видалено назавжди, скасувати не можна.</string>
+
+    <!-- Резервна копія -->
+    <string name="ajustes_seccion_copia">Резервна копія</string>
+    <string name="copia_ayuda">Збережіть усі робочі дні та налаштування у файл. Надішліть його за межі телефона (Google Drive, пошта, комп’ютер): якщо загубите або зміните телефон, відновите його тут.</string>
+    <string name="copia_guardar">Зберегти копію</string>
+    <string name="copia_restaurar">Відновити копію</string>
+    <string name="copia_guardada">Копію збережено.</string>
+    <string name="copia_restaurada">Копію відновлено.</string>
+    <string name="copia_error_guardar">Не вдалося зберегти файл. Спробуйте іншу папку.</string>
+    <string name="copia_error_leer">Не вдалося відкрити файл.</string>
+    <string name="copia_error_no_es_copia">Цей файл не є копією Mi Tacógrafo.</string>
+    <string name="copia_error_version">Ця копія з новішої версії застосунку. Оновіть застосунок і спробуйте ще раз.</string>
+    <string name="copia_error_datos">Копія пошкоджена: нічого не змінено.</string>
+    <string name="copia_confirmar_titulo">Відновити цю копію?</string>
+    <string name="copia_confirmar">Відновити</string>
+    <string name="copia_resumen_creada">Копія від %1$s.</string>
+    <string name="copia_resumen_rango">(з %1$s по %2$s)</string>
+    <plurals name="copia_resumen_jornadas">
+        <item quantity="one">%d робочий день</item>
+        <item quantity="few">%d робочі дні</item>
+        <item quantity="many">%d робочих днів</item>
+        <item quantity="other">%d робочого дня</item>
+    </plurals>
+    <string name="copia_aviso_sin_jornadas">Зараз у телефоні немає робочих днів. Налаштування буде замінено на ті, що в копії.</string>
+    <plurals name="copia_aviso_reemplazar">
+        <item quantity="one">Буде видалено %d робочий день, який зараз є в телефоні, і поточні налаштування.</item>
+        <item quantity="few">Буде видалено %d робочі дні, які зараз є в телефоні, і поточні налаштування.</item>
+        <item quantity="many">Буде видалено %d робочих днів, які зараз є в телефоні, і поточні налаштування.</item>
+        <item quantity="other">Буде видалено %d робочого дня, які зараз є в телефоні, і поточні налаштування.</item>
+    </plurals>
 </resources>

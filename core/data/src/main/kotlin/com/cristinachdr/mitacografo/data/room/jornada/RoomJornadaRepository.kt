@@ -32,4 +32,7 @@ internal class RoomJornadaRepository
         }
 
         override suspend fun borrar(id: Long) = dao.borrar(id)
+
+        override suspend fun reemplazarTodas(jornadas: List<Jornada>) =
+            dao.reemplazarTodas(jornadas.map { it.aEntity() })
     }
