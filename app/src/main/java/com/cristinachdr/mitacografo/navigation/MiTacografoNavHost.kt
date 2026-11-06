@@ -39,11 +39,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.feature.editday.EditarJornadaScreen
 import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaScreen
 import com.cristinachdr.mitacografo.feature.history.HistoryScreen
 import com.cristinachdr.mitacografo.feature.home.HomeScreen
+import com.cristinachdr.mitacografo.feature.rests.DescansosScreen
+import com.cristinachdr.mitacografo.feature.rests.EditarDescansoScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
 import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
@@ -81,10 +84,30 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
     val pantallaSecundaria = destinoActual != null && pestanaActual == null
     val tituloSecundaria =
         when {
-            destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> R.string.accion_iniciar_jornada
-            destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> R.string.accion_finalizar_jornada
-            destinoActual?.hasRoute(RutaJornada::class) == true -> R.string.editar_titulo
-            else -> R.string.nav_ajustes
+            destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> {
+                R.string.accion_iniciar_jornada
+            }
+
+            destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> {
+                R.string.accion_finalizar_jornada
+            }
+
+            destinoActual?.hasRoute(RutaJornada::class) == true -> {
+                R.string.editar_titulo
+            }
+
+            destinoActual?.hasRoute(RutaDescansos::class) == true -> {
+                R.string.nav_descansos
+            }
+
+            destinoActual?.hasRoute(RutaDescanso::class) == true -> {
+                val nuevo = entradaActual?.toRoute<RutaDescanso>()?.id == 0L
+                if (nuevo) R.string.descanso_titulo_nuevo else R.string.descanso_titulo
+            }
+
+            else -> {
+                R.string.nav_ajustes
+            }
         }
 
     Scaffold(
@@ -112,6 +135,12 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 },
                 actions = {
                     if (!pantallaSecundaria) {
+                        IconButton(onClick = { navController.navigate(RutaDescansos) { launchSingleTop = true } }) {
+                            Icon(
+                                painterResource(R.drawable.ic_descanso),
+                                contentDescription = stringResource(R.string.nav_descansos),
+                            )
+                        }
                         IconButton(onClick = { navController.navigate(RutaAjustes) { launchSingleTop = true } }) {
                             Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_ajustes))
                         }
@@ -174,6 +203,13 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             composable<RutaIniciarJornada> { IniciarJornadaScreen(onGuardado = { navController.popBackStack() }) }
             composable<RutaFinalizarJornada> { FinalizarJornadaScreen(onGuardado = { navController.popBackStack() }) }
             composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
+            composable<RutaDescansos> {
+                DescansosScreen(
+                    onDescanso = { navController.navigate(RutaDescanso(it)) },
+                    onNuevo = { navController.navigate(RutaDescanso()) },
+                )
+            }
+            composable<RutaDescanso> { EditarDescansoScreen(onCerrar = { navController.popBackStack() }) }
         }
     }
 }

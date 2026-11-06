@@ -186,4 +186,40 @@
         <item quantity="many">Se borrarán las %d jornadas que hay ahora en el móvil y tus ajustes actuales.</item>
         <item quantity="other">Se borrarán las %d jornadas que hay ahora en el móvil y tus ajustes actuales.</item>
     </plurals>
+
+    <!-- Pausas y descansos (MT-20, MT-22) -->
+    <string name="nav_descansos">Pausas y descansos</string>
+    <string name="descanso_titulo">Descanso</string>
+    <string name="descanso_titulo_nuevo">Nuevo descanso</string>
+    <string name="descansos_vacio">Todavía no hay pausas ni descansos. Durante la jornada, pulsa «Iniciar pausa»; para apuntar uno pasado, pulsa «Añadir».</string>
+    <string name="descansos_explicacion">La clase (diario normal, reducido, fraccionado, semanal…) se calcula con las horas. Es orientativa: no comprueba todavía las reglas del reglamento.</string>
+    <string name="accion_anadir_descanso">Añadir</string>
+    <string name="descanso_tipo">¿Qué fue?</string>
+    <string name="tipo_pausa">Pausa (en la jornada)</string>
+    <string name="tipo_descanso">Descanso (entre jornadas)</string>
+    <string name="descanso_terminado">Ya ha terminado</string>
+    <string name="descanso_sigue_en_curso">Sigue en curso: se termina desde Inicio.</string>
+    <string name="descanso_duracion">Duración: %1$s</string>
+    <string name="accion_borrar_descanso">Borrar descanso</string>
+    <string name="borrar_descanso_titulo">¿Borrar este descanso?</string>
+    <string name="clase_pausa">Pausa</string>
+    <string name="clase_en_curso">En curso</string>
+    <string name="clase_insuficiente">No cuenta como diario</string>
+    <string name="clase_fraccionado_1">1.ª parte de un fraccionado</string>
+    <string name="clase_fraccionado_completo">Fraccionado 3 + 9 (normal)</string>
+    <string name="clase_diario_reducido">Diario reducido</string>
+    <string name="clase_diario_normal">Diario normal</string>
+    <string name="clase_semanal_reducido">Semanal reducido · faltan %1$s</string>
+    <string name="clase_semanal_normal">Semanal normal</string>
+    <string name="error_descanso_no_existe">Este descanso ya no existe.</string>
+    <string name="error_descanso_sin_jornada">Para hacer una pausa tiene que haber una jornada en curso.</string>
+    <string name="error_descanso_ya_en_curso">Ya hay una pausa o un descanso en curso.</string>
+    <string name="error_descanso_sin_pausa">No hay ninguna pausa en curso.</string>
+    <string name="error_descanso_solapa">Se solapa con otra pausa o descanso: revisa las horas.</string>
+    <string name="accion_iniciar_pausa">Iniciar pausa</string>
+    <string name="accion_terminar_pausa">Terminar pausa</string>
+    <string name="inicio_pausa_en_curso">En pausa desde las %1$s · %2$s</string>
+    <string name="inicio_propuesta_descanso">¿Descansaste desde %1$s?</string>
+    <string name="inicio_propuesta_detalle">Se apuntará un descanso de %1$s, hasta la hora de inicio.</string>
+    <string name="inicio_propuesta_si">Sí, apuntar el descanso</string>
 </resources>

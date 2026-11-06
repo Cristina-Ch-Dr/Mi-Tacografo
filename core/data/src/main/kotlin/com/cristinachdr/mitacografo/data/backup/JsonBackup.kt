@@ -5,8 +5,10 @@ import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
+import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -65,6 +67,7 @@ private fun CopiaSeguridad.aDto() =
         creada = creada.toString(),
         jornadas = jornadas.sortedBy { it.inicio }.map { it.aDto() },
         ajustes = ajustes.aDto(),
+        descansos = descansos.sortedBy { it.inicio }.map { it.aDto() },
     )
 
 private fun CopiaDto.aDominio() =
@@ -72,6 +75,7 @@ private fun CopiaDto.aDominio() =
         creada = Instant.parse(creada),
         jornadas = jornadas.map { it.aDominio() },
         ajustes = ajustes.aDominio(),
+        descansos = descansos.map { it.aDominio() },
     )
 
 private fun Jornada.aDto() =
@@ -107,6 +111,31 @@ private fun JornadaDto.aDominio() =
         ciudadFin = ciudadFin,
         conduccionTacografo = conduccionMinutos?.let(Duration::ofMinutes),
         viajeId = viajeId,
+        observaciones = observaciones,
+    )
+
+private fun Descanso.aDto() =
+    DescansoDto(
+        id = id,
+        inicio = inicio.toString(),
+        zonaInicio = zonaInicio.id,
+        fin = fin?.toString(),
+        zonaFin = zonaFin?.id,
+        tipo = tipo.name,
+        pais = pais,
+        observaciones = observaciones,
+    )
+
+private fun DescansoDto.aDominio() =
+    Descanso(
+        id = id,
+        inicio = Instant.parse(inicio),
+        zonaInicio = ZoneId.of(zonaInicio),
+        fin = fin?.let(Instant::parse),
+        zonaFin = zonaFin?.let(ZoneId::of),
+        // Un tipo desconocido lanza IllegalArgumentException → DATOS_INCORRECTOS.
+        tipo = TipoDescanso.valueOf(tipo),
+        pais = pais,
         observaciones = observaciones,
     )
 

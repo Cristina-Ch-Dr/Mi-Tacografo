@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -20,12 +21,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +63,8 @@ fun HomeScreen(
         state = estado,
         onIniciarJornada = onIniciarJornada,
         onFinalizarJornada = onFinalizarJornada,
+        onIniciarPausa = viewModel::onIniciarPausa,
+        onTerminarPausa = viewModel::onTerminarPausa,
         permisos = { EstadoPermisosAvisos(soloSiFalta = true) },
     )
 }
@@ -71,6 +76,8 @@ fun HomeContent(
     onIniciarJornada: () -> Unit,
     onFinalizarJornada: () -> Unit,
     modifier: Modifier = Modifier,
+    onIniciarPausa: () -> Unit = {},
+    onTerminarPausa: () -> Unit = {},
     permisos: @Composable () -> Unit = {},
 ) {
     Column(
@@ -107,8 +114,10 @@ fun HomeContent(
                 icon = Icons.Filled.PlayArrow,
             )
         } else {
-            JornadaEnCursoCard(jornada)
-            Spacer(Modifier.height(32.dp))
+            JornadaEnCursoCard(jornada, state.pausa)
+            Spacer(Modifier.height(24.dp))
+            BotonPausa(enPausa = state.pausa != null, onIniciar = onIniciarPausa, onTerminar = onTerminarPausa)
+            Spacer(Modifier.height(16.dp))
             BigButton(
                 text = stringResource(R.string.accion_finalizar_jornada),
                 onClick = onFinalizarJornada,
@@ -121,6 +130,7 @@ fun HomeContent(
 @Composable
 private fun JornadaEnCursoCard(
     jornada: JornadaEnCursoUi,
+    pausa: PausaUi?,
     modifier: Modifier = Modifier,
 ) {
     // Tarjeta blanca con borde azul del logo (opción B de MT-44); el naranja, solo para el aviso.
@@ -158,6 +168,19 @@ private fun JornadaEnCursoCard(
                 text = stringResource(R.string.inicio_km_inicio, textoKm(jornada.kmInicio)),
                 style = MaterialTheme.typography.bodyLarge,
             )
+            pausa?.let {
+                Text(
+                    stringResource(
+                        R.string.inicio_pausa_en_curso,
+                        it.desde.format(FormatoHora),
+                        textoDuracion(it.transcurrido),
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
             val aviso = jornada.proximoAviso
             if (aviso == null) {
                 Text(
@@ -172,6 +195,32 @@ private fun JornadaEnCursoCard(
                 )
             }
         }
+    }
+}
+
+/** «Iniciar pausa» o «Terminar pausa»: secundario (con borde) para no confundirlo con «Finalizar jornada». */
+@Composable
+private fun BotonPausa(
+    enPausa: Boolean,
+    onIniciar: () -> Unit,
+    onTerminar: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(
+        onClick = if (enPausa) onTerminar else onIniciar,
+        modifier = modifier.fillMaxWidth().heightIn(min = 64.dp),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+    ) {
+        Icon(
+            painterResource(if (enPausa) R.drawable.ic_reanudar else R.drawable.ic_pausa),
+            contentDescription = null,
+            modifier = Modifier.size(28.dp),
+        )
+        Text(
+            stringResource(if (enPausa) R.string.accion_terminar_pausa else R.string.accion_iniciar_pausa),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(start = 12.dp),
+        )
     }
 }
 

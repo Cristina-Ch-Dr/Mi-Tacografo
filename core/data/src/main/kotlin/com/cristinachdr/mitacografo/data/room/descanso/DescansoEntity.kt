@@ -8,9 +8,8 @@ import androidx.room.PrimaryKey
 /**
  * Fila de la tabla `descanso`: pausas dentro de la jornada y descansos entre jornadas.
  *
- * De momento solo está la tabla (vacía), para que forme parte de la primera versión de la
- * base de datos que se instala en el móvil del conductor. El modelo de dominio, el DAO y las
- * pantallas llegan con MT-20 y MT-22; añadir un DAO no cambia el esquema.
+ * La tabla se creó (vacía) en la primera versión de la base de datos, para no tener que migrar
+ * la del móvil del conductor. Desde MT-20 la usan [DescansoDao] y [RoomDescansoRepository].
  *
  * La clasificación (diario normal, reducido, fraccionado, semanal…) no se guarda: la calcula
  * el motor de reglas a partir de las horas.

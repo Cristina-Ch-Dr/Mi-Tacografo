@@ -9,9 +9,12 @@ import androidx.room.Room
 import com.cristinachdr.mitacografo.data.backup.JsonBackup
 import com.cristinachdr.mitacografo.data.datastore.DataStoreSettingsRepository
 import com.cristinachdr.mitacografo.data.room.AppDatabase
+import com.cristinachdr.mitacografo.data.room.descanso.DescansoDao
+import com.cristinachdr.mitacografo.data.room.descanso.RoomDescansoRepository
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaDao
 import com.cristinachdr.mitacografo.data.room.jornada.RoomJornadaRepository
 import com.cristinachdr.mitacografo.domain.port.BackupPort
+import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import dagger.Binds
@@ -37,6 +40,10 @@ internal abstract class DataModule {
 
     @Binds
     @Singleton
+    abstract fun bindDescansoRepository(impl: RoomDescansoRepository): DescansoRepository
+
+    @Binds
+    @Singleton
     abstract fun bindSettingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
 
     @Binds
@@ -58,5 +65,8 @@ internal abstract class DataModule {
 
         @Provides
         fun provideJornadaDao(database: AppDatabase): JornadaDao = database.jornadaDao()
+
+        @Provides
+        fun provideDescansoDao(database: AppDatabase): DescansoDao = database.descansoDao()
     }
 }
