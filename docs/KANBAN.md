@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | — | MT-06 | — | MT-01 … MT-05, MT-07 … MT-17, MT-41 … MT-43 |
+| E2 – E7 | MT-44, MT-45 | — | — | MT-01 … MT-17, MT-41 … MT-43 · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -35,7 +35,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Instalar Android Studio (estable) y crear un emulador.
 - [ ] Activar las opciones de desarrollador y la depuración USB en el móvil del conductor, y anotar su versión de Android (→ D-5).
 - [ ] Crear 3 emuladores: **API 26** (mínima), **API 33** (como el móvil del conductor) y la última estable (espec. §3.1).
-  - Hecho solo el de la última (API 36). Falta probar en API 33 antes de dar el APK (ver Release v0.1.0).
+  - Hechos API 36 y **API 33** (el APK de la v0.1.0 probado ahí). Falta el de API 26.
 - [x] Decidir el `applicationId` (D-6): `com.cristinachdr.mitacografo`. (D-7 está resuelto: transporte internacional y nacional.)
 
 ### MT-02 · Repositorio y Gitflow · S
@@ -71,7 +71,9 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] `release.yml` con tag `v*` → APK firmado en la Release (PR #5). La firma se lee de variables de entorno o de `keystore.properties` (ignorado por git).
   - Probado en local con una clave de prueba: el APK release (R8) arranca, guarda jornadas y hace y restaura la copia JSON.
 - [x] Secrets en GitHub: `MT_KEYSTORE_BASE64`, `MT_KEYSTORE_PASSWORD`, `MT_KEY_ALIAS` y `MT_KEY_PASSWORD`.
-- [ ] Tag `v0.1.0` en `main` → instalar el APK en el móvil del conductor (se junta con la Release v0.1.0).
+- [x] Tag `v0.1.0` en `main` → el workflow publica la Release con el APK firmado (5 nov 2026).
+  - Antes hubo que fusionar `main` en `develop` con `-s ours` (PR #15): la PR #6 se había fusionado directamente en `main`.
+  - El APK es el de la Release, firmado con el keystore de verdad, y está probado en API 33: arranca, pide notificaciones y el aviso de 12 h 30 salta a su hora con la app en segundo plano.
 - **Criterio:** el APK firmado se instala desde la Release.
 
 ---
@@ -171,7 +173,21 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Guardar en DataStore (`paises_habituales`, `continentes`) y test de la búsqueda con y sin filtro.
 - [x] El test de DataStore usa `OkioStorage`: el almacenamiento de Android falla en Windows al sobrescribir el archivo (en el móvil y en el CI funciona igual).
 
-> 🏁 **Release v0.1.0** → antes, probar el APK firmado en un emulador **API 33** (primer arranque, permisos, un aviso). Después, instalar en el móvil del conductor. **Usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
+> 🏁 **Release v0.1.0** ✅ (5 nov 2026) → probada en un emulador **API 33** (primer arranque, permisos, un aviso). Instalar en el móvil del conductor y **usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
+
+### MT-44 · Colores del logo en toda la app · M · *(propuesta de Cristina)*
+- [ ] Sacar los colores exactos del icono: el azul del fondo (`#234885`) y el naranja de la onda. Ahora el tema usa un azul parecido (`#1E4D8C`) y un ámbar que no es exactamente el del logo.
+- [ ] Rehacer la paleta de Material 3 a partir de esos dos colores: azul como primario (botón grande, barra inferior) y naranja como acento (avisos, «Próximo aviso», jornada en curso).
+- [ ] Tema claro y oscuro: comprobar el contraste (WCAG AA, 4,5:1 en texto) para que se lea bien en cabina, de día y de noche. Los colores de estado (✅ ⚠️ ❔) no cambian.
+- [ ] Capturas de antes y después de Inicio, Historial y Ajustes en los dos temas.
+
+### MT-45 · Sonido propio de los avisos · M · deps: MT-13 · *(propuesta de Cristina)*
+- [ ] Que al oír el aviso se sepa que es de Mi Tacógrafo y no un mensaje cualquiera.
+- [ ] Un sonido propio, corto y reconocible, en `res/raw` (con licencia libre, p. ej. CC0), y una vibración distinta de la normal.
+- [ ] Desde Android 8 el sonido es del **canal** de notificaciones y no se puede cambiar por código una vez creado: hay que crear un canal nuevo (`avisos_jornada_v2`) con el sonido y borrar el antiguo.
+- [ ] En Ajustes, «Sonido de los avisos» abre los ajustes del canal en Android (`ACTION_CHANNEL_NOTIFICATION_SETTINGS`), donde el conductor puede elegir cualquier tono del móvil.
+- [ ] Botón «Probar aviso» para escucharlo sin esperar a la jornada.
+- [ ] Probar en API 33 con el móvil en silencio, en vibración y con «No molestar».
 
 ---
 
