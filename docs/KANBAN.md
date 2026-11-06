@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | MT-45 | MT-44 | — | MT-01 … MT-17, MT-41 … MT-43 · **v0.1.0 publicada** |
+| E2, E4 – E7 | MT-45 | MT-20, MT-22 | — | MT-01 … MT-17, MT-41 … MT-44 · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -209,14 +209,21 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 ## E3 · Descansos → **v0.2**
 
 ### MT-20 · Descansos: datos y clasificador (TDD) · L · (antes MT-20 y MT-21)
-- [ ] `Descanso` (pausa/descanso, país), entidad, DAO, migración y validación de solapes.
-  - Ya hecho: la tabla `descanso` (vacía) está en la versión 1 de la base de datos, para no tener que migrar. `fin` admite `null` (pausa en curso). Falta el modelo, el DAO y la validación.
-- [ ] Clasificador: diario normal, reducido y fraccionado 3+9 (parte 1 y completo); semanal normal y reducido.
-- [ ] Tests T7–T10 y T12 (clasificación).
+- [x] `Descanso` (pausa o descanso, país; `fin` `null` = en curso), puerto `DescansoRepository`, DAO, mapper y adaptador de Room.
+  - **Sin migración:** la tabla `descanso` ya estaba en la versión 1 de la base de datos; añadir el DAO no cambia el esquema (`1.json` igual).
+- [x] Validación (`validarDescanso`): fin posterior al inicio, nada en el futuro, sin solapes entre descansos y solo uno en curso. Con una jornada sí puede solaparse (espec. §5.2).
+- [x] Clasificador (`clasificarDescansos`): pausa, en curso, no cuenta, 1.ª parte de fraccionado, fraccionado 3 + 9 completo, diario reducido y normal, semanal reducido (con su deuda hasta 45 h) y normal.
+  - Fraccionado: la 2.ª parte (≥ 9 h) tiene que terminar dentro de las 24 h desde el último diario; las pausas de en medio no cuentan. ⚠️ Revisar con la guía oficial antes de E4.
+- [x] Tests T7–T10 y T12, más límites (9 h, 24 h, 45 h), casos de uso, Room (Robolectric) y ViewModels.
+- [x] Casos de uso: guardar, borrar, iniciar y terminar pausa, lista clasificada y propuesta de descanso al iniciar.
+- [x] **Copia de seguridad** con los descansos (campo `descansos`): las copias antiguas se siguen leyendo (lista vacía) y las versiones anteriores de la app lo ignoran, así que no sube `VERSION_FORMATO`.
 
 ### MT-22 · Pantalla Descansos · M · deps: MT-20 · (antes MT-22 y MT-23)
-- [ ] Lista con chip de clasificación, y alta y edición manual. País prellenado con el país de fin de la última jornada.
-- [ ] «¿Descansaste desde…?» al iniciar jornada: si hay un hueco sin descanso registrado, proponerlo prellenado. Se crea con 1 toque y solo si el usuario confirma.
+- [x] **Pausas y descansos** (icono de cama arriba, junto a Ajustes): lista con chip de clase, alta con «Añadir» y edición o borrado al tocar uno. Uno nuevo se propone desde el fin de la última jornada hasta ahora, en su país de fin.
+- [x] **Inicio:** botón «Iniciar pausa» / «Terminar pausa» con la jornada en curso y «En pausa desde las 19:17 · 12 min» en la tarjeta. Al finalizar la jornada, la pausa abierta termina a la misma hora (o se borra si empezó después).
+- [x] **«¿Descansaste desde vie 19:18?»** al iniciar jornada, si no hay descanso apuntado desde la anterior. Interruptor apagado por defecto: solo se crea si el conductor lo activa.
+- [x] Textos en español y ucraniano. Probado en el emulador API 33, en claro y oscuro.
+- [ ] Pendiente de decidir con el conductor: avisos durante la pausa (p. ej. a los 45 min) y si el ucraniano de los textos nuevos se entiende bien.
 
 > 🏁 **Release v0.2.0**
 

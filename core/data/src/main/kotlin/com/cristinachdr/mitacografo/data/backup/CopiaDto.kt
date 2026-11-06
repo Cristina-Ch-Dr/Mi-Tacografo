@@ -14,6 +14,9 @@ internal data class CopiaDto(
     val creada: String,
     val jornadas: List<JornadaDto> = emptyList(),
     val ajustes: AjustesDto = AjustesDto(),
+    // Desde MT-20. Las copias anteriores no lo traen y se leen como lista vacía; las versiones
+    // anteriores de la app lo ignoran (ignoreUnknownKeys). Por eso no hace falta subir la versión.
+    val descansos: List<DescansoDto> = emptyList(),
 )
 
 @Serializable
@@ -31,6 +34,19 @@ internal data class JornadaDto(
     val ciudadFin: String? = null,
     val conduccionMinutos: Long? = null,
     val viajeId: Long? = null,
+    val observaciones: String? = null,
+)
+
+@Serializable
+internal data class DescansoDto(
+    val id: Long,
+    val inicio: String,
+    val zonaInicio: String,
+    val fin: String? = null,
+    val zonaFin: String? = null,
+    /** "PAUSA" o "DESCANSO". */
+    val tipo: String,
+    val pais: String? = null,
     val observaciones: String? = null,
 )
 

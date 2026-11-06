@@ -21,6 +21,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object RutaFinalizarJornada
 
+/** Lista de pausas y descansos. */
+@Serializable data object RutaDescansos
+
+/** Un descanso para corregirlo o borrarlo; con [id] = 0, uno nuevo. */
+@Serializable data class RutaDescanso(
+    val id: Long = 0,
+)
+
 /** Detalle de una jornada del historial, para corregirla o borrarla. */
 @Serializable data class RutaJornada(
     val id: Long,

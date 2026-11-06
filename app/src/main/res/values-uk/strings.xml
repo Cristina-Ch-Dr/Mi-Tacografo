@@ -190,4 +190,40 @@
         <item quantity="many">Буде видалено %d робочих днів, які зараз є в телефоні, і поточні налаштування.</item>
         <item quantity="other">Буде видалено %d робочого дня, які зараз є в телефоні, і поточні налаштування.</item>
     </plurals>
+
+    <!-- Pausas y descansos (MT-20, MT-22) -->
+    <string name="nav_descansos">Перерви та відпочинок</string>
+    <string name="descanso_titulo">Відпочинок</string>
+    <string name="descanso_titulo_nuevo">Новий відпочинок</string>
+    <string name="descansos_vacio">Ще немає перерв і відпочинку. Під час робочого дня натисніть «Почати перерву»; щоб записати минулий, натисніть «Додати».</string>
+    <string name="descansos_explicacion">Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами. Це орієнтовно: правила регламенту ще не перевіряються.</string>
+    <string name="accion_anadir_descanso">Додати</string>
+    <string name="descanso_tipo">Що це було?</string>
+    <string name="tipo_pausa">Перерва (під час робочого дня)</string>
+    <string name="tipo_descanso">Відпочинок (між робочими днями)</string>
+    <string name="descanso_terminado">Вже закінчився</string>
+    <string name="descanso_sigue_en_curso">Ще триває: завершується на екрані «Головна».</string>
+    <string name="descanso_duracion">Тривалість: %1$s</string>
+    <string name="accion_borrar_descanso">Видалити відпочинок</string>
+    <string name="borrar_descanso_titulo">Видалити цей відпочинок?</string>
+    <string name="clase_pausa">Перерва</string>
+    <string name="clase_en_curso">Триває</string>
+    <string name="clase_insuficiente">Не зараховується як щоденний</string>
+    <string name="clase_fraccionado_1">1-ша частина розділеного</string>
+    <string name="clase_fraccionado_completo">Розділений 3 + 9 (звичайний)</string>
+    <string name="clase_diario_reducido">Щоденний скорочений</string>
+    <string name="clase_diario_normal">Щоденний звичайний</string>
+    <string name="clase_semanal_reducido">Тижневий скорочений · бракує %1$s</string>
+    <string name="clase_semanal_normal">Тижневий звичайний</string>
+    <string name="error_descanso_no_existe">Цього відпочинку вже немає.</string>
+    <string name="error_descanso_sin_jornada">Щоб зробити перерву, має тривати робочий день.</string>
+    <string name="error_descanso_ya_en_curso">Вже триває перерва або відпочинок.</string>
+    <string name="error_descanso_sin_pausa">Зараз немає перерви.</string>
+    <string name="error_descanso_solapa">Накладається на іншу перерву чи відпочинок: перевірте час.</string>
+    <string name="accion_iniciar_pausa">Почати перерву</string>
+    <string name="accion_terminar_pausa">Закінчити перерву</string>
+    <string name="inicio_pausa_en_curso">Перерва з %1$s · %2$s</string>
+    <string name="inicio_propuesta_descanso">Ви відпочивали з %1$s?</string>
+    <string name="inicio_propuesta_detalle">Буде записано відпочинок тривалістю %1$s, до часу початку.</string>
+    <string name="inicio_propuesta_si">Так, записати відпочинок</string>
 </resources>
