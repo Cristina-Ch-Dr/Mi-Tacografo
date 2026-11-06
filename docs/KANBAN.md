@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | MT-44, MT-45 | — | — | MT-01 … MT-17, MT-41 … MT-43 · **v0.1.0 publicada** |
+| E2 – E7 | MT-45 | MT-44 | — | MT-01 … MT-17, MT-41 … MT-43 · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -176,10 +176,15 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 > 🏁 **Release v0.1.0** ✅ (5 nov 2026) → probada en un emulador **API 33** (primer arranque, permisos, un aviso). Instalar en el móvil del conductor y **usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
 
 ### MT-44 · Colores del logo en toda la app · M · *(propuesta de Cristina)*
-- [ ] Sacar los colores exactos del icono: el azul del fondo (`#234885`) y el naranja de la onda. Ahora el tema usa un azul parecido (`#1E4D8C`) y un ámbar que no es exactamente el del logo.
-- [ ] Rehacer la paleta de Material 3 a partir de esos dos colores: azul como primario (botón grande, barra inferior) y naranja como acento (avisos, «Próximo aviso», jornada en curso).
-- [ ] Tema claro y oscuro: comprobar el contraste (WCAG AA, 4,5:1 en texto) para que se lea bien en cabina, de día y de noche. Los colores de estado (✅ ⚠️ ❔) no cambian.
-- [ ] Capturas de antes y después de Inicio, Historial y Ajustes en los dos temas.
+- [x] Colores exactos del icono (media de los píxeles del PNG): azul del fondo `#234886`, naranja de la onda `#D27204` y claro de la esfera `#E6F0FD`.
+- [x] **Barra superior en el azul del logo** en los dos temas, con la barra de estado detrás e iconos blancos: el logo de la esquina se funde con ella.
+- [x] **Naranja = avisos:** «Próximo aviso» va en una etiqueta naranja con campana, en dos líneas (hora y tiempo de jornada). Como texto sobre blanco, el naranja se oscurece a `#9A5200`.
+- [x] Tarjeta de jornada en curso blanca con borde azul (opción B de 4 bocetos). Azules claros y barra de pestañas elegidos por Cristina con un probador de colores:
+  - Claro: contenedores `#BCD2F5`, barra de pestañas `#D7E6FE`, pestaña activa `#A6C5F7` con texto `#1C3F7D`.
+  - Oscuro: borde, horas y botón `#95B1DF` (texto `#052048`), pestaña activa en el azul del logo con el icono `#E6F0FD` y la palabra en `#E5F1FF`.
+  - Los colores de la barra de pestañas van aparte (`coloresPestanas()`), para no cambiar nada más.
+- [x] Contraste comprobado (WCAG AA, 4,5:1): todos los textos pasan, la mayoría de 7:1. Los colores de estado (✅ ⚠️ ❔) no cambian.
+- [x] Probado en el emulador API 33 en claro y oscuro: Inicio, Historial y Ajustes.
 
 ### MT-45 · Sonido propio de los avisos · M · deps: MT-13 · *(propuesta de Cristina)*
 - [ ] Que al oír el aviso se sepa que es de Mi Tacógrafo y no un mensaje cualquiera.

@@ -21,7 +21,8 @@
     <string name="inicio_jornada_en_curso">Jornada en curso</string>
     <string name="inicio_desde">Desde las %1$s · %2$s</string>
     <string name="inicio_km_inicio">Km de inicio: %1$s</string>
-    <string name="inicio_proximo_aviso">Próximo aviso: %1$s (%2$s de jornada)</string>
+    <string name="inicio_proximo_aviso">Próximo aviso: %1$s</string>
+    <string name="inicio_proximo_aviso_jornada">al cumplir %1$s de jornada</string>
     <string name="inicio_sin_avisos">No quedan avisos en esta jornada</string>
 
     <!-- Formularios de jornada -->

@@ -22,6 +22,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -47,6 +48,9 @@ import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
 import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
 import com.cristinachdr.mitacografo.feature.trips.TripsScreen
+import com.cristinachdr.mitacografo.ui.theme.AzulLogo
+import com.cristinachdr.mitacografo.ui.theme.SobreAzul
+import com.cristinachdr.mitacografo.ui.theme.coloresPestanas
 import kotlin.reflect.KClass
 
 /** Pestañas de la barra inferior. */
@@ -113,6 +117,14 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                         }
                     }
                 },
+                // Azul del fondo del icono en los dos temas: el logo de la izquierda se funde con la barra.
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = AzulLogo,
+                        titleContentColor = SobreAzul,
+                        navigationIconContentColor = SobreAzul,
+                        actionIconContentColor = SobreAzul,
+                    ),
             )
         },
         bottomBar = {
@@ -134,9 +146,9 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                             label = { Text(stringResource(pestana.titulo)) },
                             colors =
                                 NavigationBarItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedIconColor = coloresPestanas().iconoActiva,
+                                    selectedTextColor = coloresPestanas().textoActiva,
+                                    indicatorColor = coloresPestanas().activa,
                                 ),
                         )
                     }

@@ -22,7 +22,8 @@
     <string name="inicio_jornada_en_curso">Робочий день триває</string>
     <string name="inicio_desde">З %1$s · %2$s</string>
     <string name="inicio_km_inicio">Км на початку: %1$s</string>
-    <string name="inicio_proximo_aviso">Наступне нагадування: %1$s (%2$s від початку)</string>
+    <string name="inicio_proximo_aviso">Наступне нагадування: %1$s</string>
+    <string name="inicio_proximo_aviso_jornada">через %1$s від початку</string>
     <string name="inicio_sin_avisos">Нагадувань на цей робочий день більше немає</string>
 
     <!-- Formularios de jornada -->
