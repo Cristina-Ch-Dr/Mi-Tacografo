@@ -161,7 +161,7 @@
 
     <!-- Copia de seguridad -->
     <string name="ajustes_seccion_copia">Copia de seguridad</string>
-    <string name="copia_ayuda">Guarda todas tus jornadas y ajustes en un archivo. Mándalo fuera del móvil (Google Drive, correo, ordenador): si pierdes o cambias de móvil, lo restauras aquí.</string>
+    <string name="copia_ayuda">Guarda todas tus jornadas, descansos y ajustes en un archivo. Mándalo fuera del móvil (Google Drive, correo, ordenador): si pierdes o cambias de móvil, lo restauras aquí.</string>
     <string name="copia_guardar">Guardar copia</string>
     <string name="copia_restaurar">Restaurar copia</string>
     <string name="copia_guardada">Copia guardada.</string>
@@ -222,4 +222,47 @@
     <string name="inicio_propuesta_descanso">¿Descansaste desde %1$s?</string>
     <string name="inicio_propuesta_detalle">Se apuntará un descanso de %1$s, hasta la hora de inicio.</string>
     <string name="inicio_propuesta_si">Sí, apuntar el descanso</string>
+
+    <!-- Resumen y PDF (MT-32, MT-33B) -->
+    <string name="resumen_semana">Semana</string>
+    <string name="resumen_bisemana">2 semanas</string>
+    <string name="resumen_periodo">Del %1$s al %2$s</string>
+    <string name="resumen_anterior">Semana anterior</string>
+    <string name="resumen_siguiente">Semana siguiente</string>
+    <string name="resumen_totales">Totales</string>
+    <string name="resumen_km">Km recorridos</string>
+    <string name="resumen_jornadas">Jornadas</string>
+    <string name="resumen_tiempo">Tiempo de jornada</string>
+    <string name="resumen_conduccion">Conducción (tacógrafo)</string>
+    <string name="resumen_conduccion_incompleta">Falta apuntar la conducción de alguna jornada: la suma se queda corta.</string>
+    <string name="resumen_km_por_dia">Km por día</string>
+    <string name="resumen_descansos">Descansos</string>
+    <string name="resumen_deuda">Por compensar (semanales reducidos): %1$s</string>
+    <string name="resumen_sin_descansos">No hay descansos apuntados en este periodo.</string>
+    <string name="resumen_semana_de">Semana del %1$s</string>
+    <string name="resumen_aviso_reglas">Todavía no comprueba las reglas del reglamento: llegará con el motor de reglas.</string>
+    <string name="accion_compartir_pdf">Compartir PDF</string>
+    <string name="accion_guardar_pdf">Guardar PDF</string>
+    <string name="pdf_guardado">PDF guardado.</string>
+    <string name="pdf_error">No se ha podido crear el PDF.</string>
+    <string name="pdf_compartir_titulo">Enviar el informe</string>
+    <string name="pdf_titulo">Informe de jornadas y descansos</string>
+    <string name="pdf_conductor">Conductor: %1$s</string>
+    <string name="pdf_periodo">Periodo: del %1$s al %2$s</string>
+    <string name="pdf_generado">Generado el %1$s a las %2$s</string>
+    <string name="pdf_resumen">Resumen</string>
+    <string name="pdf_col_fecha">Fecha</string>
+    <string name="pdf_col_inicio">Inicio</string>
+    <string name="pdf_col_fin">Fin</string>
+    <string name="pdf_col_km_inicio">Km inicio</string>
+    <string name="pdf_col_km_fin">Km fin</string>
+    <string name="pdf_col_km">Km</string>
+    <string name="pdf_col_conduccion">Conducción</string>
+    <string name="pdf_col_pais">País</string>
+    <string name="pdf_col_duracion">Duración</string>
+    <string name="pdf_col_clase">Clase</string>
+    <string name="pdf_en_curso">En curso</string>
+    <string name="pdf_sin_jornadas">No hay jornadas en este periodo.</string>
+    <string name="pdf_pagina">Página %1$d de %2$d</string>
+    <string name="pdf_aviso_legal">Mi Tacógrafo es una herramienta personal de apoyo. No sustituye al tacógrafo ni a sus registros oficiales y no tiene validez ante una inspección. Los cálculos son orientativos y dependen de los datos introducidos.</string>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lo único que se puede compartir: los PDF del resumen, en la caché (ver ArchivosInforme). -->
+<paths>
+    <cache-path
+        name="informes"
+        path="informes/" />
+</paths>

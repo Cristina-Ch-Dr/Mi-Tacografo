@@ -163,7 +163,7 @@
 
     <!-- Резервна копія -->
     <string name="ajustes_seccion_copia">Резервна копія</string>
-    <string name="copia_ayuda">Збережіть усі робочі дні та налаштування у файл. Надішліть його за межі телефона (Google Drive, пошта, комп’ютер): якщо загубите або зміните телефон, відновите його тут.</string>
+    <string name="copia_ayuda">Збережіть усі робочі дні, відпочинок і налаштування у файл. Надішліть його за межі телефона (Google Drive, пошта, комп’ютер): якщо загубите або зміните телефон, відновите його тут.</string>
     <string name="copia_guardar">Зберегти копію</string>
     <string name="copia_restaurar">Відновити копію</string>
     <string name="copia_guardada">Копію збережено.</string>
@@ -226,4 +226,47 @@
     <string name="inicio_propuesta_descanso">Ви відпочивали з %1$s?</string>
     <string name="inicio_propuesta_detalle">Буде записано відпочинок тривалістю %1$s, до часу початку.</string>
     <string name="inicio_propuesta_si">Так, записати відпочинок</string>
+
+    <!-- Resumen y PDF (MT-32, MT-33B) -->
+    <string name="resumen_semana">Тиждень</string>
+    <string name="resumen_bisemana">2 тижні</string>
+    <string name="resumen_periodo">З %1$s по %2$s</string>
+    <string name="resumen_anterior">Попередній тиждень</string>
+    <string name="resumen_siguiente">Наступний тиждень</string>
+    <string name="resumen_totales">Підсумки</string>
+    <string name="resumen_km">Пробіг, км</string>
+    <string name="resumen_jornadas">Робочі дні</string>
+    <string name="resumen_tiempo">Тривалість робочих днів</string>
+    <string name="resumen_conduccion">Керування (тахограф)</string>
+    <string name="resumen_conduccion_incompleta">В якомусь робочому дні не записано керування: сума неповна.</string>
+    <string name="resumen_km_por_dia">Пробіг по днях</string>
+    <string name="resumen_descansos">Відпочинок</string>
+    <string name="resumen_deuda">Компенсувати (скорочені тижневі): %1$s</string>
+    <string name="resumen_sin_descansos">У цьому періоді немає записаного відпочинку.</string>
+    <string name="resumen_semana_de">Тиждень з %1$s</string>
+    <string name="resumen_aviso_reglas">Правила регламенту ще не перевіряються: це з’явиться разом із перевіркою правил.</string>
+    <string name="accion_compartir_pdf">Поділитися PDF</string>
+    <string name="accion_guardar_pdf">Зберегти PDF</string>
+    <string name="pdf_guardado">PDF збережено.</string>
+    <string name="pdf_error">Не вдалося створити PDF.</string>
+    <string name="pdf_compartir_titulo">Надіслати звіт</string>
+    <string name="pdf_titulo">Звіт про робочі дні та відпочинок</string>
+    <string name="pdf_conductor">Водій: %1$s</string>
+    <string name="pdf_periodo">Період: з %1$s по %2$s</string>
+    <string name="pdf_generado">Створено %1$s о %2$s</string>
+    <string name="pdf_resumen">Підсумок</string>
+    <string name="pdf_col_fecha">Дата</string>
+    <string name="pdf_col_inicio">Початок</string>
+    <string name="pdf_col_fin">Кінець</string>
+    <string name="pdf_col_km_inicio">Км поч.</string>
+    <string name="pdf_col_km_fin">Км кін.</string>
+    <string name="pdf_col_km">Км</string>
+    <string name="pdf_col_conduccion">Керування</string>
+    <string name="pdf_col_pais">Країна</string>
+    <string name="pdf_col_duracion">Тривалість</string>
+    <string name="pdf_col_clase">Вид</string>
+    <string name="pdf_en_curso">Триває</string>
+    <string name="pdf_sin_jornadas">У цьому періоді немає робочих днів.</string>
+    <string name="pdf_pagina">Сторінка %1$d з %2$d</string>
+    <string name="pdf_aviso_legal">Мій Тахограф — це особистий допоміжний інструмент. Він не замінює тахограф і його офіційні записи та не має сили під час перевірки. Розрахунки орієнтовні й залежать від введених даних.</string>
 </resources>
