@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2, E4 – E7 | MT-45 | MT-20, MT-22 | — | MT-01 … MT-17, MT-41 … MT-44 · **v0.1.0 publicada** |
+| E2, E4 – E7 | MT-45 | MT-32, MT-33B (sin reglas) | — | MT-01 … MT-17, MT-20, MT-22, MT-41 … MT-44 · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -264,14 +264,21 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E5 · Resumen, estadísticas y exportación (CSV + PDF) → **v1.0**
 
-### MT-32 · Pantalla Resumen y estadísticas · L
-- [ ] Semana y bisemana: conducción, km, descansos y deudas con fecha límite. Km por día y por viaje.
+### MT-32 · Pantalla Resumen y estadísticas · L · *(adelantada a petición de Cristina, sin el motor de reglas)*
+- [x] Pestaña **Resumen**: «Semana» o «2 semanas» (la elegida y la anterior, las de las 90 h), con flechas para ir hacia atrás. No deja pasar de la semana actual.
+- [x] Totales: km, jornadas, tiempo de jornada y conducción del tacógrafo (avisa si a alguna jornada le falta). En la bisemana, cada semana por separado.
+- [x] Km por día con barras (también los días sin trabajar) y descansos por clase, con lo que falta por compensar de los semanales reducidos.
+- [x] Dominio puro `resumirPeriodo` (TDD, test T25): solo cuenta lo que empieza en el periodo, en la zona de referencia si hay.
+- [ ] Fecha límite de las deudas y km por viaje: con el motor de reglas (E4) y con Viajes (E2).
 
 ### MT-33 · Exportar CSV · M
 - [ ] `jornadas.csv`, `viajes.csv` y `descansos.csv` (UTF-8 BOM, `;`, coma decimal). Compartir con `Intent.ACTION_SEND`.
 - [ ] Test del formato (que se abra bien en Excel).
 
 ### MT-33B · Exportar PDF · XL · deps: MT-30 · (antes MT-33B y MT-33C)
+> **Primera parte hecha sin reglas** (con MT-32): «Compartir PDF» y «Guardar PDF» en Resumen. Cabecera, resumen, tablas de jornadas y descansos con su clase, cabecera repetida al cambiar de página, «Página X de Y» y aviso legal. Probado en API 33 en español y ucraniano (el cirílico sale bien).
+> - `Informe` (dominio) + `GeneradorPdf` (puerto en `app`, porque los textos traducidos están en `app`) con `PdfDocument`. Se comparte con `FileProvider` (`cache/informes/`) y se guarda con `CreateDocument`.
+> - Falta: informe de reglas por semana, rango mes / viaje / fechas libres, y el test instrumentado T26.
 - [ ] Puerto `ReportRenderer` e `InformeModel` puro: cabecera, resumen, tablas de jornadas y descansos, informe de reglas por semana y deudas. Test T25.
 - [ ] Selección de rango: semana, bisemana, mes, viaje o fechas libres.
 - [ ] `PdfReportRenderer` con `PdfDocument`: A4, tablas con paginación y cabecera repetida, «Página X de Y», pie con el aviso legal, y comprobar que el ucraniano (cirílico) se ve bien.
