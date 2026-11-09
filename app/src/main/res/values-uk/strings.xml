@@ -269,4 +269,13 @@
     <string name="pdf_sin_jornadas">У цьому періоді немає робочих днів.</string>
     <string name="pdf_pagina">Сторінка %1$d з %2$d</string>
     <string name="pdf_aviso_legal">Мій Тахограф — це особистий допоміжний інструмент. Він не замінює тахограф і його офіційні записи та не має сили під час перевірки. Розрахунки орієнтовні й залежать від введених даних.</string>
+
+    <!-- Sonido de los avisos (MT-45) -->
+    <string name="ajustes_sonido_ayuda">Нагадування звучать власним звуком (три ноти) і вібрують довго-коротко-довго, щоб ви знали, що це про робочий день, а не повідомлення. Змінити це можна в налаштуваннях Android.</string>
+    <string name="accion_escuchar_sonido">Прослухати звук</string>
+    <string name="accion_cambiar_sonido">Змінити звук чи вібрацію</string>
+    <string name="ajustes_sonido_actual">Поточний звук: %1$s</string>
+    <string name="sonido_propio">звук Мій Тахограф (три ноти)</string>
+    <string name="sonido_otro">інший звук телефона</string>
+    <string name="sonido_ninguno">немає (без звуку)</string>
 </resources>
