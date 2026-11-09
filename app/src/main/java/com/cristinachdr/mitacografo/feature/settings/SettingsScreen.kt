@@ -52,6 +52,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                 onNombreConductor = viewModel::onNombreConductor,
             ),
         permisos = { EstadoPermisosAvisos(soloSiFalta = false) },
+        sonido = { SeccionSonido() },
         copia = { SeccionCopia() },
     )
 }
@@ -85,6 +86,7 @@ fun SettingsContent(
     acciones: AccionesAjustes,
     modifier: Modifier = Modifier,
     permisos: @Composable () -> Unit = {},
+    sonido: @Composable () -> Unit = {},
     copia: @Composable () -> Unit = {},
 ) {
     Column(
@@ -105,6 +107,7 @@ fun SettingsContent(
         if (estado.pruebaProgramada) {
             Text(stringResource(R.string.ajustes_prueba_programada), style = MaterialTheme.typography.bodyMedium)
         }
+        sonido()
 
         HorizontalDivider()
         Seccion(stringResource(R.string.ajustes_seccion_reglas))

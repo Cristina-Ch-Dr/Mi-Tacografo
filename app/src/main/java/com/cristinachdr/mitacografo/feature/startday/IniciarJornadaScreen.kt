@@ -1,32 +1,49 @@
 package com.cristinachdr.mitacografo.feature.startday
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
+import com.cristinachdr.mitacografo.domain.usecase.PropuestaDescanso
+import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
 import com.cristinachdr.mitacografo.ui.components.CampoTexto
 import com.cristinachdr.mitacografo.ui.components.ListaErrores
+import com.cristinachdr.mitacografo.ui.formatoDiaSemana
+import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -49,6 +66,7 @@ fun IniciarJornadaScreen(
         onCiudad = viewModel::onCiudad,
         onObservaciones = viewModel::onObservaciones,
         onIniciar = viewModel::onIniciar,
+        onApuntarDescanso = viewModel::onApuntarDescanso,
     )
 }
 
@@ -62,6 +80,7 @@ fun IniciarJornadaContent(
     onObservaciones: (String) -> Unit,
     onIniciar: () -> Unit,
     modifier: Modifier = Modifier,
+    onApuntarDescanso: (Boolean) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -77,6 +96,11 @@ fun IniciarJornadaContent(
             valor = estado.fechaHora,
             onCambio = onFechaHora,
         )
+        val propuesta = estado.propuestaDescanso
+        val duracion = estado.duracionDescanso
+        if (propuesta != null && duracion != null) {
+            PropuestaDescansoCard(propuesta, duracion, estado.apuntarDescanso, onApuntarDescanso)
+        }
         CampoNumero(
             valor = estado.km,
             onCambio = onKm,
@@ -103,6 +127,53 @@ fun IniciarJornadaContent(
             enabled = estado.puedeGuardar,
             icon = Icons.Filled.PlayArrow,
         )
+    }
+}
+
+/**
+ * «¿Descansaste desde el martes 19:40?» con un interruptor. No se apunta nada si no se activa:
+ * es el conductor quien lo confirma, la app no se inventa el descanso.
+ */
+@Composable
+private fun PropuestaDescansoCard(
+    propuesta: PropuestaDescanso,
+    duracion: Duration,
+    apuntar: Boolean,
+    onApuntar: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val desde = propuesta.desde.atZone(propuesta.zona)
+    OutlinedCard(modifier = modifier.fillMaxWidth(), border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                stringResource(
+                    R.string.inicio_propuesta_descanso,
+                    "${desde.format(formatoDiaSemana())} ${desde.format(FormatoHora)}",
+                ),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                stringResource(R.string.inicio_propuesta_detalle, textoDuracion(duracion)),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 56.dp)
+                        .toggleable(value = apuntar, onValueChange = onApuntar, role = Role.Switch),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(R.string.inicio_propuesta_si),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(checked = apuntar, onCheckedChange = null)
+            }
+        }
     }
 }
 

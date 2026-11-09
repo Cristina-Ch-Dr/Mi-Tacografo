@@ -1,13 +1,18 @@
 package com.cristinachdr.mitacografo.domain.usecase
 
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
+import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
+import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -56,17 +61,48 @@ class CopiaDeSeguridadTest {
     fun `exportar y restaurar en otro movil deja los mismos datos y avisos`() =
         runTest {
             val ajustes = Ajustes(paisEmpresa = "ES", nombreConductor = "Conductor")
-            val origen = FakeJornadaRepository(listOf(lunes, enCurso))
-            val texto = ExportarCopia(origen, FakeSettingsRepository(ajustes), backup, reloj)()
+            val viaje = Viaje(id = 5, nombre = "Ida", inicio = hora(2, 5), zonaInicio = madrid)
+            val origen = FakeJornadaRepository(listOf(lunes.copy(viajeId = 5), enCurso))
+            val descanso =
+                Descanso(
+                    id = 4,
+                    inicio = hora(2, 17),
+                    zonaInicio = madrid,
+                    fin = hora(3, 6),
+                    zonaFin = madrid,
+                    tipo = TipoDescanso.DESCANSO,
+                    pais = "FR",
+                )
+            val texto =
+                ExportarCopia(
+                    origen,
+                    FakeDescansoRepository(listOf(descanso)),
+                    FakeViajeRepository(listOf(viaje)),
+                    FakeSettingsRepository(ajustes),
+                    backup,
+                    reloj,
+                )()
 
             // Móvil nuevo: vacío.
             val destino = FakeJornadaRepository()
+            val descansosDestino = FakeDescansoRepository()
+            val viajesDestino = FakeViajeRepository()
             val settingsDestino = FakeSettingsRepository()
             val alarmas = FakeAlarmScheduler()
             val copia = (LeerCopia(backup)(texto) as ResultadoLectura.Ok).copia
-            RestaurarCopia(destino, settingsDestino, GestorAvisos(destino, settingsDestino, alarmas, reloj))(copia)
+            RestaurarCopia(
+                destino,
+                descansosDestino,
+                viajesDestino,
+                settingsDestino,
+                GestorAvisos(destino, settingsDestino, alarmas, reloj),
+            )(
+                copia,
+            )
 
-            assertEquals(listOf(lunes, enCurso), destino.guardadas.sortedBy { it.id })
+            assertEquals(listOf(lunes.copy(viajeId = 5), enCurso), destino.guardadas.sortedBy { it.id })
+            assertEquals(listOf(viaje), viajesDestino.guardados)
+            assertEquals(listOf(descanso), descansosDestino.guardados)
             assertEquals(ajustes, settingsDestino.actuales)
             assertEquals(hora(3, 20), copia.creada)
             // La jornada en curso empezó a las 19:00: los avisos de 12 h 30… vuelven a estar programados.
@@ -84,7 +120,13 @@ class CopiaDeSeguridadTest {
             val gestor = GestorAvisos(repo, settings, alarmas, reloj)
             gestor.reprogramar(ahoraAbierta)
 
-            RestaurarCopia(repo, settings, gestor)(CopiaSeguridad(hora(3, 20), listOf(lunes), Ajustes()))
+            RestaurarCopia(
+                repo,
+                FakeDescansoRepository(),
+                FakeViajeRepository(),
+                settings,
+                gestor,
+            )(CopiaSeguridad(hora(3, 20), listOf(lunes), Ajustes()))
 
             assertEquals(listOf(lunes), repo.guardadas)
             assertTrue(alarmas.programados.isEmpty())
@@ -112,5 +154,11 @@ class CopiaDeSeguridadTest {
         val vacia = backup.codificar(CopiaSeguridad(hora(3, 20), emptyList(), Ajustes()))
 
         assertTrue(LeerCopia(backup)(vacia) is ResultadoLectura.Ok)
+    }
+
+    @Test
+    fun `una jornada que apunta a un viaje que no esta en la copia son datos incorrectos`() {
+        val huerfana = backup.codificar(CopiaSeguridad(hora(3, 20), listOf(lunes.copy(viajeId = 99)), Ajustes()))
+        assertEquals(ResultadoLectura.Invalida(ErrorCopia.DATOS_INCORRECTOS), LeerCopia(backup)(huerfana))
     }
 }

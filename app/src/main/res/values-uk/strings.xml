@@ -22,7 +22,8 @@
     <string name="inicio_jornada_en_curso">Робочий день триває</string>
     <string name="inicio_desde">З %1$s · %2$s</string>
     <string name="inicio_km_inicio">Км на початку: %1$s</string>
-    <string name="inicio_proximo_aviso">Наступне нагадування: %1$s (%2$s від початку)</string>
+    <string name="inicio_proximo_aviso">Наступне нагадування: %1$s</string>
+    <string name="inicio_proximo_aviso_jornada">через %1$s від початку</string>
     <string name="inicio_sin_avisos">Нагадувань на цей робочий день більше немає</string>
 
     <!-- Formularios de jornada -->
@@ -162,7 +163,7 @@
 
     <!-- Резервна копія -->
     <string name="ajustes_seccion_copia">Резервна копія</string>
-    <string name="copia_ayuda">Збережіть усі робочі дні та налаштування у файл. Надішліть його за межі телефона (Google Drive, пошта, комп’ютер): якщо загубите або зміните телефон, відновите його тут.</string>
+    <string name="copia_ayuda">Збережіть усі робочі дні, відпочинок і налаштування у файл. Надішліть його за межі телефона (Google Drive, пошта, комп’ютер): якщо загубите або зміните телефон, відновите його тут.</string>
     <string name="copia_guardar">Зберегти копію</string>
     <string name="copia_restaurar">Відновити копію</string>
     <string name="copia_guardada">Копію збережено.</string>
@@ -188,5 +189,124 @@
         <item quantity="few">Буде видалено %d робочі дні, які зараз є в телефоні, і поточні налаштування.</item>
         <item quantity="many">Буде видалено %d робочих днів, які зараз є в телефоні, і поточні налаштування.</item>
         <item quantity="other">Буде видалено %d робочого дня, які зараз є в телефоні, і поточні налаштування.</item>
+    </plurals>
+
+    <!-- Pausas y descansos (MT-20, MT-22) -->
+    <string name="nav_descansos">Перерви та відпочинок</string>
+    <string name="descanso_titulo">Відпочинок</string>
+    <string name="descanso_titulo_nuevo">Новий відпочинок</string>
+    <string name="descansos_vacio">Ще немає перерв і відпочинку. Під час робочого дня натисніть «Почати перерву»; щоб записати минулий, натисніть «Додати».</string>
+    <string name="descansos_explicacion">Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами. Це орієнтовно: правила регламенту ще не перевіряються.</string>
+    <string name="accion_anadir_descanso">Додати</string>
+    <string name="descanso_tipo">Що це було?</string>
+    <string name="tipo_pausa">Перерва (під час робочого дня)</string>
+    <string name="tipo_descanso">Відпочинок (між робочими днями)</string>
+    <string name="descanso_terminado">Вже закінчився</string>
+    <string name="descanso_sigue_en_curso">Ще триває: завершується на екрані «Головна».</string>
+    <string name="descanso_duracion">Тривалість: %1$s</string>
+    <string name="accion_borrar_descanso">Видалити відпочинок</string>
+    <string name="borrar_descanso_titulo">Видалити цей відпочинок?</string>
+    <string name="clase_pausa">Перерва</string>
+    <string name="clase_en_curso">Триває</string>
+    <string name="clase_insuficiente">Не зараховується як щоденний</string>
+    <string name="clase_fraccionado_1">1-ша частина розділеного</string>
+    <string name="clase_fraccionado_completo">Розділений 3 + 9 (звичайний)</string>
+    <string name="clase_diario_reducido">Щоденний скорочений</string>
+    <string name="clase_diario_normal">Щоденний звичайний</string>
+    <string name="clase_semanal_reducido">Тижневий скорочений · бракує %1$s</string>
+    <string name="clase_semanal_normal">Тижневий звичайний</string>
+    <string name="error_descanso_no_existe">Цього відпочинку вже немає.</string>
+    <string name="error_descanso_sin_jornada">Щоб зробити перерву, має тривати робочий день.</string>
+    <string name="error_descanso_ya_en_curso">Вже триває перерва або відпочинок.</string>
+    <string name="error_descanso_sin_pausa">Зараз немає перерви.</string>
+    <string name="error_descanso_solapa">Накладається на іншу перерву чи відпочинок: перевірте час.</string>
+    <string name="accion_iniciar_pausa">Почати перерву</string>
+    <string name="accion_terminar_pausa">Закінчити перерву</string>
+    <string name="inicio_pausa_en_curso">Перерва з %1$s · %2$s</string>
+    <string name="inicio_propuesta_descanso">Ви відпочивали з %1$s?</string>
+    <string name="inicio_propuesta_detalle">Буде записано відпочинок тривалістю %1$s, до часу початку.</string>
+    <string name="inicio_propuesta_si">Так, записати відпочинок</string>
+
+    <!-- Resumen y PDF (MT-32, MT-33B) -->
+    <string name="resumen_semana">Тиждень</string>
+    <string name="resumen_bisemana">2 тижні</string>
+    <string name="resumen_periodo">З %1$s по %2$s</string>
+    <string name="resumen_anterior">Попередній тиждень</string>
+    <string name="resumen_siguiente">Наступний тиждень</string>
+    <string name="resumen_totales">Підсумки</string>
+    <string name="resumen_km">Пробіг, км</string>
+    <string name="resumen_jornadas">Робочі дні</string>
+    <string name="resumen_tiempo">Тривалість робочих днів</string>
+    <string name="resumen_conduccion">Керування (тахограф)</string>
+    <string name="resumen_conduccion_incompleta">В якомусь робочому дні не записано керування: сума неповна.</string>
+    <string name="resumen_km_por_dia">Пробіг по днях</string>
+    <string name="resumen_descansos">Відпочинок</string>
+    <string name="resumen_deuda">Компенсувати (скорочені тижневі): %1$s</string>
+    <string name="resumen_sin_descansos">У цьому періоді немає записаного відпочинку.</string>
+    <string name="resumen_semana_de">Тиждень з %1$s</string>
+    <string name="resumen_aviso_reglas">Правила регламенту ще не перевіряються: це з’явиться разом із перевіркою правил.</string>
+    <string name="accion_compartir_pdf">Поділитися PDF</string>
+    <string name="accion_guardar_pdf">Зберегти PDF</string>
+    <string name="pdf_guardado">PDF збережено.</string>
+    <string name="pdf_error">Не вдалося створити PDF.</string>
+    <string name="pdf_compartir_titulo">Надіслати звіт</string>
+    <string name="pdf_titulo">Звіт про робочі дні та відпочинок</string>
+    <string name="pdf_conductor">Водій: %1$s</string>
+    <string name="pdf_periodo">Період: з %1$s по %2$s</string>
+    <string name="pdf_generado">Створено %1$s о %2$s</string>
+    <string name="pdf_resumen">Підсумок</string>
+    <string name="pdf_col_fecha">Дата</string>
+    <string name="pdf_col_inicio">Початок</string>
+    <string name="pdf_col_fin">Кінець</string>
+    <string name="pdf_col_km_inicio">Км поч.</string>
+    <string name="pdf_col_km_fin">Км кін.</string>
+    <string name="pdf_col_km">Км</string>
+    <string name="pdf_col_conduccion">Керування</string>
+    <string name="pdf_col_pais">Країна</string>
+    <string name="pdf_col_duracion">Тривалість</string>
+    <string name="pdf_col_clase">Вид</string>
+    <string name="pdf_en_curso">Триває</string>
+    <string name="pdf_sin_jornadas">У цьому періоді немає робочих днів.</string>
+    <string name="pdf_pagina">Сторінка %1$d з %2$d</string>
+    <string name="pdf_aviso_legal">Мій Тахограф — це особистий допоміжний інструмент. Він не замінює тахограф і його офіційні записи та не має сили під час перевірки. Розрахунки орієнтовні й залежать від введених даних.</string>
+
+    <!-- Sonido de los avisos (MT-45) -->
+    <string name="ajustes_sonido_ayuda">Нагадування звучать власним звуком (три ноти) і вібрують довго-коротко-довго, щоб ви знали, що це про робочий день, а не повідомлення. Змінити це можна в налаштуваннях Android.</string>
+    <string name="accion_escuchar_sonido">Прослухати звук</string>
+    <string name="accion_cambiar_sonido">Змінити звук чи вібрацію</string>
+    <string name="ajustes_sonido_actual">Поточний звук: %1$s</string>
+    <string name="sonido_propio">звук Мій Тахограф (три ноти)</string>
+    <string name="sonido_otro">інший звук телефона</string>
+    <string name="sonido_ninguno">немає (без звуку)</string>
+
+    <!-- Viajes (MT-18) -->
+    <string name="viajes_explicacion">Рейс об’єднує кілька робочих днів (наприклад, туди й назад). Поки триває рейс, кожен новий робочий день записується в нього сам.</string>
+    <string name="accion_iniciar_viaje">Почати рейс</string>
+    <string name="accion_finalizar_viaje">Завершити рейс</string>
+    <string name="viaje_en_curso">Поточний рейс</string>
+    <string name="viaje_nombre">Назва рейсу</string>
+    <string name="viaje_nombre_propuesto">Рейс від %1$s</string>
+    <string name="viaje_desde">З %1$s</string>
+    <string name="viaje_paises">Країни: %1$s</string>
+    <string name="viajes_anteriores">Попередні рейси</string>
+    <string name="viajes_vacio">Ще немає завершених рейсів.</string>
+    <string name="finalizar_viaje_titulo">Завершити рейс?</string>
+    <string name="finalizar_viaje_texto">Робочі дні, які ви почнете відтепер, більше не записуватимуться в «%1$s».</string>
+    <string name="viaje_titulo">Рейс</string>
+    <string name="viaje_jornadas">Робочі дні рейсу</string>
+    <string name="viaje_sin_jornadas">У цьому рейсі ще немає робочих днів.</string>
+    <string name="accion_borrar_viaje">Видалити рейс</string>
+    <string name="borrar_viaje_titulo">Видалити цей рейс?</string>
+    <string name="borrar_viaje_texto">Його робочі дні не видаляються: вони залишаться в історії, без рейсу.</string>
+    <string name="error_viaje_no_existe">Цього рейсу вже немає.</string>
+    <string name="error_viaje_en_curso">Вже триває рейс: завершіть його, перш ніж почати інший.</string>
+    <string name="error_viaje_sin_en_curso">Зараз немає рейсу.</string>
+    <string name="error_viaje_sin_nombre">Дайте рейсу назву.</string>
+    <string name="inicio_viaje">Рейс: %1$s</string>
+    <plurals name="viaje_resumen">
+        <item quantity="one">%1$s км · %2$d робочий день</item>
+        <item quantity="few">%1$s км · %2$d робочі дні</item>
+        <item quantity="many">%1$s км · %2$d робочих днів</item>
+        <item quantity="other">%1$s км · %2$d робочого дня</item>
     </plurals>
 </resources>

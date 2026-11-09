@@ -2,8 +2,10 @@ package com.cristinachdr.mitacografo.data.room.jornada
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.cristinachdr.mitacografo.data.room.viaje.ViajeEntity
 
 /**
  * Fila de la tabla `jornada`.
@@ -18,6 +20,15 @@ import androidx.room.PrimaryKey
         Index("inicio_epoch_ms"),
         Index("fin_epoch_ms"),
         Index("viaje_id"),
+    ],
+    // Desde la versión 2 (MT-18). Si se borra un viaje, sus jornadas se quedan sin viaje (no se borran).
+    foreignKeys = [
+        ForeignKey(
+            entity = ViajeEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["viaje_id"],
+            onDelete = ForeignKey.SET_NULL,
+        ),
     ],
 )
 data class JornadaEntity(
@@ -34,7 +45,6 @@ data class JornadaEntity(
     @ColumnInfo(name = "pais_fin") val paisFin: String?,
     @ColumnInfo(name = "ciudad_fin") val ciudadFin: String?,
     @ColumnInfo(name = "conduccion_min") val conduccionMin: Int?,
-    // La clave ajena a `viaje` se añadirá con la tabla de viajes (MT-18).
     @ColumnInfo(name = "viaje_id") val viajeId: Long?,
     @ColumnInfo(name = "observaciones") val observaciones: String?,
 )

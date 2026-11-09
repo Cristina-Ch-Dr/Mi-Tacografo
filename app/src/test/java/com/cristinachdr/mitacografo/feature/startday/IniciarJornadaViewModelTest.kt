@@ -2,15 +2,20 @@ package com.cristinachdr.mitacografo.feature.startday
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
+import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
+import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.domain.usecase.ProponerDatosInicio
+import com.cristinachdr.mitacografo.domain.usecase.ProponerDescansoPrevio
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -20,6 +25,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -44,13 +50,22 @@ class IniciarJornadaViewModelTest {
             ciudadFin = "Lyon",
         )
 
-    private fun viewModel(repo: FakeJornadaRepository) =
-        IniciarJornadaViewModel(
-            IniciarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
-            ProponerDatosInicio(repo),
-            ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
+    private fun viewModel(
+        repo: FakeJornadaRepository,
+        descansos: FakeDescansoRepository = FakeDescansoRepository(),
+    ) = IniciarJornadaViewModel(
+        IniciarJornada(
+            repo,
+            FakeViajeRepository(),
+            GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj),
             reloj,
-        )
+        ),
+        ProponerDatosInicio(repo),
+        ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
+        ProponerDescansoPrevio(repo, descansos),
+        GuardarDescanso(descansos, reloj),
+        reloj,
+    )
 
     @Test
     fun `se rellena con la hora actual y donde termino la jornada anterior`() {
@@ -112,5 +127,39 @@ class IniciarJornadaViewModelTest {
 
             assertFalse(vm.uiState.value.guardado)
             assertEquals(setOf(ErrorJornada.INICIO_ANTES_DEL_FIN_ANTERIOR), vm.uiState.value.errores)
+        }
+
+    @Test
+    fun `pregunta si descanso desde que termino la jornada anterior, sin apuntarlo todavia`() {
+        val estado = viewModel(FakeJornadaRepository(listOf(ayer))).uiState.value
+
+        assertEquals(ayer.fin, estado.propuestaDescanso?.desde)
+        assertEquals(Duration.ofHours(13), estado.duracionDescanso)
+        assertFalse(estado.apuntarDescanso)
+    }
+
+    @Test
+    fun `si dice que si, al iniciar se apunta el descanso hasta la hora de inicio`() =
+        runTest {
+            val descansos = FakeDescansoRepository()
+            val vm = viewModel(FakeJornadaRepository(listOf(ayer)), descansos)
+            vm.onApuntarDescanso(true)
+
+            vm.onIniciar()
+
+            val descanso = descansos.guardados.single()
+            assertEquals(TipoDescanso.DESCANSO, descanso.tipo)
+            assertEquals(ayer.fin, descanso.inicio)
+            assertEquals(ahora.atZone(madrid).toInstant(), descanso.fin)
+            assertEquals("FR", descanso.pais)
+        }
+
+    @Test
+    fun `si no lo confirma no se apunta nada`() =
+        runTest {
+            val descansos = FakeDescansoRepository()
+            viewModel(FakeJornadaRepository(listOf(ayer)), descansos).onIniciar()
+
+            assertTrue(descansos.guardados.isEmpty())
         }
 }

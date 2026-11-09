@@ -2,15 +2,19 @@ package com.cristinachdr.mitacografo.feature.endday
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
+import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
+import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,13 +46,16 @@ class FinalizarJornadaViewModelTest {
             paisInicio = "ES",
         )
 
-    private fun viewModel(repo: FakeJornadaRepository) =
-        FinalizarJornadaViewModel(
-            FinalizarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
-            ObtenerJornadaActual(repo),
-            ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
-            reloj,
-        )
+    private fun viewModel(
+        repo: FakeJornadaRepository,
+        descansos: FakeDescansoRepository = FakeDescansoRepository(),
+    ) = FinalizarJornadaViewModel(
+        FinalizarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
+        ObtenerJornadaActual(repo),
+        ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
+        TerminarPausa(descansos, reloj),
+        reloj,
+    )
 
     @Test
     fun `carga la jornada abierta y propone la hora actual y el mismo pais`() {
@@ -132,4 +139,26 @@ class FinalizarJornadaViewModelTest {
         assertTrue(estado.sinJornada)
         assertFalse(estado.puedeGuardar)
     }
+
+    @Test
+    fun `una pausa que se quedo abierta termina con la jornada`() =
+        runTest {
+            val descansos =
+                FakeDescansoRepository(
+                    listOf(
+                        Descanso(
+                            id = 1,
+                            inicio = ahora.minusMinutes(30).atZone(madrid).toInstant(),
+                            zonaInicio = madrid,
+                            tipo = TipoDescanso.PAUSA,
+                        ),
+                    ),
+                )
+            val vm = viewModel(FakeJornadaRepository(listOf(abierta)), descansos)
+            vm.onKm("245872")
+
+            vm.onFinalizar()
+
+            assertEquals(ahora.atZone(madrid).toInstant(), descansos.guardados.single().fin)
+        }
 }

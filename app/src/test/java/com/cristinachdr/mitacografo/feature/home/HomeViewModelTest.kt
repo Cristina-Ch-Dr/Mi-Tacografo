@@ -1,10 +1,17 @@
 package com.cristinachdr.mitacografo.feature.home
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
+import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
+import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
+import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
+import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -35,7 +42,19 @@ class HomeViewModelTest {
     private fun viewModel(
         reloj: Clock,
         vararg jornadas: Jornada,
-    ) = HomeViewModel(ObtenerJornadaActual(FakeJornadaRepository(jornadas.toList())), FakeSettingsRepository(), reloj)
+        descansos: FakeDescansoRepository = FakeDescansoRepository(),
+    ): HomeViewModel {
+        val repo = FakeJornadaRepository(jornadas.toList())
+        return HomeViewModel(
+            ObtenerJornadaActual(repo),
+            FakeSettingsRepository(),
+            descansos,
+            FakeViajeRepository(),
+            IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
+            TerminarPausa(descansos, reloj),
+            reloj,
+        )
+    }
 
     /** Se suscribe al estado (como haría la pantalla) para que el ViewModel empiece a emitir. */
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,5 +102,47 @@ class HomeViewModelTest {
 
             val enCurso = vm.uiState.value.jornada!!
             assertNull(enCurso.proximoAviso)
+        }
+
+    @Test
+    fun `iniciar pausa la muestra en curso desde ahora`() =
+        runTest {
+            val abierta = Jornada(id = 1, inicio = hora(6, 0), zonaInicio = madrid, kmInicio = 0)
+            val vm = viewModel(Clock.fixed(hora(11, 0), madrid), abierta)
+            observar(vm)
+
+            vm.onIniciarPausa()
+
+            assertEquals(
+                hora(11, 0),
+                vm.uiState.value.pausa
+                    ?.desde
+                    ?.toInstant(),
+            )
+            assertEquals(
+                Duration.ZERO,
+                vm.uiState.value.pausa
+                    ?.transcurrido,
+            )
+        }
+
+    @Test
+    fun `terminar pausa le pone la hora de fin y deja de mostrarla`() =
+        runTest {
+            val abierta = Jornada(id = 1, inicio = hora(6, 0), zonaInicio = madrid, kmInicio = 0)
+            val pausa = Descanso(id = 1, inicio = hora(10, 30), zonaInicio = madrid, tipo = TipoDescanso.PAUSA)
+            val descansos = FakeDescansoRepository(listOf(pausa))
+            val vm = viewModel(Clock.fixed(hora(11, 0), madrid), abierta, descansos = descansos)
+            observar(vm)
+            assertEquals(
+                Duration.ofMinutes(30),
+                vm.uiState.value.pausa
+                    ?.transcurrido,
+            )
+
+            vm.onTerminarPausa()
+
+            assertNull(vm.uiState.value.pausa)
+            assertEquals(hora(11, 0), descansos.guardados.single().fin)
         }
 }

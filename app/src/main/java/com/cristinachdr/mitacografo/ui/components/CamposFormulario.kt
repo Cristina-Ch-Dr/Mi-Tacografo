@@ -1,5 +1,6 @@
 package com.cristinachdr.mitacografo.ui.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.cristinachdr.mitacografo.domain.model.ErrorDescanso
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
+import com.cristinachdr.mitacografo.domain.model.ErrorViaje
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import com.cristinachdr.mitacografo.ui.mensaje
 
@@ -66,12 +69,32 @@ fun CampoNumero(
 fun ListaErrores(
     errores: Set<ErrorJornada>,
     modifier: Modifier = Modifier,
+) = ListaMensajes(errores.map { it.mensaje }, modifier)
+
+/** Lo mismo para las pausas y los descansos. */
+@Composable
+fun ListaErroresDescanso(
+    errores: Set<ErrorDescanso>,
+    modifier: Modifier = Modifier,
+) = ListaMensajes(errores.map { it.mensaje }, modifier)
+
+/** Lo mismo para los viajes. */
+@Composable
+fun ListaErroresViaje(
+    errores: Set<ErrorViaje>,
+    modifier: Modifier = Modifier,
+) = ListaMensajes(errores.map { it.mensaje }, modifier)
+
+@Composable
+private fun ListaMensajes(
+    @StringRes mensajes: List<Int>,
+    modifier: Modifier = Modifier,
 ) {
-    if (errores.isEmpty()) return
+    if (mensajes.isEmpty()) return
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        errores.forEach { error ->
+        mensajes.distinct().forEach { mensaje ->
             Text(
-                text = "• " + stringResource(error.mensaje),
+                text = "• " + stringResource(mensaje),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyLarge,
             )

@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2 – E7 | — | MT-06 | — | MT-01 … MT-05, MT-07 … MT-17, MT-41 … MT-43 |
+| E4 – E7 | — | MT-18 | — | MT-01 … MT-17, MT-20, MT-22, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -35,7 +35,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Instalar Android Studio (estable) y crear un emulador.
 - [ ] Activar las opciones de desarrollador y la depuración USB en el móvil del conductor, y anotar su versión de Android (→ D-5).
 - [ ] Crear 3 emuladores: **API 26** (mínima), **API 33** (como el móvil del conductor) y la última estable (espec. §3.1).
-  - Hecho solo el de la última (API 36). Falta probar en API 33 antes de dar el APK (ver Release v0.1.0).
+  - Hechos API 36 y **API 33** (el APK de la v0.1.0 probado ahí). Falta el de API 26.
 - [x] Decidir el `applicationId` (D-6): `com.cristinachdr.mitacografo`. (D-7 está resuelto: transporte internacional y nacional.)
 
 ### MT-02 · Repositorio y Gitflow · S
@@ -71,7 +71,9 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] `release.yml` con tag `v*` → APK firmado en la Release (PR #5). La firma se lee de variables de entorno o de `keystore.properties` (ignorado por git).
   - Probado en local con una clave de prueba: el APK release (R8) arranca, guarda jornadas y hace y restaura la copia JSON.
 - [x] Secrets en GitHub: `MT_KEYSTORE_BASE64`, `MT_KEYSTORE_PASSWORD`, `MT_KEY_ALIAS` y `MT_KEY_PASSWORD`.
-- [ ] Tag `v0.1.0` en `main` → instalar el APK en el móvil del conductor (se junta con la Release v0.1.0).
+- [x] Tag `v0.1.0` en `main` → el workflow publica la Release con el APK firmado (5 nov 2026).
+  - Antes hubo que fusionar `main` en `develop` con `-s ours` (PR #15): la PR #6 se había fusionado directamente en `main`.
+  - El APK es el de la Release, firmado con el keystore de verdad, y está probado en API 33: arranca, pide notificaciones y el aviso de 12 h 30 salta a su hora con la app en segundo plano.
 - **Criterio:** el APK firmado se instala desde la Release.
 
 ---
@@ -171,31 +173,60 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Guardar en DataStore (`paises_habituales`, `continentes`) y test de la búsqueda con y sin filtro.
 - [x] El test de DataStore usa `OkioStorage`: el almacenamiento de Android falla en Windows al sobrescribir el archivo (en el móvil y en el CI funciona igual).
 
-> 🏁 **Release v0.1.0** → antes, probar el APK firmado en un emulador **API 33** (primer arranque, permisos, un aviso). Después, instalar en el móvil del conductor. **Usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
+> 🏁 **Release v0.1.0** ✅ (5 nov 2026) → probada en un emulador **API 33** (primer arranque, permisos, un aviso). Instalar en el móvil del conductor y **usar en paralelo con la libreta 1–2 semanas** mientras se desarrolla E2.
 
----
+### MT-44 · Colores del logo en toda la app · M · *(propuesta de Cristina)*
+- [x] Colores exactos del icono (media de los píxeles del PNG): azul del fondo `#234886`, naranja de la onda `#D27204` y claro de la esfera `#E6F0FD`.
+- [x] **Barra superior en el azul del logo** en los dos temas, con la barra de estado detrás e iconos blancos: el logo de la esquina se funde con ella.
+- [x] **Naranja = avisos:** «Próximo aviso» va en una etiqueta naranja con campana, en dos líneas (hora y tiempo de jornada). Como texto sobre blanco, el naranja se oscurece a `#9A5200`.
+- [x] Tarjeta de jornada en curso blanca con borde azul (opción B de 4 bocetos). Azules claros y barra de pestañas elegidos por Cristina con un probador de colores:
+  - Claro: contenedores `#BCD2F5`, barra de pestañas `#D7E6FE`, pestaña activa `#A6C5F7` con texto `#1C3F7D`.
+  - Oscuro: borde, horas y botón `#95B1DF` (texto `#052048`), pestaña activa en el azul del logo con el icono `#E6F0FD` y la palabra en `#E5F1FF`.
+  - Los colores de la barra de pestañas van aparte (`coloresPestanas()`), para no cambiar nada más.
+- [x] Contraste comprobado (WCAG AA, 4,5:1): todos los textos pasan, la mayoría de 7:1. Los colores de estado (✅ ⚠️ ❔) no cambian.
+- [x] Probado en el emulador API 33 en claro y oscuro: Inicio, Historial y Ajustes.
 
-## E2 · Viajes → **v0.2**
+### MT-45 · Sonido propio de los avisos · M · deps: MT-13 · *(propuesta de Cristina)*
+- [x] Que al oír el aviso se sepa que es de Mi Tacógrafo y no un mensaje cualquiera.
+- [x] Sonido propio en `res/raw/aviso_jornada.wav` (1,35 s, tres notas que suben). Es una **síntesis propia**, sin grabaciones de nadie ni licencias: se regenera con `herramientas/generar_sonido_aviso.py`. Vibración larga-corta-larga.
+- [x] Canal nuevo `avisos_jornada_v2` con ese sonido y esa vibración, y se borra el antiguo. Probado actualizando desde la versión de `develop`: el canal viejo queda borrado y el nuevo, creado.
+  - `res/raw/keep.xml`: el sonido se usa por su nombre, así que se protege para que R8 no lo quite en la release.
+  - Respeta el modo silencio y «No molestar» (es una notificación, no una alarma).
+- [x] En Ajustes: «Sonido actual: …», «Escuchar el sonido» (con el volumen de notificaciones) y «Cambiar sonido o vibración», que abre la pantalla de Android del canal. «Probar aviso» ya existía (llega en 1 minuto).
+  - El sonido se lee del canal cada vez que se vuelve a la pantalla: si el conductor elige otro tono en Android, la app lo muestra y reproduce ese (fallo que vio Cristina al probarlo).
+- [ ] Probar en el móvil del conductor con el móvil en vibración y con «No molestar».
 
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
-- [ ] `Viaje`, `ViajeRepository`, entidad, DAO, migración y FK `jornada.viaje_id` (`SET_NULL`).
-- [ ] km del viaje = suma de las jornadas (test).
-- [ ] Lista con km acumulados, iniciar y finalizar viaje, y detalle con sus jornadas.
-- [ ] Al iniciar una jornada con un viaje en curso, se asigna automáticamente.
+- [x] `Viaje` (nombre, inicio y fin con zona, observaciones), puerto `ViajeRepository`, entidad, DAO y adaptador de Room.
+- [x] **Primera migración de verdad, 1 → 2** (`AutoMigration`): tabla `viaje` y clave ajena `jornada.viaje_id` con `ON DELETE SET NULL` (borrar un viaje no borra sus jornadas). Room rehace la tabla `jornada` copiando todas las filas.
+  - `MigracionesTest` (Robolectric + `MigrationTestHelper`): crea una base de datos de la v0.1 con jornadas y un descanso, la migra, la valida contra `2.json` y comprueba que no se pierde nada.
+  - Probado también en el emulador: con 9 jornadas y 17 descansos en la versión anterior, se instala la nueva encima y está todo.
+- [x] km del viaje = suma de sus jornadas, más conducción y países por los que pasa (tests).
+- [x] Pestaña **Viajes**: «Iniciar viaje» (con un nombre propuesto, «Viaje del 9 nov 2026»), el viaje en curso con sus km y «Finalizar viaje» (pide confirmación), y los anteriores. Detalle con sus jornadas (se abren para corregirlas), y corregir nombre, fechas u observaciones, o borrarlo.
+- [x] Al iniciar una jornada con un viaje en curso, se asigna sola. Si se inicia un viaje con una jornada ya empezada, también entra. En Inicio sale «Viaje: …».
+- [x] Copia de seguridad con los viajes (`viajes`; las copias antiguas se siguen leyendo). Restaurar comprueba que ninguna jornada apunte a un viaje que no está en la copia.
+- [ ] Km por viaje en Resumen y PDF de un viaje (MT-33B).
 
 ---
 
 ## E3 · Descansos → **v0.2**
 
 ### MT-20 · Descansos: datos y clasificador (TDD) · L · (antes MT-20 y MT-21)
-- [ ] `Descanso` (pausa/descanso, país), entidad, DAO, migración y validación de solapes.
-  - Ya hecho: la tabla `descanso` (vacía) está en la versión 1 de la base de datos, para no tener que migrar. `fin` admite `null` (pausa en curso). Falta el modelo, el DAO y la validación.
-- [ ] Clasificador: diario normal, reducido y fraccionado 3+9 (parte 1 y completo); semanal normal y reducido.
-- [ ] Tests T7–T10 y T12 (clasificación).
+- [x] `Descanso` (pausa o descanso, país; `fin` `null` = en curso), puerto `DescansoRepository`, DAO, mapper y adaptador de Room.
+  - **Sin migración:** la tabla `descanso` ya estaba en la versión 1 de la base de datos; añadir el DAO no cambia el esquema (`1.json` igual).
+- [x] Validación (`validarDescanso`): fin posterior al inicio, nada en el futuro, sin solapes entre descansos y solo uno en curso. Con una jornada sí puede solaparse (espec. §5.2).
+- [x] Clasificador (`clasificarDescansos`): pausa, en curso, no cuenta, 1.ª parte de fraccionado, fraccionado 3 + 9 completo, diario reducido y normal, semanal reducido (con su deuda hasta 45 h) y normal.
+  - Fraccionado: la 2.ª parte (≥ 9 h) tiene que terminar dentro de las 24 h desde el último diario; las pausas de en medio no cuentan. ⚠️ Revisar con la guía oficial antes de E4.
+- [x] Tests T7–T10 y T12, más límites (9 h, 24 h, 45 h), casos de uso, Room (Robolectric) y ViewModels.
+- [x] Casos de uso: guardar, borrar, iniciar y terminar pausa, lista clasificada y propuesta de descanso al iniciar.
+- [x] **Copia de seguridad** con los descansos (campo `descansos`): las copias antiguas se siguen leyendo (lista vacía) y las versiones anteriores de la app lo ignoran, así que no sube `VERSION_FORMATO`.
 
 ### MT-22 · Pantalla Descansos · M · deps: MT-20 · (antes MT-22 y MT-23)
-- [ ] Lista con chip de clasificación, y alta y edición manual. País prellenado con el país de fin de la última jornada.
-- [ ] «¿Descansaste desde…?» al iniciar jornada: si hay un hueco sin descanso registrado, proponerlo prellenado. Se crea con 1 toque y solo si el usuario confirma.
+- [x] **Pausas y descansos** (icono de cama arriba, junto a Ajustes): lista con chip de clase, alta con «Añadir» y edición o borrado al tocar uno. Uno nuevo se propone desde el fin de la última jornada hasta ahora, en su país de fin.
+- [x] **Inicio:** botón «Iniciar pausa» / «Terminar pausa» con la jornada en curso y «En pausa desde las 19:17 · 12 min» en la tarjeta. Al finalizar la jornada, la pausa abierta termina a la misma hora (o se borra si empezó después).
+- [x] **«¿Descansaste desde vie 19:18?»** al iniciar jornada, si no hay descanso apuntado desde la anterior. Interruptor apagado por defecto: solo se crea si el conductor lo activa.
+- [x] Textos en español y ucraniano. Probado en el emulador API 33, en claro y oscuro.
+- [ ] Pendiente de decidir con el conductor: avisos durante la pausa (p. ej. a los 45 min) y si el ucraniano de los textos nuevos se entiende bien.
 
 > 🏁 **Release v0.2.0**
 
@@ -236,14 +267,21 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E5 · Resumen, estadísticas y exportación (CSV + PDF) → **v1.0**
 
-### MT-32 · Pantalla Resumen y estadísticas · L
-- [ ] Semana y bisemana: conducción, km, descansos y deudas con fecha límite. Km por día y por viaje.
+### MT-32 · Pantalla Resumen y estadísticas · L · *(adelantada a petición de Cristina, sin el motor de reglas)*
+- [x] Pestaña **Resumen**: «Semana» o «2 semanas» (la elegida y la anterior, las de las 90 h), con flechas para ir hacia atrás. No deja pasar de la semana actual.
+- [x] Totales: km, jornadas, tiempo de jornada y conducción del tacógrafo (avisa si a alguna jornada le falta). En la bisemana, cada semana por separado.
+- [x] Km por día con barras (también los días sin trabajar) y descansos por clase, con lo que falta por compensar de los semanales reducidos.
+- [x] Dominio puro `resumirPeriodo` (TDD, test T25): solo cuenta lo que empieza en el periodo, en la zona de referencia si hay.
+- [ ] Fecha límite de las deudas y km por viaje: con el motor de reglas (E4) y con Viajes (E2).
 
 ### MT-33 · Exportar CSV · M
 - [ ] `jornadas.csv`, `viajes.csv` y `descansos.csv` (UTF-8 BOM, `;`, coma decimal). Compartir con `Intent.ACTION_SEND`.
 - [ ] Test del formato (que se abra bien en Excel).
 
 ### MT-33B · Exportar PDF · XL · deps: MT-30 · (antes MT-33B y MT-33C)
+> **Primera parte hecha sin reglas** (con MT-32): «Compartir PDF» y «Guardar PDF» en Resumen. Cabecera, resumen, tablas de jornadas y descansos con su clase, cabecera repetida al cambiar de página, «Página X de Y» y aviso legal. Probado en API 33 en español y ucraniano (el cirílico sale bien).
+> - `Informe` (dominio) + `GeneradorPdf` (puerto en `app`, porque los textos traducidos están en `app`) con `PdfDocument`. Se comparte con `FileProvider` (`cache/informes/`) y se guarda con `CreateDocument`.
+> - Falta: informe de reglas por semana, rango mes / viaje / fechas libres, y el test instrumentado T26.
 - [ ] Puerto `ReportRenderer` e `InformeModel` puro: cabecera, resumen, tablas de jornadas y descansos, informe de reglas por semana y deudas. Test T25.
 - [ ] Selección de rango: semana, bisemana, mes, viaje o fechas libres.
 - [ ] `PdfReportRenderer` con `PdfDocument`: A4, tablas con paginación y cabecera repetida, «Página X de Y», pie con el aviso legal, y comprobar que el ucraniano (cirílico) se ve bien.

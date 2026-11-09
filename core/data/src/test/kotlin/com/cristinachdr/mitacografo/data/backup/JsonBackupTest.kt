@@ -5,8 +5,11 @@ import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
+import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.Viaje
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -64,6 +67,31 @@ class JsonBackupTest {
                     paisesHabituales = setOf("DE", "FR"),
                     continentes = setOf(Continente.EUROPA),
                 ),
+            descansos =
+                listOf(
+                    Descanso(
+                        id = 1,
+                        inicio = hora(2, 18, kyiv),
+                        zonaInicio = kyiv,
+                        fin = hora(3, 5),
+                        zonaFin = madrid,
+                        tipo = TipoDescanso.DESCANSO,
+                        pais = "UA",
+                        observaciones = "En el aparcamiento",
+                    ),
+                    Descanso(id = 2, inicio = hora(3, 10), zonaInicio = madrid, tipo = TipoDescanso.PAUSA),
+                ),
+            viajes =
+                listOf(
+                    Viaje(
+                        id = 3,
+                        nombre = "Ida – vuelta",
+                        inicio = hora(2, 5),
+                        zonaInicio = madrid,
+                        fin = hora(3, 19, kyiv),
+                        zonaFin = kyiv,
+                    ),
+                ),
         )
 
     /** El error al leer [texto]; si se lee sin error, el test falla. */
@@ -115,6 +143,18 @@ class JsonBackupTest {
         assertEquals(500, leida.jornadas.single().kmRecorridos)
         assertEquals(Duration.ofHours(9), leida.jornadas.single().conduccionTacografo)
         assertEquals(Ajustes(paisEmpresa = "ES"), leida.ajustes)
+        // Las copias de antes de MT-20 no traen descansos.
+        assertEquals(emptyList<Descanso>(), leida.descansos)
+        assertEquals(emptyList<Viaje>(), leida.viajes)
+    }
+
+    @Test
+    fun `un tipo de descanso que no existe son datos incorrectos`() {
+        val tipoMalo =
+            """{ "app": "mi-tacografo", "version": 1, "creada": "2026-11-03T19:00:00Z",
+                "descansos": [ { "id": 1, "inicio": "2026-11-02T05:00:00Z", "zonaInicio": "Europe/Madrid", "tipo": "SIESTA" } ] }"""
+
+        assertEquals(ErrorCopia.DATOS_INCORRECTOS, errorAlLeer(tipoMalo))
     }
 
     @Test

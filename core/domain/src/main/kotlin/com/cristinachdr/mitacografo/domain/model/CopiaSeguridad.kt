@@ -3,7 +3,7 @@ package com.cristinachdr.mitacografo.domain.model
 import java.time.Instant
 
 /**
- * Todo lo que guarda la app, en un solo archivo: las jornadas y los ajustes.
+ * Todo lo que guarda la app, en un solo archivo: jornadas, descansos, viajes y ajustes.
  *
  * Sirve para cambiar de móvil o recuperar los datos si se borra la app.
  */
@@ -11,6 +11,10 @@ data class CopiaSeguridad(
     val creada: Instant,
     val jornadas: List<Jornada>,
     val ajustes: Ajustes,
+    /** Pausas y descansos. Las copias anteriores a MT-20 no los traen: se leen como lista vacía. */
+    val descansos: List<Descanso> = emptyList(),
+    /** Viajes. Las copias anteriores a MT-18 no los traen: se leen como lista vacía. */
+    val viajes: List<Viaje> = emptyList(),
 ) {
     /** La primera y la última jornada de la copia, para el resumen antes de restaurar. */
     val desde: Instant? get() = jornadas.minOfOrNull { it.inicio }

@@ -22,6 +22,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -38,15 +39,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.feature.editday.EditarJornadaScreen
 import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaScreen
 import com.cristinachdr.mitacografo.feature.history.HistoryScreen
 import com.cristinachdr.mitacografo.feature.home.HomeScreen
+import com.cristinachdr.mitacografo.feature.rests.DescansosScreen
+import com.cristinachdr.mitacografo.feature.rests.EditarDescansoScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
 import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
+import com.cristinachdr.mitacografo.feature.trips.EditarViajeScreen
 import com.cristinachdr.mitacografo.feature.trips.TripsScreen
+import com.cristinachdr.mitacografo.ui.theme.AzulLogo
+import com.cristinachdr.mitacografo.ui.theme.SobreAzul
+import com.cristinachdr.mitacografo.ui.theme.coloresPestanas
 import kotlin.reflect.KClass
 
 /** Pestañas de la barra inferior. */
@@ -77,10 +85,34 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
     val pantallaSecundaria = destinoActual != null && pestanaActual == null
     val tituloSecundaria =
         when {
-            destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> R.string.accion_iniciar_jornada
-            destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> R.string.accion_finalizar_jornada
-            destinoActual?.hasRoute(RutaJornada::class) == true -> R.string.editar_titulo
-            else -> R.string.nav_ajustes
+            destinoActual?.hasRoute(RutaIniciarJornada::class) == true -> {
+                R.string.accion_iniciar_jornada
+            }
+
+            destinoActual?.hasRoute(RutaFinalizarJornada::class) == true -> {
+                R.string.accion_finalizar_jornada
+            }
+
+            destinoActual?.hasRoute(RutaJornada::class) == true -> {
+                R.string.editar_titulo
+            }
+
+            destinoActual?.hasRoute(RutaDescansos::class) == true -> {
+                R.string.nav_descansos
+            }
+
+            destinoActual?.hasRoute(RutaViaje::class) == true -> {
+                R.string.viaje_titulo
+            }
+
+            destinoActual?.hasRoute(RutaDescanso::class) == true -> {
+                val nuevo = entradaActual?.toRoute<RutaDescanso>()?.id == 0L
+                if (nuevo) R.string.descanso_titulo_nuevo else R.string.descanso_titulo
+            }
+
+            else -> {
+                R.string.nav_ajustes
+            }
         }
 
     Scaffold(
@@ -108,11 +140,25 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 },
                 actions = {
                     if (!pantallaSecundaria) {
+                        IconButton(onClick = { navController.navigate(RutaDescansos) { launchSingleTop = true } }) {
+                            Icon(
+                                painterResource(R.drawable.ic_descanso),
+                                contentDescription = stringResource(R.string.nav_descansos),
+                            )
+                        }
                         IconButton(onClick = { navController.navigate(RutaAjustes) { launchSingleTop = true } }) {
                             Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_ajustes))
                         }
                     }
                 },
+                // Azul del fondo del icono en los dos temas: el logo de la izquierda se funde con la barra.
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = AzulLogo,
+                        titleContentColor = SobreAzul,
+                        navigationIconContentColor = SobreAzul,
+                        actionIconContentColor = SobreAzul,
+                    ),
             )
         },
         bottomBar = {
@@ -134,9 +180,9 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                             label = { Text(stringResource(pestana.titulo)) },
                             colors =
                                 NavigationBarItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedIconColor = coloresPestanas().iconoActiva,
+                                    selectedTextColor = coloresPestanas().textoActiva,
+                                    indicatorColor = coloresPestanas().activa,
                                 ),
                         )
                     }
@@ -156,12 +202,25 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 )
             }
             composable<RutaHistorial> { HistoryScreen(onJornada = { navController.navigate(RutaJornada(it)) }) }
-            composable<RutaViajes> { TripsScreen() }
+            composable<RutaViajes> { TripsScreen(onViaje = { navController.navigate(RutaViaje(it)) }) }
+            composable<RutaViaje> {
+                EditarViajeScreen(
+                    onJornada = { navController.navigate(RutaJornada(it)) },
+                    onCerrar = { navController.popBackStack() },
+                )
+            }
             composable<RutaResumen> { StatsScreen() }
             composable<RutaAjustes> { SettingsScreen() }
             composable<RutaIniciarJornada> { IniciarJornadaScreen(onGuardado = { navController.popBackStack() }) }
             composable<RutaFinalizarJornada> { FinalizarJornadaScreen(onGuardado = { navController.popBackStack() }) }
             composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
+            composable<RutaDescansos> {
+                DescansosScreen(
+                    onDescanso = { navController.navigate(RutaDescanso(it)) },
+                    onNuevo = { navController.navigate(RutaDescanso()) },
+                )
+            }
+            composable<RutaDescanso> { EditarDescansoScreen(onCerrar = { navController.popBackStack() }) }
         }
     }
 }

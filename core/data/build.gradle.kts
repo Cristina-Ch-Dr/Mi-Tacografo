@@ -27,6 +27,12 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    // MigracionesTest lee los esquemas exportados (1.json, 2.json…) como assets.
+    sourceSets
+        .getByName("test")
+        .assets.directories
+        .add("$projectDir/schemas")
 }
 
 // El esquema de cada versión de la base de datos se guarda en git (core/data/schemas/).
@@ -54,5 +60,6 @@ dependencies {
     testImplementation(libs.androidx.junit)
     testImplementation(libs.androidx.test.core.ktx)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.junit)
 }

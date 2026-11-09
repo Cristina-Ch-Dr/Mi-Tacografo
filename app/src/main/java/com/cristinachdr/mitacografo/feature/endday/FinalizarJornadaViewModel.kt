@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.usecase.DatosFin
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
+import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import com.cristinachdr.mitacografo.ui.errorMinutos
 import com.cristinachdr.mitacografo.ui.leerConduccion
@@ -65,6 +66,7 @@ class FinalizarJornadaViewModel
         private val finalizarJornada: FinalizarJornada,
         private val obtenerJornadaActual: ObtenerJornadaActual,
         private val obtenerPreferenciasPaises: ObtenerPreferenciasPaises,
+        private val terminarPausa: TerminarPausa,
         private val clock: Clock,
     ) : ViewModel() {
         private val _uiState =
@@ -126,6 +128,8 @@ class FinalizarJornadaViewModel
                     )
                 when (val resultado = finalizarJornada(datos)) {
                     is ResultadoJornada.Ok -> {
+                        // Si se quedó una pausa abierta, termina con la jornada (si no había, no hace nada).
+                        terminarPausa(hasta = datos.fin, zona = datos.zona)
                         _uiState.update { it.copy(guardado = true) }
                     }
 

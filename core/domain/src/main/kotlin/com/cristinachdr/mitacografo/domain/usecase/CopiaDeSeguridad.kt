@@ -2,20 +2,26 @@ package com.cristinachdr.mitacografo.domain.usecase
 
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
+import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.port.BackupPort
+import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
+import com.cristinachdr.mitacografo.domain.port.ViajeRepository
 import kotlinx.coroutines.flow.first
 import java.time.Clock
 import javax.inject.Inject
 
-/** Caso de uso: preparar el texto del archivo de copia con todas las jornadas y los ajustes. */
+/** Caso de uso: preparar el texto del archivo de copia con todas las jornadas, los descansos y los ajustes. */
 class ExportarCopia
     @Inject
     constructor(
         private val repository: JornadaRepository,
+        private val descansos: DescansoRepository,
+        private val viajes: ViajeRepository,
         private val settings: SettingsRepository,
         private val backup: BackupPort,
         private val clock: Clock,
@@ -26,6 +32,8 @@ class ExportarCopia
                     creada = clock.instant(),
                     jornadas = repository.observarTodas().first(),
                     ajustes = settings.observar().first(),
+                    descansos = descansos.obtenerTodos(),
+                    viajes = viajes.obtenerTodos(),
                 )
             return backup.codificar(copia)
         }
@@ -55,7 +63,8 @@ class LeerCopia
         operator fun invoke(texto: String): ResultadoLectura =
             try {
                 val copia = backup.decodificar(texto)
-                val correcta = datosCorrectos(copia.jornadas)
+                val correcta =
+                    datosCorrectos(copia.jornadas) && descansosCorrectos(copia.descansos) && viajesCorrectos(copia)
                 if (correcta) ResultadoLectura.Ok(copia) else ResultadoLectura.Invalida(ErrorCopia.DATOS_INCORRECTOS)
             } catch (e: CopiaInvalidaException) {
                 ResultadoLectura.Invalida(e.error)
@@ -67,10 +76,26 @@ class LeerCopia
                 jornadas.map { it.id }.toSet().size == jornadas.size &&
                 jornadas.count { it.abierta } <= 1 &&
                 jornadas.all { jornada -> jornada.fin?.isAfter(jornada.inicio) ?: true }
+
+        /** Lo mismo para los descansos: ids únicos, como mucho uno en curso y fin después del inicio. */
+        private fun descansosCorrectos(descansos: List<Descanso>): Boolean =
+            descansos.all { it.id > Descanso.SIN_ID } &&
+                descansos.map { it.id }.toSet().size == descansos.size &&
+                descansos.count { it.enCurso } <= 1 &&
+                descansos.all { descanso -> descanso.fin?.isAfter(descanso.inicio) ?: true }
+
+        /** Viajes con ids únicos, como mucho uno en curso, y jornadas que solo apuntan a viajes de la copia. */
+        private fun viajesCorrectos(copia: CopiaSeguridad): Boolean {
+            val ids = copia.viajes.map { it.id }.toSet()
+            return copia.viajes.all { it.id > Viaje.SIN_ID } &&
+                ids.size == copia.viajes.size &&
+                copia.viajes.count { it.enCurso } <= 1 &&
+                copia.jornadas.all { it.viajeId == null || it.viajeId in ids }
+        }
     }
 
 /**
- * Caso de uso: **reemplazar** todos los datos por los de la copia (jornadas y ajustes).
+ * Caso de uso: **reemplazar** todos los datos por los de la copia (jornadas, descansos y ajustes).
  *
  * Las jornadas se cambian de una vez (transacción): si algo falla a mitad, se queda todo como estaba.
  * Después se reprograman los avisos por si la copia trae una jornada en curso.
@@ -79,13 +104,18 @@ class RestaurarCopia
     @Inject
     constructor(
         private val repository: JornadaRepository,
+        private val descansos: DescansoRepository,
+        private val viajes: ViajeRepository,
         private val settings: SettingsRepository,
         private val avisos: GestorAvisos,
     ) {
         suspend operator fun invoke(copia: CopiaSeguridad) {
             // Los avisos de la jornada en curso de ahora dejarían de tener sentido.
             repository.obtenerAbierta()?.let { avisos.cancelar(it.id) }
+            // Primero los viajes: las jornadas apuntan a ellos (clave ajena).
+            viajes.reemplazarTodos(copia.viajes)
             repository.reemplazarTodas(copia.jornadas)
+            descansos.reemplazarTodos(copia.descansos)
             settings.actualizar { copia.ajustes }
             avisos.reprogramarJornadaAbierta()
         }
