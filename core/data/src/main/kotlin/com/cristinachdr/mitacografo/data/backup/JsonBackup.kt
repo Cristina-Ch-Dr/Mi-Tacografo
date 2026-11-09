@@ -9,6 +9,7 @@ import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -68,6 +69,7 @@ private fun CopiaSeguridad.aDto() =
         jornadas = jornadas.sortedBy { it.inicio }.map { it.aDto() },
         ajustes = ajustes.aDto(),
         descansos = descansos.sortedBy { it.inicio }.map { it.aDto() },
+        viajes = viajes.sortedBy { it.inicio }.map { it.aDto() },
     )
 
 private fun CopiaDto.aDominio() =
@@ -76,6 +78,7 @@ private fun CopiaDto.aDominio() =
         jornadas = jornadas.map { it.aDominio() },
         ajustes = ajustes.aDominio(),
         descansos = descansos.map { it.aDominio() },
+        viajes = viajes.map { it.aDominio() },
     )
 
 private fun Jornada.aDto() =
@@ -136,6 +139,28 @@ private fun DescansoDto.aDominio() =
         // Un tipo desconocido lanza IllegalArgumentException → DATOS_INCORRECTOS.
         tipo = TipoDescanso.valueOf(tipo),
         pais = pais,
+        observaciones = observaciones,
+    )
+
+private fun Viaje.aDto() =
+    ViajeDto(
+        id = id,
+        nombre = nombre,
+        inicio = inicio.toString(),
+        zonaInicio = zonaInicio.id,
+        fin = fin?.toString(),
+        zonaFin = zonaFin?.id,
+        observaciones = observaciones,
+    )
+
+private fun ViajeDto.aDominio() =
+    Viaje(
+        id = id,
+        nombre = nombre,
+        inicio = Instant.parse(inicio),
+        zonaInicio = ZoneId.of(zonaInicio),
+        fin = fin?.let(Instant::parse),
+        zonaFin = zonaFin?.let(ZoneId::of),
         observaciones = observaciones,
     )
 

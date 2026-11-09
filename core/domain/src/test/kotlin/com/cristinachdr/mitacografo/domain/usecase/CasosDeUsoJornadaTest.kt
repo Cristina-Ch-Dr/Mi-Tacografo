@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.domain.usecase
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Continente
@@ -56,7 +57,7 @@ class CasosDeUsoJornadaTest {
         ajustes: Ajustes = Ajustes(),
     ) = GestorAvisos(repo, FakeSettingsRepository(ajustes), alarmas, reloj)
 
-    private fun iniciar(repo: FakeJornadaRepository) = IniciarJornada(repo, gestor(repo), reloj)
+    private fun iniciar(repo: FakeJornadaRepository) = IniciarJornada(repo, FakeViajeRepository(), gestor(repo), reloj)
 
     private fun finalizar(repo: FakeJornadaRepository) = FinalizarJornada(repo, gestor(repo), reloj)
 

@@ -5,6 +5,7 @@ import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.ClaseDescanso
 import com.cristinachdr.mitacografo.domain.model.ErrorDescanso
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
+import com.cristinachdr.mitacografo.domain.model.ErrorViaje
 
 /** Errores de un campo del formulario que se detectan antes de llegar al dominio. */
 enum class ErrorCampo(
@@ -46,6 +47,19 @@ val ErrorDescanso.mensaje: Int
             ErrorDescanso.FIN_NO_POSTERIOR_AL_INICIO -> R.string.error_fin_no_posterior
             ErrorDescanso.FIN_EN_EL_FUTURO -> R.string.error_fin_futuro
             ErrorDescanso.SOLAPA_CON_OTRO_DESCANSO -> R.string.error_descanso_solapa
+        }
+
+@get:StringRes
+val ErrorViaje.mensaje: Int
+    get() =
+        when (this) {
+            ErrorViaje.VIAJE_NO_EXISTE -> R.string.error_viaje_no_existe
+            ErrorViaje.YA_HAY_UNO_EN_CURSO -> R.string.error_viaje_en_curso
+            ErrorViaje.SIN_VIAJE_EN_CURSO -> R.string.error_viaje_sin_en_curso
+            ErrorViaje.SIN_NOMBRE -> R.string.error_viaje_sin_nombre
+            ErrorViaje.INICIO_EN_EL_FUTURO -> R.string.error_inicio_futuro
+            ErrorViaje.FIN_NO_POSTERIOR_AL_INICIO -> R.string.error_fin_no_posterior
+            ErrorViaje.FIN_EN_EL_FUTURO -> R.string.error_fin_futuro
         }
 
 /** Nombre de cada clase de descanso para el chip de la lista. El semanal reducido lleva la deuda (`%1$s`). */

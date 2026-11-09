@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.cristinachdr.mitacografo.domain.model.ErrorDescanso
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
+import com.cristinachdr.mitacografo.domain.model.ErrorViaje
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import com.cristinachdr.mitacografo.ui.mensaje
 
@@ -74,6 +75,13 @@ fun ListaErrores(
 @Composable
 fun ListaErroresDescanso(
     errores: Set<ErrorDescanso>,
+    modifier: Modifier = Modifier,
+) = ListaMensajes(errores.map { it.mensaje }, modifier)
+
+/** Lo mismo para los viajes. */
+@Composable
+fun ListaErroresViaje(
+    errores: Set<ErrorViaje>,
     modifier: Modifier = Modifier,
 ) = ListaMensajes(errores.map { it.mensaje }, modifier)
 

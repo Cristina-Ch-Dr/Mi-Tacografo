@@ -5,6 +5,7 @@ import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
@@ -83,9 +84,9 @@ class CopiaViewModelTest {
         val gestor = GestorAvisos(repo, settings, FakeAlarmScheduler(), reloj)
         val descansos = FakeDescansoRepository()
         return CopiaViewModel(
-            ExportarCopia(repo, descansos, settings, backup, reloj),
+            ExportarCopia(repo, descansos, FakeViajeRepository(), settings, backup, reloj),
             LeerCopia(backup),
-            RestaurarCopia(repo, descansos, settings, gestor),
+            RestaurarCopia(repo, descansos, FakeViajeRepository(), settings, gestor),
             repo,
             archivos,
             reloj,
