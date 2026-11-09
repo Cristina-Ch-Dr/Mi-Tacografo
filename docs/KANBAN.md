@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2, E4 – E7 | MT-45 | MT-32, MT-33B (sin reglas) | — | MT-01 … MT-17, MT-20, MT-22, MT-41 … MT-44 · **v0.1.0 publicada** |
+| E2, E4 – E7 | — | MT-45 | — | MT-01 … MT-17, MT-20, MT-22, MT-32, MT-41 … MT-44 · MT-33B sin reglas · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -187,16 +187,14 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Probado en el emulador API 33 en claro y oscuro: Inicio, Historial y Ajustes.
 
 ### MT-45 · Sonido propio de los avisos · M · deps: MT-13 · *(propuesta de Cristina)*
-- [ ] Que al oír el aviso se sepa que es de Mi Tacógrafo y no un mensaje cualquiera.
-- [ ] Un sonido propio, corto y reconocible, en `res/raw` (con licencia libre, p. ej. CC0), y una vibración distinta de la normal.
-- [ ] Desde Android 8 el sonido es del **canal** de notificaciones y no se puede cambiar por código una vez creado: hay que crear un canal nuevo (`avisos_jornada_v2`) con el sonido y borrar el antiguo.
-- [ ] En Ajustes, «Sonido de los avisos» abre los ajustes del canal en Android (`ACTION_CHANNEL_NOTIFICATION_SETTINGS`), donde el conductor puede elegir cualquier tono del móvil.
-- [ ] Botón «Probar aviso» para escucharlo sin esperar a la jornada.
-- [ ] Probar en API 33 con el móvil en silencio, en vibración y con «No molestar».
-
----
-
-## E2 · Viajes → **v0.2**
+- [x] Que al oír el aviso se sepa que es de Mi Tacógrafo y no un mensaje cualquiera.
+- [x] Sonido propio en `res/raw/aviso_jornada.wav` (1,35 s, tres notas que suben). Es una **síntesis propia**, sin grabaciones de nadie ni licencias: se regenera con `herramientas/generar_sonido_aviso.py`. Vibración larga-corta-larga.
+- [x] Canal nuevo `avisos_jornada_v2` con ese sonido y esa vibración, y se borra el antiguo. Probado actualizando desde la versión de `develop`: el canal viejo queda borrado y el nuevo, creado.
+  - `res/raw/keep.xml`: el sonido se usa por su nombre, así que se protege para que R8 no lo quite en la release.
+  - Respeta el modo silencio y «No molestar» (es una notificación, no una alarma).
+- [x] En Ajustes: «Sonido actual: …», «Escuchar el sonido» (con el volumen de notificaciones) y «Cambiar sonido o vibración», que abre la pantalla de Android del canal. «Probar aviso» ya existía (llega en 1 minuto).
+  - El sonido se lee del canal cada vez que se vuelve a la pantalla: si el conductor elige otro tono en Android, la app lo muestra y reproduce ese (fallo que vio Cristina al probarlo).
+- [ ] Probar en el móvil del conductor con el móvil en vibración y con «No molestar».
 
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
 - [ ] `Viaje`, `ViajeRepository`, entidad, DAO, migración y FK `jornada.viaje_id` (`SET_NULL`).

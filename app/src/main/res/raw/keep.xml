@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    El sonido de los avisos se usa por su nombre (android.resource://…/raw/aviso_jornada),
+    no por R.raw: el canal de Android guarda esa dirección, y el número de R.raw puede cambiar
+    de una versión a otra. Así R8 no lo borra al reducir los recursos de la release.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@raw/aviso_jornada" />

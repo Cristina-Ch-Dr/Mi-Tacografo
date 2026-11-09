@@ -265,4 +265,13 @@
     <string name="pdf_sin_jornadas">No hay jornadas en este periodo.</string>
     <string name="pdf_pagina">Página %1$d de %2$d</string>
     <string name="pdf_aviso_legal">Mi Tacógrafo es una herramienta personal de apoyo. No sustituye al tacógrafo ni a sus registros oficiales y no tiene validez ante una inspección. Los cálculos son orientativos y dependen de los datos introducidos.</string>
+
+    <!-- Sonido de los avisos (MT-45) -->
+    <string name="ajustes_sonido_ayuda">Los avisos suenan con un sonido propio (tres notas) y vibran largo-corto-largo, para que sepas que son de la jornada y no un mensaje. Puedes cambiarlo en los ajustes de Android.</string>
+    <string name="accion_escuchar_sonido">Escuchar el sonido</string>
+    <string name="accion_cambiar_sonido">Cambiar sonido o vibración</string>
+    <string name="ajustes_sonido_actual">Sonido actual: %1$s</string>
+    <string name="sonido_propio">el de Mi Tacógrafo (tres notas)</string>
+    <string name="sonido_otro">otro sonido del móvil</string>
+    <string name="sonido_ninguno">ninguno (en silencio)</string>
 </resources>
