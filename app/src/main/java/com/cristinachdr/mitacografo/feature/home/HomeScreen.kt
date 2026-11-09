@@ -168,6 +168,13 @@ private fun JornadaEnCursoCard(
                 text = stringResource(R.string.inicio_km_inicio, textoKm(jornada.kmInicio)),
                 style = MaterialTheme.typography.bodyLarge,
             )
+            jornada.viaje?.let {
+                Text(
+                    text = stringResource(R.string.inicio_viaje, it),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                )
+            }
             pausa?.let {
                 Text(
                     stringResource(

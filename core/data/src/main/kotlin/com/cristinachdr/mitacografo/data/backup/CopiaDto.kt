@@ -17,6 +17,8 @@ internal data class CopiaDto(
     // Desde MT-20. Las copias anteriores no lo traen y se leen como lista vacía; las versiones
     // anteriores de la app lo ignoran (ignoreUnknownKeys). Por eso no hace falta subir la versión.
     val descansos: List<DescansoDto> = emptyList(),
+    // Desde MT-18, igual que `descansos`: las copias antiguas se leen con la lista vacía.
+    val viajes: List<ViajeDto> = emptyList(),
 )
 
 @Serializable
@@ -47,6 +49,17 @@ internal data class DescansoDto(
     /** "PAUSA" o "DESCANSO". */
     val tipo: String,
     val pais: String? = null,
+    val observaciones: String? = null,
+)
+
+@Serializable
+internal data class ViajeDto(
+    val id: Long,
+    val nombre: String,
+    val inicio: String,
+    val zonaInicio: String,
+    val fin: String? = null,
+    val zonaFin: String? = null,
     val observaciones: String? = null,
 )
 

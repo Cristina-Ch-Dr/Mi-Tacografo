@@ -50,6 +50,7 @@ import com.cristinachdr.mitacografo.feature.rests.EditarDescansoScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
 import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
+import com.cristinachdr.mitacografo.feature.trips.EditarViajeScreen
 import com.cristinachdr.mitacografo.feature.trips.TripsScreen
 import com.cristinachdr.mitacografo.ui.theme.AzulLogo
 import com.cristinachdr.mitacografo.ui.theme.SobreAzul
@@ -98,6 +99,10 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
 
             destinoActual?.hasRoute(RutaDescansos::class) == true -> {
                 R.string.nav_descansos
+            }
+
+            destinoActual?.hasRoute(RutaViaje::class) == true -> {
+                R.string.viaje_titulo
             }
 
             destinoActual?.hasRoute(RutaDescanso::class) == true -> {
@@ -197,7 +202,13 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 )
             }
             composable<RutaHistorial> { HistoryScreen(onJornada = { navController.navigate(RutaJornada(it)) }) }
-            composable<RutaViajes> { TripsScreen() }
+            composable<RutaViajes> { TripsScreen(onViaje = { navController.navigate(RutaViaje(it)) }) }
+            composable<RutaViaje> {
+                EditarViajeScreen(
+                    onJornada = { navController.navigate(RutaJornada(it)) },
+                    onCerrar = { navController.popBackStack() },
+                )
+            }
             composable<RutaResumen> { StatsScreen() }
             composable<RutaAjustes> { SettingsScreen() }
             composable<RutaIniciarJornada> { IniciarJornadaScreen(onGuardado = { navController.popBackStack() }) }

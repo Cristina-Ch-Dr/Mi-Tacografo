@@ -274,4 +274,34 @@
     <string name="sonido_propio">el de Mi Tacógrafo (tres notas)</string>
     <string name="sonido_otro">otro sonido del móvil</string>
     <string name="sonido_ninguno">ninguno (en silencio)</string>
+
+    <!-- Viajes (MT-18) -->
+    <string name="viajes_explicacion">Un viaje junta varias jornadas (por ejemplo, la ida y la vuelta). Mientras hay uno en curso, cada jornada que empiezas se apunta sola en él.</string>
+    <string name="accion_iniciar_viaje">Iniciar viaje</string>
+    <string name="accion_finalizar_viaje">Finalizar viaje</string>
+    <string name="viaje_en_curso">Viaje en curso</string>
+    <string name="viaje_nombre">Nombre del viaje</string>
+    <string name="viaje_nombre_propuesto">Viaje del %1$s</string>
+    <string name="viaje_desde">Desde el %1$s</string>
+    <string name="viaje_paises">Países: %1$s</string>
+    <string name="viajes_anteriores">Viajes anteriores</string>
+    <string name="viajes_vacio">Todavía no hay viajes terminados.</string>
+    <string name="finalizar_viaje_titulo">¿Finalizar el viaje?</string>
+    <string name="finalizar_viaje_texto">Las jornadas que empieces a partir de ahora ya no se apuntarán en «%1$s».</string>
+    <string name="viaje_titulo">Viaje</string>
+    <string name="viaje_jornadas">Jornadas del viaje</string>
+    <string name="viaje_sin_jornadas">Este viaje todavía no tiene jornadas.</string>
+    <string name="accion_borrar_viaje">Borrar viaje</string>
+    <string name="borrar_viaje_titulo">¿Borrar este viaje?</string>
+    <string name="borrar_viaje_texto">Sus jornadas no se borran: se quedan en el historial, sin viaje.</string>
+    <string name="error_viaje_no_existe">Este viaje ya no existe.</string>
+    <string name="error_viaje_en_curso">Ya hay un viaje en curso: finalízalo antes de empezar otro.</string>
+    <string name="error_viaje_sin_en_curso">No hay ningún viaje en curso.</string>
+    <string name="error_viaje_sin_nombre">Ponle un nombre al viaje.</string>
+    <string name="inicio_viaje">Viaje: %1$s</string>
+    <plurals name="viaje_resumen">
+        <item quantity="one">%1$s km · %2$d jornada</item>
+        <item quantity="many">%1$s km · %2$d jornadas</item>
+        <item quantity="other">%1$s km · %2$d jornadas</item>
+    </plurals>
 </resources>

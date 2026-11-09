@@ -5,6 +5,7 @@ import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
@@ -53,7 +54,12 @@ class IniciarJornadaViewModelTest {
         repo: FakeJornadaRepository,
         descansos: FakeDescansoRepository = FakeDescansoRepository(),
     ) = IniciarJornadaViewModel(
-        IniciarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
+        IniciarJornada(
+            repo,
+            FakeViajeRepository(),
+            GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj),
+            reloj,
+        ),
         ProponerDatosInicio(repo),
         ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
         ProponerDescansoPrevio(repo, descansos),

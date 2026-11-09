@@ -5,6 +5,7 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
+import com.cristinachdr.mitacografo.domain.port.ViajeRepository
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -25,12 +26,13 @@ data class DatosInicio(
  *
  * Reglas: no puede haber otra jornada abierta, la hora no puede ser futura
  * y no puede empezar antes de que terminara la anterior.
- * Al guardarla se programan sus avisos (12 h 30, 13 h…).
+ * Al guardarla se programan sus avisos (12 h 30, 13 h…) y, si hay un viaje en curso, se apunta en él.
  */
 class IniciarJornada
     @Inject
     constructor(
         private val repository: JornadaRepository,
+        private val viajes: ViajeRepository,
         private val avisos: GestorAvisos,
         private val clock: Clock,
     ) {
@@ -46,6 +48,7 @@ class IniciarJornada
                     paisInicio = datos.pais.comoPais(),
                     ciudadInicio = datos.ciudad.limpio(),
                     observaciones = datos.observaciones.limpio(),
+                    viajeId = viajes.obtenerEnCurso()?.id,
                 )
             val finAnterior = repository.obtenerUltimaFinalizada()?.fin
             val errores = validarJornada(jornada, clock.instant(), finAnterior)

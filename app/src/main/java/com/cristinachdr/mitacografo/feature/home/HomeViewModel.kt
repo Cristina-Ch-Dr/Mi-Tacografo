@@ -8,6 +8,7 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
+import com.cristinachdr.mitacografo.domain.port.ViajeRepository
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
@@ -49,6 +50,8 @@ data class JornadaEnCursoUi(
     val kmInicio: Int,
     /** `null` si ya han pasado todos los avisos. */
     val proximoAviso: AvisoUi?,
+    /** Nombre del viaje en el que se apunta, o `null` si no va en ninguno. */
+    val viaje: String? = null,
 )
 
 data class AvisoUi(
@@ -70,6 +73,7 @@ class HomeViewModel
         obtenerJornadaActual: ObtenerJornadaActual,
         settings: SettingsRepository,
         descansos: DescansoRepository,
+        viajes: ViajeRepository,
         private val iniciarPausa: IniciarPausa,
         private val terminarPausa: TerminarPausa,
         private val clock: Clock,
@@ -79,9 +83,11 @@ class HomeViewModel
                 obtenerJornadaActual(),
                 settings.observar(),
                 descansos.observarEnCurso(),
+                viajes.observarTodos(),
                 cadaMinuto(),
-            ) { jornada, ajustes, pausa, ahora ->
-                crearEstado(jornada, ajustes.avisos, pausa, ahora)
+            ) { jornada, ajustes, pausa, todosLosViajes, ahora ->
+                val viaje = jornada?.viajeId?.let { id -> todosLosViajes.find { it.id == id }?.nombre }
+                crearEstado(jornada, ajustes.avisos, pausa, ahora, viaje)
             }.stateIn(
                 scope = viewModelScope,
                 // Deja de contar 5 s después de salir de la pantalla (ahorra batería).
@@ -113,10 +119,11 @@ class HomeViewModel
             avisos: List<AvisoConfig>,
             pausa: Descanso?,
             ahora: Instant,
+            viaje: String? = null,
         ): HomeUiState =
             HomeUiState(
                 hoy = ahora.atZone(clock.zone).toLocalDate(),
-                jornada = jornada?.let { enCurso(it, avisos, ahora) },
+                jornada = jornada?.let { enCurso(it, avisos, ahora).copy(viaje = viaje) },
                 pausa =
                     pausa?.let {
                         PausaUi(

@@ -13,10 +13,13 @@ import com.cristinachdr.mitacografo.data.room.descanso.DescansoDao
 import com.cristinachdr.mitacografo.data.room.descanso.RoomDescansoRepository
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaDao
 import com.cristinachdr.mitacografo.data.room.jornada.RoomJornadaRepository
+import com.cristinachdr.mitacografo.data.room.viaje.RoomViajeRepository
+import com.cristinachdr.mitacografo.data.room.viaje.ViajeDao
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
+import com.cristinachdr.mitacografo.domain.port.ViajeRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -44,6 +47,10 @@ internal abstract class DataModule {
 
     @Binds
     @Singleton
+    abstract fun bindViajeRepository(impl: RoomViajeRepository): ViajeRepository
+
+    @Binds
+    @Singleton
     abstract fun bindSettingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
 
     @Binds
@@ -68,5 +75,8 @@ internal abstract class DataModule {
 
         @Provides
         fun provideDescansoDao(database: AppDatabase): DescansoDao = database.descansoDao()
+
+        @Provides
+        fun provideViajeDao(database: AppDatabase): ViajeDao = database.viajeDao()
     }
 }

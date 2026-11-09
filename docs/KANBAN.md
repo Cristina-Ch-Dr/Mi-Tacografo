@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E2, E4 – E7 | — | MT-45 | — | MT-01 … MT-17, MT-20, MT-22, MT-32, MT-41 … MT-44 · MT-33B sin reglas · **v0.1.0 publicada** |
+| E4 – E7 | — | MT-18 | — | MT-01 … MT-17, MT-20, MT-22, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.1.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -197,10 +197,15 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [ ] Probar en el móvil del conductor con el móvil en vibración y con «No molestar».
 
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
-- [ ] `Viaje`, `ViajeRepository`, entidad, DAO, migración y FK `jornada.viaje_id` (`SET_NULL`).
-- [ ] km del viaje = suma de las jornadas (test).
-- [ ] Lista con km acumulados, iniciar y finalizar viaje, y detalle con sus jornadas.
-- [ ] Al iniciar una jornada con un viaje en curso, se asigna automáticamente.
+- [x] `Viaje` (nombre, inicio y fin con zona, observaciones), puerto `ViajeRepository`, entidad, DAO y adaptador de Room.
+- [x] **Primera migración de verdad, 1 → 2** (`AutoMigration`): tabla `viaje` y clave ajena `jornada.viaje_id` con `ON DELETE SET NULL` (borrar un viaje no borra sus jornadas). Room rehace la tabla `jornada` copiando todas las filas.
+  - `MigracionesTest` (Robolectric + `MigrationTestHelper`): crea una base de datos de la v0.1 con jornadas y un descanso, la migra, la valida contra `2.json` y comprueba que no se pierde nada.
+  - Probado también en el emulador: con 9 jornadas y 17 descansos en la versión anterior, se instala la nueva encima y está todo.
+- [x] km del viaje = suma de sus jornadas, más conducción y países por los que pasa (tests).
+- [x] Pestaña **Viajes**: «Iniciar viaje» (con un nombre propuesto, «Viaje del 9 nov 2026»), el viaje en curso con sus km y «Finalizar viaje» (pide confirmación), y los anteriores. Detalle con sus jornadas (se abren para corregirlas), y corregir nombre, fechas u observaciones, o borrarlo.
+- [x] Al iniciar una jornada con un viaje en curso, se asigna sola. Si se inicia un viaje con una jornada ya empezada, también entra. En Inicio sale «Viaje: …».
+- [x] Copia de seguridad con los viajes (`viajes`; las copias antiguas se siguen leyendo). Restaurar comprueba que ninguna jornada apunte a un viaje que no está en la copia.
+- [ ] Km por viaje en Resumen y PDF de un viaje (MT-33B).
 
 ---
 

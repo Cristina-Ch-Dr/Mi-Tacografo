@@ -278,4 +278,35 @@
     <string name="sonido_propio">звук Мій Тахограф (три ноти)</string>
     <string name="sonido_otro">інший звук телефона</string>
     <string name="sonido_ninguno">немає (без звуку)</string>
+
+    <!-- Viajes (MT-18) -->
+    <string name="viajes_explicacion">Рейс об’єднує кілька робочих днів (наприклад, туди й назад). Поки триває рейс, кожен новий робочий день записується в нього сам.</string>
+    <string name="accion_iniciar_viaje">Почати рейс</string>
+    <string name="accion_finalizar_viaje">Завершити рейс</string>
+    <string name="viaje_en_curso">Поточний рейс</string>
+    <string name="viaje_nombre">Назва рейсу</string>
+    <string name="viaje_nombre_propuesto">Рейс від %1$s</string>
+    <string name="viaje_desde">З %1$s</string>
+    <string name="viaje_paises">Країни: %1$s</string>
+    <string name="viajes_anteriores">Попередні рейси</string>
+    <string name="viajes_vacio">Ще немає завершених рейсів.</string>
+    <string name="finalizar_viaje_titulo">Завершити рейс?</string>
+    <string name="finalizar_viaje_texto">Робочі дні, які ви почнете відтепер, більше не записуватимуться в «%1$s».</string>
+    <string name="viaje_titulo">Рейс</string>
+    <string name="viaje_jornadas">Робочі дні рейсу</string>
+    <string name="viaje_sin_jornadas">У цьому рейсі ще немає робочих днів.</string>
+    <string name="accion_borrar_viaje">Видалити рейс</string>
+    <string name="borrar_viaje_titulo">Видалити цей рейс?</string>
+    <string name="borrar_viaje_texto">Його робочі дні не видаляються: вони залишаться в історії, без рейсу.</string>
+    <string name="error_viaje_no_existe">Цього рейсу вже немає.</string>
+    <string name="error_viaje_en_curso">Вже триває рейс: завершіть його, перш ніж почати інший.</string>
+    <string name="error_viaje_sin_en_curso">Зараз немає рейсу.</string>
+    <string name="error_viaje_sin_nombre">Дайте рейсу назву.</string>
+    <string name="inicio_viaje">Рейс: %1$s</string>
+    <plurals name="viaje_resumen">
+        <item quantity="one">%1$s км · %2$d робочий день</item>
+        <item quantity="few">%1$s км · %2$d робочі дні</item>
+        <item quantity="many">%1$s км · %2$d робочих днів</item>
+        <item quantity="other">%1$s км · %2$d робочого дня</item>
+    </plurals>
 </resources>
