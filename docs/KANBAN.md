@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E4 – E7 | MT-27 | MT-24 | — | MT-01 … MT-18, MT-20, MT-22, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E4 – E7 | MT-28 | MT-27 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -246,7 +246,10 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Caso de uso `ObtenerInformeReglas` (se recalcula al corregir una jornada, T24). Aún sin pantalla: los chips llegan en MT-30.
 
 ### MT-27 · Reglas de descanso diario · L · deps: MT-24, MT-20
-- [ ] R-DD-1 (24 h, con huecos → No verificado) y R-DD-3 (máx. 3 reducidos). Tests T11 y T23.
+- [x] Art. 8.1–8.5 releídos (EUR-Lex bloqueaba la descarga: texto de legislation.gov.uk a 20/08/2020, ya con el Paquete de Movilidad; estos apartados no cambiaron).
+- [x] R-DD-1 (8.2), por jornada: después del descanso que la precede, otro descanso con ≥ 9 h dentro de las 24 h. Fraccionado 3 + 9 completo = cumple. Sin el descanso previo apuntado, o con un hueco sin nada apuntado de ≥ 9 h en el plazo → No verificado (`DESCANSO_NO_REGISTRADO`, T23). Mientras no han pasado las 24 h, sin resultado.
+- [x] R-DD-3 (8.4), por semana: reducidos desde el último semanal apuntado. > 3 → Excedido (T11). Sin semanal apuntado antes → `DATOS_INSUFICIENTES_PERIODO`; con jornadas seguidas sin descanso apuntado entre medias → `DESCANSO_NO_REGISTRADO`.
+- [x] 11 tests nuevos; los de conducción siguen igual.
 
 ### MT-28 · Reglas de descanso semanal (nacional e internacional) · XL · deps: MT-27
 - [ ] R-DS-1 (patrón bisemanal) y R-DS-2 (6 × 24 h).
