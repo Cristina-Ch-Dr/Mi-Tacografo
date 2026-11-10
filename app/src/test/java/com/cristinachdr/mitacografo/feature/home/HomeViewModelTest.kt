@@ -5,6 +5,7 @@ import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
+import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
@@ -18,7 +19,9 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
@@ -43,11 +46,12 @@ class HomeViewModelTest {
         reloj: Clock,
         vararg jornadas: Jornada,
         descansos: FakeDescansoRepository = FakeDescansoRepository(),
+        ajustes: Ajustes = Ajustes(),
     ): HomeViewModel {
         val repo = FakeJornadaRepository(jornadas.toList())
         return HomeViewModel(
             ObtenerJornadaActual(repo),
-            FakeSettingsRepository(),
+            FakeSettingsRepository(ajustes),
             descansos,
             FakeViajeRepository(),
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
@@ -144,5 +148,21 @@ class HomeViewModelTest {
 
             assertNull(vm.uiState.value.pausa)
             assertEquals(hora(11, 0), descansos.guardados.single().fin)
+        }
+
+    @Test
+    fun `avisa si faltan el pais de la empresa o el de residencia`() =
+        runTest {
+            val sinPaises = viewModel(Clock.fixed(hora(11, 0), madrid))
+            observar(sinPaises)
+            assertTrue(sinPaises.uiState.value.faltanPaises)
+
+            val conPaises =
+                viewModel(
+                    Clock.fixed(hora(11, 0), madrid),
+                    ajustes = Ajustes(paisEmpresa = "ES", paisResidencia = "UA"),
+                )
+            observar(conPaises)
+            assertFalse(conPaises.uiState.value.faltanPaises)
         }
 }

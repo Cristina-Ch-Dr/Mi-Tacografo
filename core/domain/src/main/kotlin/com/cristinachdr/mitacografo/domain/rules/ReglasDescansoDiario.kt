@@ -37,7 +37,7 @@ private fun ContextoReglas.queCuentan(): List<DescansoClasificado> =
  * El tramo más largo de [desde, hasta) en el que no hay ninguna jornada ni ningún descanso apuntado:
  * ahí podría haber un descanso sin apuntar.
  */
-private fun ContextoReglas.huecoMasLargo(
+internal fun ContextoReglas.huecoMasLargo(
     desde: Instant,
     hasta: Instant,
 ): Duration {

@@ -15,6 +15,9 @@ data class ContextoReglas(
     /** Zona en la que empieza la semana el lunes a las 00:00 (D-1). `null` = la de cada jornada. */
     val zonaReferencia: ZoneId? = null,
     val ahora: Instant,
+    /** País de la empresa y de residencia (Ajustes), para los semanales reducidos fuera de casa (R-DS-3). */
+    val paisEmpresa: String? = null,
+    val paisResidencia: String? = null,
 ) {
     /** Los descansos con su clase (diario, fraccionado, semanal…), en orden. Se calculan una vez. */
     val clasificados: List<DescansoClasificado> by lazy { clasificarDescansos(descansos) }
@@ -95,12 +98,21 @@ internal data class SemanaRepartida(
 /**
  * El motor de reglas (espec. §8): reparte la conducción por semanas y pasa cada regla.
  *
- * Conducción (art. 6), pausas (art. 7) y descanso diario (art. 8.2 y 8.4). El semanal llega en MT-28 y MT-29.
+ * Conducción (art. 6), pausas (art. 7), descanso diario (art. 8.2 y 8.4) y semanal (art. 8.6 y 8.9).
+ * Las compensaciones de los reducidos llegan en MT-29.
  */
 class MotorReglas {
     private val reglasJornada: List<ReglaJornada> = listOf(ConduccionDiaria, Pausa, DescansoDiario)
     private val reglasSemana: List<ReglaSemana> =
-        listOf(Ampliaciones, ConduccionSemanal, ConduccionBisemanal, ReducidosEntreSemanales)
+        listOf(
+            Ampliaciones,
+            ConduccionSemanal,
+            ConduccionBisemanal,
+            ReducidosEntreSemanales,
+            SemanalDosSemanas,
+            SeisPeriodos,
+            ReducidosFueraDeCasa,
+        )
 
     fun evaluar(contexto: ContextoReglas): InformeReglas {
         val jornadas = contexto.jornadas.sortedBy { it.inicio }

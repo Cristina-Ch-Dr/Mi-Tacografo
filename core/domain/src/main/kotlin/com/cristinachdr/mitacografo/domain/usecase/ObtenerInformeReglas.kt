@@ -27,6 +27,15 @@ class ObtenerInformeReglas
 
         operator fun invoke(): Flow<InformeReglas> =
             combine(jornadas.observarTodas(), descansos.observarTodos(), settings.observar()) { j, d, ajustes ->
-                motor.evaluar(ContextoReglas(j, d, ajustes.zonaReferencia, clock.instant()))
+                motor.evaluar(
+                    ContextoReglas(
+                        jornadas = j,
+                        descansos = d,
+                        zonaReferencia = ajustes.zonaReferencia,
+                        ahora = clock.instant(),
+                        paisEmpresa = ajustes.paisEmpresa,
+                        paisResidencia = ajustes.paisResidencia,
+                    ),
+                )
             }
     }

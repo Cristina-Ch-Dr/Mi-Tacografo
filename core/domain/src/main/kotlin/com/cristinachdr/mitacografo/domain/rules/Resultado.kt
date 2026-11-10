@@ -31,6 +31,15 @@ enum class ReglaId(
 
     /** Art. 8.4: como mucho 3 descansos diarios reducidos entre dos semanales. */
     REDUCIDOS_ENTRE_SEMANALES("R-DD-3"),
+
+    /** Art. 8.6: en dos semanas seguidas, 2 semanales normales o 1 normal y 1 reducido. */
+    SEMANAL_DOS_SEMANAS("R-DS-1"),
+
+    /** Art. 8.6: el semanal empieza como muy tarde 6 × 24 h después del anterior. */
+    SEIS_PERIODOS("R-DS-2"),
+
+    /** Art. 8.6 (internacional): 2 reducidos seguidos solo fuera de casa y con 2 normales en 4 semanas. */
+    REDUCIDOS_FUERA_DE_CASA("R-DS-3"),
 }
 
 /** Por qué una regla no se puede comprobar con lo que hay apuntado (espec. §8.1). */

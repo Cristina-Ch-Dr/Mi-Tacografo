@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E4 – E7 | MT-28 | MT-27 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E4 – E7 | MT-29 | MT-28 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -252,10 +252,13 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] 11 tests nuevos; los de conducción siguen igual.
 
 ### MT-28 · Reglas de descanso semanal (nacional e internacional) · XL · deps: MT-27
-- [ ] R-DS-1 (patrón bisemanal) y R-DS-2 (6 × 24 h).
-- [ ] R-DS-3: 2 reducidos consecutivos permitidos solo si **ambos** son fuera del país de la empresa y del de residencia, más la regla de 4 semanas. En otro caso se aplica el patrón nacional (espec. §7.7).
-- [ ] Motivos `SIN_PAIS_DESCANSO` y `PAISES_NO_CONFIGURADOS`, y aviso en Inicio si faltan los países.
-- [ ] Tests T15, T16, T17, T17b, T17c y T17d.
+- [x] Art. 8.6 y 8.9 releídos (legislation.gov.uk a 20/08/2020, con el Reglamento (UE) 2020/1054).
+- [x] D-2 (`asignarSemanales`): cada semanal cuenta en la semana en que empieza, salvo que ya tenga uno; entonces en la siguiente. ⚠️ Validar con la guía de la Comisión.
+- [x] R-DS-1 (patrón bisemanal): 2 normales o 1 normal + 1 reducido en dos semanas seguidas. Dos reducidos seguidos: solo si los dos son fuera de casa. Sin semanal apuntado y con un hueco de ≥ 24 h sin nada → `DESCANSO_NO_REGISTRADO`; semana anterior a los primeros datos → `DATOS_INSUFICIENTES_PERIODO`.
+- [x] R-DS-2 (6 × 24 h): el semanal empieza como muy tarde 144 h después de acabar el anterior (T15). Con un hueco de ≥ 24 h sin nada entre medias → No verificado.
+- [x] R-DS-3: 2 reducidos seguidos solo si **ambos** son fuera del país de la empresa y del de residencia, y en las 4 semanas desde el primero hay ≥ 4 semanales y ≥ 2 normales. Si no, se aplica el patrón nacional (espec. §7.7).
+- [x] Motivos `SIN_PAIS_DESCANSO` y `PAISES_NO_CONFIGURADOS` (los países van en `ContextoReglas`), y **aviso en Inicio** con «Ir a Ajustes» si faltan los países.
+- [x] Tests T15, T16, T17, T17b, T17c y T17d, más D-2 y casos límite (13 en total).
 
 ### MT-29 · Compensaciones · XL · deps: MT-28
 - [ ] Deudas (45 h − duración), fecha límite (fin de la 3ª semana siguiente), detección de compensación unida a un descanso ≥ 9 h, FIFO y estados.
