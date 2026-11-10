@@ -309,4 +309,8 @@
         <item quantity="many">%1$s км · %2$d робочих днів</item>
         <item quantity="other">%1$s км · %2$d робочого дня</item>
     </plurals>
+
+    <!-- Reglas de descanso semanal (MT-28) -->
+    <string name="inicio_faltan_paises">Щоб перевіряти скорочений тижневий відпочинок поза домом, вкажіть у налаштуваннях країну компанії та країну, де ви живете.</string>
+    <string name="accion_ir_ajustes">Перейти до налаштувань</string>
 </resources>

@@ -304,4 +304,8 @@
         <item quantity="many">%1$s km · %2$d jornadas</item>
         <item quantity="other">%1$s km · %2$d jornadas</item>
     </plurals>
+
+    <!-- Reglas de descanso semanal (MT-28) -->
+    <string name="inicio_faltan_paises">Para comprobar los descansos semanales reducidos fuera de casa, indica en Ajustes el país de la empresa y el país donde vives.</string>
+    <string name="accion_ir_ajustes">Ir a Ajustes</string>
 </resources>

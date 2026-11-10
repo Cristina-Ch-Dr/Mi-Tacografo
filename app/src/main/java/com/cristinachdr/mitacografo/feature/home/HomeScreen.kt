@@ -56,6 +56,7 @@ import java.time.format.FormatStyle
 fun HomeScreen(
     onIniciarJornada: () -> Unit,
     onFinalizarJornada: () -> Unit,
+    onAjustes: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
@@ -65,6 +66,7 @@ fun HomeScreen(
         onFinalizarJornada = onFinalizarJornada,
         onIniciarPausa = viewModel::onIniciarPausa,
         onTerminarPausa = viewModel::onTerminarPausa,
+        onAjustes = onAjustes,
         permisos = { EstadoPermisosAvisos(soloSiFalta = true) },
     )
 }
@@ -78,6 +80,7 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     onIniciarPausa: () -> Unit = {},
     onTerminarPausa: () -> Unit = {},
+    onAjustes: () -> Unit = {},
     permisos: @Composable () -> Unit = {},
 ) {
     Column(
@@ -91,6 +94,10 @@ fun HomeContent(
     ) {
         // Solo aparece si faltan permisos para que los avisos lleguen.
         permisos()
+        if (state.faltanPaises) {
+            Spacer(Modifier.height(12.dp))
+            AvisoPaises(onAjustes)
+        }
         Spacer(Modifier.height(16.dp))
         Text(
             text = state.hoy.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
@@ -200,6 +207,29 @@ private fun JornadaEnCursoCard(
                     hora = stringResource(R.string.inicio_proximo_aviso, aviso.hora.format(FormatoHora)),
                     detalle = stringResource(R.string.inicio_proximo_aviso_jornada, textoDuracion(aviso.desdeInicio)),
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Sin el país de la empresa y el de residencia no se puede saber si un semanal reducido se tomó
+ * fuera de casa (R-DS-3). Se avisa hasta que se completen en Ajustes.
+ */
+@Composable
+private fun AvisoPaises(
+    onAjustes: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.inicio_faltan_paises), style = MaterialTheme.typography.bodyLarge)
+            OutlinedButton(onClick = onAjustes, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.accion_ir_ajustes))
             }
         }
     }

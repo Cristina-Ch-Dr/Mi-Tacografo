@@ -199,6 +199,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 HomeScreen(
                     onIniciarJornada = { navController.navigate(RutaIniciarJornada) { launchSingleTop = true } },
                     onFinalizarJornada = { navController.navigate(RutaFinalizarJornada) { launchSingleTop = true } },
+                    onAjustes = { navController.navigate(RutaAjustes) { launchSingleTop = true } },
                 )
             }
             composable<RutaHistorial> { HistoryScreen(onJornada = { navController.navigate(RutaJornada(it)) }) }

@@ -35,6 +35,8 @@ data class HomeUiState(
     val jornada: JornadaEnCursoUi? = null,
     /** `null` si no hay pausa en curso. */
     val pausa: PausaUi? = null,
+    /** Faltan el país de la empresa o el de residencia en Ajustes: la regla R-DS-3 no se puede comprobar. */
+    val faltanPaises: Boolean = false,
 )
 
 data class PausaUi(
@@ -88,6 +90,7 @@ class HomeViewModel
             ) { jornada, ajustes, pausa, todosLosViajes, ahora ->
                 val viaje = jornada?.viajeId?.let { id -> todosLosViajes.find { it.id == id }?.nombre }
                 crearEstado(jornada, ajustes.avisos, pausa, ahora, viaje)
+                    .copy(faltanPaises = ajustes.paisEmpresa == null || ajustes.paisResidencia == null)
             }.stateIn(
                 scope = viewModelScope,
                 // Deja de contar 5 s después de salir de la pantalla (ahorra batería).
