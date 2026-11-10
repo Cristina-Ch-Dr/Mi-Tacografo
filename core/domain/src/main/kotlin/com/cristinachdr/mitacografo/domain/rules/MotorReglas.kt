@@ -45,9 +45,11 @@ data class InformeSemana(
     fun resultado(regla: ReglaId): Resultado = resultados.single { it.regla == regla }
 }
 
-/** El informe completo: las semanas con jornadas, de la más reciente a la más antigua. */
+/** El informe completo: las semanas con jornadas, de la más reciente a la más antigua, y las deudas. */
 data class InformeReglas(
     val semanas: List<InformeSemana>,
+    /** Las deudas de los semanales reducidos, de la más antigua a la más nueva. */
+    val deudas: List<Deuda> = emptyList(),
 )
 
 /**
@@ -98,8 +100,8 @@ internal data class SemanaRepartida(
 /**
  * El motor de reglas (espec. §8): reparte la conducción por semanas y pasa cada regla.
  *
- * Conducción (art. 6), pausas (art. 7), descanso diario (art. 8.2 y 8.4) y semanal (art. 8.6 y 8.9).
- * Las compensaciones de los reducidos llegan en MT-29.
+ * Conducción (art. 6), pausas (art. 7), descanso diario (art. 8.2 y 8.4), semanal (art. 8.6 y 8.9)
+ * y compensaciones (art. 8.6 ter y 8.7).
  */
 class MotorReglas {
     private val reglasJornada: List<ReglaJornada> = listOf(ConduccionDiaria, Pausa, DescansoDiario)
@@ -112,6 +114,8 @@ class MotorReglas {
             SemanalDosSemanas,
             SeisPeriodos,
             ReducidosFueraDeCasa,
+            Compensacion,
+            CompensacionAntesDelSemanal,
         )
 
     fun evaluar(contexto: ContextoReglas): InformeReglas {
@@ -157,6 +161,6 @@ class MotorReglas {
                         },
                 )
             }
-        return InformeReglas(informes.sortedByDescending { it.lunes })
+        return InformeReglas(informes.sortedByDescending { it.lunes }, calcularDeudas(contexto))
     }
 }

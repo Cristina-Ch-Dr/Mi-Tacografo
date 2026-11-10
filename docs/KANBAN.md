@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E4 – E7 | MT-29 | MT-28 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E4 – E7 | MT-30 | MT-29 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27, MT-28, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -261,9 +261,11 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Tests T15, T16, T17, T17b, T17c y T17d, más D-2 y casos límite (13 en total).
 
 ### MT-29 · Compensaciones · XL · deps: MT-28
-- [ ] Deudas (45 h − duración), fecha límite (fin de la 3ª semana siguiente), detección de compensación unida a un descanso ≥ 9 h, FIFO y estados.
-- [ ] R-DS-5: tras 2 reducidos consecutivos, el siguiente semanal va precedido de la compensación.
-- [ ] Tests T13, T14, T17e y T24. Resolver D-3.
+- [x] Art. 8.6 ter y 8.7 releídos: compensación equivalente, **en bloque**, antes del final de la 3ª semana siguiente, unida a un descanso de ≥ 9 h.
+- [x] `calcularDeudas`: deuda = 45 h − duración de cada reducido, fecha límite = lunes de 4 semanas después a las 00:00. Lo que un descanso tiene de más paga deudas enteras, de la más antigua a la más nueva (FIFO), si acaba antes del plazo. Estados `PENDIENTE`, `COMPENSADA`, `VENCIDA` y `NO_VERIFICADO` (hueco sin apuntar de ≥ deuda + 9 h). Van en `InformeReglas.deudas`.
+- [x] R-DS-4 en la semana del reducido (sin resultado mientras está pendiente) y R-DS-5: tras 2 reducidos seguidos, las dos deudas pagadas antes de acabar el siguiente semanal (vale la unida a ese mismo semanal).
+- [x] **D-3 resuelta:** cuenta como compensación lo que pasa de 45 h en un semanal normal y lo que pasa de 11 h en un diario. Limitación: un descanso de 24 h a < 45 h se toma siempre como semanal reducido (no se puede distinguir de diario + compensación con lo que se apunta).
+- [x] Tests T13, T14, T17e, D-3, FIFO, «en bloque» y estados (9). T24 ya estaba (MT-24).
 
 ### MT-30 · Semanas reales y estados en la UI · L · deps: MT-29 · (antes MT-30 y MT-31)
 - [ ] 2–3 semanas de la libreta, **anonimizadas**, como fixtures JSON. Comparar los resultados con lo que el conductor sabe que pasó.

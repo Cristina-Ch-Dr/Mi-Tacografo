@@ -23,10 +23,10 @@ private fun ContextoReglas.semanales(): List<DescansoClasificado> =
     clasificados.filter { it.clase in SEMANALES && it.descanso.fin != null }
 
 /** Zona en la que se cortan las semanas: la de referencia o, si no hay, la del primer registro. */
-private fun ContextoReglas.zonaSemanas(): ZoneId =
+internal fun ContextoReglas.zonaSemanas(): ZoneId =
     zonaReferencia ?: jornadas.firstOrNull()?.zonaInicio ?: descansos.firstOrNull()?.zonaInicio ?: ZoneOffset.UTC
 
-private fun ContextoReglas.inicioSemana(lunes: LocalDate): Instant = lunes.atStartOfDay(zonaSemanas()).toInstant()
+internal fun ContextoReglas.inicioSemana(lunes: LocalDate): Instant = lunes.atStartOfDay(zonaSemanas()).toInstant()
 
 private fun ContextoReglas.terminada(lunes: LocalDate): Boolean = inicioSemana(lunes.plusWeeks(1)) <= ahora
 
