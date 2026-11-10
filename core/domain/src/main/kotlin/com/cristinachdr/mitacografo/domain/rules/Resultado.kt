@@ -25,6 +25,12 @@ enum class ReglaId(
 
     /** Art. 7: pausa de 45 min tras 4 h 30 de conducción. */
     PAUSA("R-PAUSA-1"),
+
+    /** Art. 8.2: un descanso diario (≥ 9 h) dentro de las 24 h siguientes al anterior. */
+    DESCANSO_DIARIO("R-DD-1"),
+
+    /** Art. 8.4: como mucho 3 descansos diarios reducidos entre dos semanales. */
+    REDUCIDOS_ENTRE_SEMANALES("R-DD-3"),
 }
 
 /** Por qué una regla no se puede comprobar con lo que hay apuntado (espec. §8.1). */

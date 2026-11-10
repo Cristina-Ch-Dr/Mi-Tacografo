@@ -1,7 +1,9 @@
 package com.cristinachdr.mitacografo.domain.rules
 
 import com.cristinachdr.mitacografo.domain.model.Descanso
+import com.cristinachdr.mitacografo.domain.model.DescansoClasificado
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.clasificarDescansos
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -13,7 +15,10 @@ data class ContextoReglas(
     /** Zona en la que empieza la semana el lunes a las 00:00 (D-1). `null` = la de cada jornada. */
     val zonaReferencia: ZoneId? = null,
     val ahora: Instant,
-)
+) {
+    /** Los descansos con su clase (diario, fraccionado, semanal…), en orden. Se calculan una vez. */
+    val clasificados: List<DescansoClasificado> by lazy { clasificarDescansos(descansos) }
+}
 
 /** Una jornada con sus resultados (conducción diaria, pausa…). Vacío mientras sigue en curso. */
 data class InformeJornada(
@@ -69,6 +74,8 @@ internal data class SemanaRepartida(
     /** Las jornadas terminadas que empiezan en esta semana (para contar las ampliadas). */
     val jornadas: List<Jornada>,
     val ahora: Instant,
+    /** Todo el contexto, para las reglas que miran los descansos. */
+    val contexto: ContextoReglas,
 ) {
     val conduccion: Intervalo get() = partes.fold(Intervalo.CERO) { acc, p -> acc + p.conduccion }
 
@@ -88,11 +95,12 @@ internal data class SemanaRepartida(
 /**
  * El motor de reglas (espec. §8): reparte la conducción por semanas y pasa cada regla.
  *
- * De momento, conducción (art. 6) y pausas (art. 7). Las de descanso llegan en MT-27 a MT-29.
+ * Conducción (art. 6), pausas (art. 7) y descanso diario (art. 8.2 y 8.4). El semanal llega en MT-28 y MT-29.
  */
 class MotorReglas {
-    private val reglasJornada: List<ReglaJornada> = listOf(ConduccionDiaria, Pausa)
-    private val reglasSemana: List<ReglaSemana> = listOf(Ampliaciones, ConduccionSemanal, ConduccionBisemanal)
+    private val reglasJornada: List<ReglaJornada> = listOf(ConduccionDiaria, Pausa, DescansoDiario)
+    private val reglasSemana: List<ReglaSemana> =
+        listOf(Ampliaciones, ConduccionSemanal, ConduccionBisemanal, ReducidosEntreSemanales)
 
     fun evaluar(contexto: ContextoReglas): InformeReglas {
         val jornadas = contexto.jornadas.sortedBy { it.inicio }
@@ -108,6 +116,7 @@ class MotorReglas {
                     partes = partes[lunes].orEmpty(),
                     jornadas = semanaDeInicio[lunes].orEmpty().filterNot { it.abierta },
                     ahora = contexto.ahora,
+                    contexto = contexto,
                 )
             }
         val primera = lunesConDatos.first()
