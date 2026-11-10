@@ -40,6 +40,12 @@ enum class ReglaId(
 
     /** Art. 8.6 (internacional): 2 reducidos seguidos solo fuera de casa y con 2 normales en 4 semanas. */
     REDUCIDOS_FUERA_DE_CASA("R-DS-3"),
+
+    /** Art. 8.6 ter: la deuda de cada reducido, devuelta en bloque antes del final de la 3ª semana siguiente. */
+    COMPENSACION("R-DS-4"),
+
+    /** Art. 8.6 ter: tras dos reducidos seguidos, el siguiente semanal va precedido de la compensación. */
+    COMPENSACION_ANTES_DEL_SEMANAL("R-DS-5"),
 }
 
 /** Por qué una regla no se puede comprobar con lo que hay apuntado (espec. §8.1). */
