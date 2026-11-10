@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E4 – E7 | — | MT-18 | — | MT-01 … MT-17, MT-20, MT-22, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.1.0 publicada** |
+| E4 – E7 | MT-27 | MT-24 | — | MT-01 … MT-18, MT-20, MT-22, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -207,6 +207,8 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Copia de seguridad con los viajes (`viajes`; las copias antiguas se siguen leyendo). Restaurar comprueba que ninguna jornada apunte a un viaje que no está en la copia.
 - [ ] Km por viaje en Resumen y PDF de un viaje (MT-33B).
 
+> 🏁 **Release v0.2.0** ✅ (9 nov 2026): viajes, descansos, resumen con PDF, sonido de los avisos y colores del logo. Probada actualizando en un emulador API 33 desde la v0.1.0 de la Release (las dos firmadas con la misma clave), con jornadas, descansos y una jornada en curso: la base de datos pasa de la versión 1 a la 2 sin perder nada y los avisos siguen programados.
+
 ---
 
 ## E3 · Descansos → **v0.2**
@@ -228,8 +230,6 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Textos en español y ucraniano. Probado en el emulador API 33, en claro y oscuro.
 - [ ] Pendiente de decidir con el conductor: avisos durante la pausa (p. ej. a los 45 min) y si el ucraniano de los textos nuevos se entiende bien.
 
-> 🏁 **Release v0.2.0**
-
 ---
 
 ## E4 · Motor del Reglamento 561/2006 → **v0.3**
@@ -237,10 +237,13 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 > **TDD estricto:** primero los tests de la tabla §13 de la especificación y luego la regla. Antes de cada tarjeta, **releer el artículo** en EUR-Lex.
 
 ### MT-24 · Núcleo del motor, conducción y pausas · XL · (antes MT-24, MT-25 y MT-26)
-- [ ] `Resultado` (Cumple, Excedido, NoVerificado), `MotivoNoVerificado`, intervalo `[min, max]` y `RuleEngine`.
-- [ ] `AsignadorSemanas`: semana lunes 00:00 en la zona de referencia, reparto de la conducción con intervalos (T20) y asignación de semanales (D-2).
-- [ ] R-COND-1/2/3/4. Tests T1–T6 y T21.
-- [ ] R-PAUSA: ≤ 4 h 30 → Cumple; si no → No verificado. Test T22.
+- [x] Art. 4, 6 y 7 releídos en EUR-Lex (consolidado a 22/05/2024) antes de escribir las reglas: coinciden con la espec. §7.2 y §7.3.
+- [x] `Resultado` (Cumple, Excedido, NoVerificado), `MotivoNoVerificado`, `Intervalo [min, max]` con la comparación de §8.2, y `MotorReglas` con reglas independientes (`ReglaJornada`, `ReglaSemana`). Paquete `domain/rules`.
+- [x] `repartirPorSemanas`: semana de lunes 00:00 en la zona de referencia (o la de cada jornada). Una jornada que cruza el domingo reparte su conducción con un intervalo (T20); sin conducción apuntada, entre 0 y lo que duró; en curso, entre 0 y lo que lleva.
+  - La asignación de semanales (D-2) se hará con las reglas de descanso semanal (MT-28).
+- [x] R-COND-1/2/3/4. Tests T1–T6 y T21. La semana anterior a la primera apuntada cuenta como [0, 56 h] para las 90 h (`DATOS_INSUFICIENTES_PERIODO`).
+- [x] R-PAUSA: ≤ 4 h 30 → Cumple; si no → No verificado (`SIN_TRAMOS_CONDUCCION`). Test T22.
+- [x] Caso de uso `ObtenerInformeReglas` (se recalcula al corregir una jornada, T24). Aún sin pantalla: los chips llegan en MT-30.
 
 ### MT-27 · Reglas de descanso diario · L · deps: MT-24, MT-20
 - [ ] R-DD-1 (24 h, con huecos → No verificado) y R-DD-3 (máx. 3 reducidos). Tests T11 y T23.
