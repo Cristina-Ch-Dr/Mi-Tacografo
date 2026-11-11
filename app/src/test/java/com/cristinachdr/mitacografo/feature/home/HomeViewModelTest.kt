@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,13 +50,15 @@ class HomeViewModelTest {
         ajustes: Ajustes = Ajustes(),
     ): HomeViewModel {
         val repo = FakeJornadaRepository(jornadas.toList())
+        val settings = FakeSettingsRepository(ajustes)
         return HomeViewModel(
             ObtenerJornadaActual(repo),
-            FakeSettingsRepository(ajustes),
+            settings,
             descansos,
             FakeViajeRepository(),
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
             TerminarPausa(descansos, reloj),
+            ObtenerInformeReglas(repo, descansos, settings, reloj),
             reloj,
         )
     }
@@ -164,5 +167,28 @@ class HomeViewModelTest {
                 )
             observar(conPaises)
             assertFalse(conPaises.uiState.value.faltanPaises)
+        }
+
+    @Test
+    fun `esta semana muestra la conduccion y las ampliadas`() =
+        runTest {
+            val lunes =
+                Jornada(
+                    id = 1,
+                    inicio = hora(6, 0),
+                    zonaInicio = madrid,
+                    kmInicio = 0,
+                    fin = hora(17, 0),
+                    zonaFin = madrid,
+                    kmFin = 500,
+                    conduccionTacografo = Duration.ofHours(9).plusMinutes(30),
+                )
+            val vm = viewModel(Clock.fixed(hora(20, 0), madrid), lunes)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.semana.collect {} }
+
+            val semana = vm.semana.value!!
+            // Es la primera semana con datos: lo de antes de las 06:00 del lunes no se sabe.
+            assertEquals(Duration.ofHours(9).plusMinutes(30), semana.conduccion.min)
+            assertEquals(1, semana.ampliadas)
         }
 }

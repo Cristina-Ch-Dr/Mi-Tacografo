@@ -53,8 +53,17 @@ class ReglasConduccionTest {
         minutos: Long = 0,
     ) = Duration.ofHours(horas).plusMinutes(minutos)
 
+    /** Todo apuntado desde mucho antes (para estos tests, la primera semana está completa). */
+    private val desdeSiempre: Instant = LocalDateTime.of(2026, 1, 1, 0, 0).atZone(madrid).toInstant()
+
     private fun evaluar(vararg jornadas: Jornada) =
-        MotorReglas().evaluar(ContextoReglas(jornadas.toList(), ahora = ahora))
+        MotorReglas().evaluar(ContextoReglas(jornadas.toList(), ahora = ahora, datosDesde = desdeSiempre))
+
+    /** Empieza a usar la app el lunes 2 a las 00:00: esa semana está completa, la anterior no se sabe. */
+    private fun desdeElLunes2(jornadas: List<Jornada>) =
+        MotorReglas().evaluar(
+            ContextoReglas(jornadas, ahora = ahora, datosDesde = lunes2.atStartOfDay(madrid).toInstant()),
+        )
 
     private fun InformeReglas.deJornada(
         jornada: Jornada,
@@ -179,7 +188,7 @@ class ReglasConduccionTest {
         @Test
         fun `la primera semana registrada no se sabe cuanto se condujo la anterior`() {
             // Antes de usar la app pudo conducir hasta 56 h: 40 + 56 > 90, así que no se puede asegurar.
-            val informe = evaluar(*(0..4).map { jornada(2 + it, h(8)) }.toTypedArray())
+            val informe = desdeElLunes2((0..4).map { jornada(2 + it, h(8)) })
             val r = informe.deSemana(lunes2, ReglaId.CONDUCCION_BISEMANAL)
 
             assertEquals(MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO, (r as Resultado.NoVerificado).motivo)
@@ -188,7 +197,7 @@ class ReglasConduccionTest {
         @Test
         fun `una semana de poca conduccion cumple la bisemana aunque sea la primera`() {
             // 30 h + como mucho 56 h de antes = 86 h ≤ 90 h.
-            val informe = evaluar(*(0..2).map { jornada(2 + it, h(10)) }.toTypedArray())
+            val informe = desdeElLunes2((0..2).map { jornada(2 + it, h(10)) })
             assertTrue(informe.deSemana(lunes2, ReglaId.CONDUCCION_BISEMANAL) is Resultado.Cumple)
         }
 
@@ -237,7 +246,7 @@ class ReglasConduccionTest {
     @Test
     fun `la jornada en curso cuenta en la semana pero aun no tiene resultados propios`() {
         val enCurso = Jornada(id = 50, inicio = ahora.minus(h(3)), zonaInicio = madrid, kmInicio = 0)
-        val informe = MotorReglas().evaluar(ContextoReglas(listOf(enCurso), ahora = ahora))
+        val informe = MotorReglas().evaluar(ContextoReglas(listOf(enCurso), ahora = ahora, datosDesde = desdeSiempre))
 
         val semana = informe.semanas.single()
         assertEquals(Intervalo(Duration.ZERO, h(3)), semana.conduccion)
@@ -253,5 +262,18 @@ class ReglasConduccionTest {
     fun `las semanas salen de la mas reciente a la mas antigua`() {
         val informe = evaluar(jornada(2, h(8)), jornada(16, h(8)))
         assertEquals(listOf(LocalDate.of(2026, 11, 16), lunes2), informe.semanas.map { it.lunes })
+    }
+
+    @Test
+    fun `si los datos empiezan a mitad de semana, lo de antes no se sabe`() {
+        // Empieza a usar la app el jueves 5: de lunes a miércoles pudo conducir sin apuntarlo.
+        val jueves = jornada(5, h(9))
+        val informe = MotorReglas().evaluar(ContextoReglas(listOf(jueves), ahora = ahora))
+
+        val semana = informe.semanas.single()
+        assertEquals(h(9), semana.conduccion.min)
+        assertTrue(semana.conduccion.max > h(56))
+        val r = semana.resultado(ReglaId.CONDUCCION_SEMANAL)
+        assertEquals(MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO, (r as Resultado.NoVerificado).motivo)
     }
 }

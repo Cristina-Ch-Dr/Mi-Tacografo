@@ -45,6 +45,7 @@ import com.cristinachdr.mitacografo.feature.editday.EditarJornadaScreen
 import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaScreen
 import com.cristinachdr.mitacografo.feature.history.HistoryScreen
 import com.cristinachdr.mitacografo.feature.home.HomeScreen
+import com.cristinachdr.mitacografo.feature.report.InformeSemanaScreen
 import com.cristinachdr.mitacografo.feature.rests.DescansosScreen
 import com.cristinachdr.mitacografo.feature.rests.EditarDescansoScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
@@ -103,6 +104,10 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
 
             destinoActual?.hasRoute(RutaViaje::class) == true -> {
                 R.string.viaje_titulo
+            }
+
+            destinoActual?.hasRoute(RutaInforme::class) == true -> {
+                R.string.informe_titulo
             }
 
             destinoActual?.hasRoute(RutaDescanso::class) == true -> {
@@ -200,9 +205,16 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                     onIniciarJornada = { navController.navigate(RutaIniciarJornada) { launchSingleTop = true } },
                     onFinalizarJornada = { navController.navigate(RutaFinalizarJornada) { launchSingleTop = true } },
                     onAjustes = { navController.navigate(RutaAjustes) { launchSingleTop = true } },
+                    onInforme = { navController.navigate(RutaInforme(it.toString())) },
                 )
             }
-            composable<RutaHistorial> { HistoryScreen(onJornada = { navController.navigate(RutaJornada(it)) }) }
+            composable<RutaHistorial> {
+                HistoryScreen(
+                    onJornada = { navController.navigate(RutaJornada(it)) },
+                    onSemana = { navController.navigate(RutaInforme(it.toString())) },
+                )
+            }
+            composable<RutaInforme> { InformeSemanaScreen() }
             composable<RutaViajes> { TripsScreen(onViaje = { navController.navigate(RutaViaje(it)) }) }
             composable<RutaViaje> {
                 EditarViajeScreen(

@@ -9,9 +9,16 @@ import com.cristinachdr.mitacografo.domain.model.calcularAvisos
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.port.ViajeRepository
+import com.cristinachdr.mitacografo.domain.rules.Deuda
+import com.cristinachdr.mitacografo.domain.rules.EstadoDeuda
+import com.cristinachdr.mitacografo.domain.rules.Intervalo
+import com.cristinachdr.mitacografo.domain.rules.ReglaId
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
+import com.cristinachdr.mitacografo.ui.reglas.EstadoRegla
+import com.cristinachdr.mitacografo.ui.reglas.peor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -19,13 +26,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Clock
+import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 /** Estado de la pantalla de Inicio. */
@@ -62,6 +72,23 @@ data class AvisoUi(
     val desdeInicio: Duration,
 )
 
+/**
+ * Lo que va en «Esta semana» de Inicio: lo que antes sumaba a mano en la libreta (S, ampliaciones…)
+ * y el estado de las reglas.
+ */
+data class ResumenSemanaUi(
+    val lunes: LocalDate,
+    val conduccion: Intervalo,
+    /** Jornadas de más de 9 h (como mucho 2). */
+    val ampliadas: Int,
+    /** Diarios reducidos desde el último semanal (como mucho 3); `null` si no se sabe. */
+    val reducidos: Int?,
+    /** La deuda pendiente que vence antes, si hay. */
+    val deuda: Deuda?,
+    /** El peor estado de las reglas de la semana y de sus jornadas; `null` si aún no hay resultados. */
+    val estado: EstadoRegla?,
+)
+
 private const val UN_MINUTO_MS = 60_000L
 
 /**
@@ -78,8 +105,38 @@ class HomeViewModel
         viajes: ViajeRepository,
         private val iniciarPausa: IniciarPausa,
         private val terminarPausa: TerminarPausa,
+        obtenerInformeReglas: ObtenerInformeReglas,
         private val clock: Clock,
     ) : ViewModel() {
+        /** «Esta semana»: `null` si en la semana de hoy aún no hay jornadas. */
+        val semana: StateFlow<ResumenSemanaUi?> =
+            obtenerInformeReglas()
+                .map { informe ->
+                    val lunes = LocalDate.now(clock).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                    informe.semanas.find { it.lunes == lunes }?.let { s ->
+                        ResumenSemanaUi(
+                            lunes = lunes,
+                            conduccion = s.conduccion,
+                            ampliadas =
+                                s.resultados
+                                    .find { it.regla == ReglaId.AMPLIACIONES_SEMANA }
+                                    ?.detalle
+                                    ?.cuenta ?: 0,
+                            reducidos =
+                                s.resultados
+                                    .find { it.regla == ReglaId.REDUCIDOS_ENTRE_SEMANALES }
+                                    ?.detalle
+                                    ?.cuenta,
+                            deuda =
+                                informe.deudas
+                                    .filter {
+                                        it.estado == EstadoDeuda.PENDIENTE
+                                    }.minByOrNull { it.fechaLimite },
+                            estado = (s.resultados + s.jornadas.flatMap { it.resultados }).peor(),
+                        )
+                    }
+                }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
         val uiState: StateFlow<HomeUiState> =
             combine(
                 obtenerJornadaActual(),

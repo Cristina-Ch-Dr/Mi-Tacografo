@@ -105,6 +105,8 @@ data class Detalle(
     /** Para las reglas que cuentan algo (jornadas ampliadas…): cuántas hay seguro. */
     val cuenta: Int? = null,
     val maximo: Int? = null,
+    /** Para las reglas que piden un mínimo (semanales en 2 semanas, normales en 4…). */
+    val minimo: Int? = null,
     /** Solo en la conducción diaria: si la jornada pasa de 9 h (cuenta como ampliada). */
     val ampliada: Boolean? = null,
 )
