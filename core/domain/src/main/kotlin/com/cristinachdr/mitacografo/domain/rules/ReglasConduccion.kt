@@ -63,6 +63,15 @@ internal object Ampliaciones : ReglaSemana {
                     Resultado.Excedido(ReglaId.AMPLIACIONES_SEMANA, detalle)
                 }
 
+                // Días de la primera semana sin apuntar: pudo haber más ampliadas.
+                !semana.desconocido.exacto -> {
+                    Resultado.NoVerificado(
+                        ReglaId.AMPLIACIONES_SEMANA,
+                        MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO,
+                        detalle,
+                    )
+                }
+
                 posibles <= AMPLIADAS_POR_SEMANA -> {
                     Resultado.Cumple(ReglaId.AMPLIACIONES_SEMANA, detalle)
                 }
@@ -114,10 +123,16 @@ internal object ConduccionBisemanal : ReglaSemana {
                 lunesAnterior < primeraSemana -> Intervalo(Duration.ZERO, SEMANAL)
                 else -> todas[lunesAnterior]?.conduccion ?: Intervalo.CERO
             }
+        // El motivo de la semana con más incertidumbre: es el que decide si no se puede saber.
+        val estaSemana = semana.motivo to (semana.conduccion.max - semana.conduccion.min)
+        val laAnterior =
+            (todas[lunesAnterior]?.motivo ?: MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO) to
+                (anterior.max - anterior.min)
         val motivo =
-            semana.motivo
-                ?: todas[lunesAnterior]?.motivo
-                ?: MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO
+            listOf(estaSemana, laAnterior)
+                .filter { it.first != null }
+                .maxByOrNull { it.second }
+                ?.first ?: MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO
         return listOf(comparar(ReglaId.CONDUCCION_BISEMANAL, semana.conduccion + anterior, BISEMANAL, motivo))
     }
 }

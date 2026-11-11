@@ -1,10 +1,12 @@
 package com.cristinachdr.mitacografo.feature.history
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
+import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerHistorial
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -37,11 +39,20 @@ class HistorialViewModelTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
     }
 
+    private fun historial(repo: FakeJornadaRepository): HistorialViewModel {
+        val settings = FakeSettingsRepository()
+        val reloj = java.time.Clock.systemDefaultZone()
+        return HistorialViewModel(
+            ObtenerHistorial(repo, settings),
+            ObtenerInformeReglas(repo, FakeDescansoRepository(), settings, reloj),
+        )
+    }
+
     @Test
     fun `muestra las jornadas por semanas y se actualiza al borrar`() =
         runTest {
             val repo = FakeJornadaRepository(listOf(jornada(1, 2), jornada(2, 9)))
-            val vm = HistorialViewModel(ObtenerHistorial(repo, FakeSettingsRepository()))
+            val vm = historial(repo)
             observar(vm)
 
             assertEquals(
@@ -63,7 +74,7 @@ class HistorialViewModelTest {
     @Test
     fun `sin jornadas se muestra el mensaje de lista vacia`() =
         runTest {
-            val vm = HistorialViewModel(ObtenerHistorial(FakeJornadaRepository(), FakeSettingsRepository()))
+            val vm = historial(FakeJornadaRepository())
             observar(vm)
 
             assertTrue(vm.uiState.value.vacio)

@@ -29,6 +29,11 @@ import kotlinx.serialization.Serializable
     val id: Long = 0,
 )
 
+/** Informe de reglas de una semana. [lunes] en ISO («2026-11-09»): las rutas solo llevan tipos simples. */
+@Serializable data class RutaInforme(
+    val lunes: String,
+)
+
 /** Detalle de un viaje: sus jornadas y km, y corregirlo o borrarlo. */
 @Serializable data class RutaViaje(
     val id: Long,

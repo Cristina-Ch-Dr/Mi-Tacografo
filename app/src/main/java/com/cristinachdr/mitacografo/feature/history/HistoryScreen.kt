@@ -1,9 +1,11 @@
 package com.cristinachdr.mitacografo.feature.history
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,8 +15,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,20 +33,24 @@ import com.cristinachdr.mitacografo.domain.model.agruparPorSemana
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
+import com.cristinachdr.mitacografo.ui.reglas.ChipEstado
+import com.cristinachdr.mitacografo.ui.reglas.EstadoRegla
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.textoKm
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 @Composable
 fun HistoryScreen(
     onJornada: (Long) -> Unit,
+    onSemana: (LocalDate) -> Unit = {},
     viewModel: HistorialViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
-    HistorialContent(estado = estado, onJornada = onJornada)
+    HistorialContent(estado = estado, onJornada = onJornada, onSemana = onSemana)
 }
 
 /** Las jornadas por semanas (de lunes a domingo), como en la libreta. Tocar una abre su detalle. */
@@ -51,6 +59,7 @@ fun HistorialContent(
     estado: HistorialUiState,
     onJornada: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    onSemana: (LocalDate) -> Unit = {},
 ) {
     if (estado.vacio) {
         Text(
@@ -66,9 +75,15 @@ fun HistorialContent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         estado.semanas.forEach { semana ->
-            item(key = "semana-${semana.lunes}") { CabeceraSemana(semana) }
+            item(key = "semana-${semana.lunes}") {
+                CabeceraSemana(semana, estado.estadoSemana[semana.lunes], onInforme = { onSemana(semana.lunes) })
+            }
             items(semana.jornadas, key = { it.id }) { jornada ->
-                FilaJornada(jornada = jornada, onClick = { onJornada(jornada.id) })
+                FilaJornada(
+                    jornada = jornada,
+                    estado = estado.estadoJornada[jornada.id],
+                    onClick = { onJornada(jornada.id) },
+                )
             }
         }
     }
@@ -77,6 +92,8 @@ fun HistorialContent(
 @Composable
 private fun CabeceraSemana(
     semana: SemanaJornadas,
+    estado: EstadoRegla?,
+    onInforme: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.padding(top = 12.dp, bottom = 4.dp)) {
@@ -98,12 +115,20 @@ private fun CabeceraSemana(
             },
             style = MaterialTheme.typography.bodyLarge,
         )
+        // El estado de las reglas de la semana y el acceso a su informe.
+        if (estado != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ChipEstado(estado)
+                TextButton(onClick = onInforme) { Text(stringResource(R.string.accion_ver_informe)) }
+            }
+        }
     }
 }
 
 @Composable
 private fun FilaJornada(
     jornada: Jornada,
+    estado: EstadoRegla?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -115,19 +140,25 @@ private fun FilaJornada(
             if (jornada.abierta) {
                 CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             } else {
-                CardDefaults.cardColors()
+                CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             },
+        // Blanca con borde azul claro, como las demás tarjetas (MT-44).
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(
-                stringResource(
-                    R.string.historial_dia,
-                    inicio.format(formatoDiaSemana()),
-                    inicio.format(formatoFecha()),
-                ),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(
+                        R.string.historial_dia,
+                        inicio.format(formatoDiaSemana()),
+                        inicio.format(formatoFecha()),
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                estado?.let { ChipEstado(it, conTexto = false) }
+            }
             val horas =
                 when {
                     fin == null -> {

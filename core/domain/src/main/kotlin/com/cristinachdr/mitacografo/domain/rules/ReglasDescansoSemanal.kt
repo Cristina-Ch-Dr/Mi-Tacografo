@@ -96,7 +96,7 @@ internal object SemanalDosSemanas : ReglaSemana {
         val asignados = asignarSemanales(contexto)
         val enLasDos = asignados[anterior].orEmpty() + asignados[semana.lunes].orEmpty()
         val normales = enLasDos.count { it.clase == ClaseDescanso.SEMANAL_NORMAL }
-        val detalle = Detalle(cuenta = enLasDos.size, maximo = 2)
+        val detalle = Detalle(cuenta = enLasDos.size, minimo = 2)
         val regla = ReglaId.SEMANAL_DOS_SEMANAS
 
         if (enLasDos.size >= 2 && normales >= 1) return listOf(Resultado.Cumple(regla, detalle))
@@ -213,7 +213,7 @@ internal object ReducidosFueraDeCasa : ReglaSemana {
         if (!contexto.terminada(cuatro.last())) return emptyList()
         val enLasCuatro = cuatro.flatMap { asignados[it].orEmpty() }
         val normales = enLasCuatro.count { it.clase == ClaseDescanso.SEMANAL_NORMAL }
-        val detalle = Detalle(cuenta = normales, maximo = 2)
+        val detalle = Detalle(cuenta = normales, minimo = 2)
         val resultado =
             when {
                 enLasCuatro.size >= 4 && normales >= 2 -> {

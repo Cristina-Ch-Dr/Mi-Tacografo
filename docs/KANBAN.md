@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E4 – E7 | MT-30 | MT-29 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27, MT-28, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E5 – E7 | — | MT-30 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-29, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -268,11 +268,15 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Tests T13, T14, T17e, D-3, FIFO, «en bloque» y estados (9). T24 ya estaba (MT-24).
 
 ### MT-30 · Semanas reales y estados en la UI · L · deps: MT-29 · (antes MT-30 y MT-31)
-- [ ] 2–3 semanas de la libreta, **anonimizadas**, como fixtures JSON. Comparar los resultados con lo que el conductor sabe que pasó.
-- [ ] Chips ✅⚠️❔ en Historial e Inicio, y el resumen semanal en Inicio (conducción X/56 h, ampliaciones X/2, reducidos X/3, deuda pendiente).
-- [ ] Pantalla de detalle del informe con la explicación de cada regla (textos traducidos).
+- [x] 1–17 de octubre de la libreta, **anonimizados** (solo horas, conducción y km, con el cuentakilómetros desplazado; sin lugares ni países) en `LibretaAnonimizada.kt`, y `LibretaRealTest` comparando con lo que él sumó a mano: S 29 h 16 exacta, S 43 h 08 y BS 72 h 24 dentro del intervalo del motor, ampliadas los días 3, 7 y 12, deudas de 21 h y 6 h 40. Va en Kotlin y no en JSON: el dominio no tiene librería de JSON y así es más fácil de leer.
+- [x] **Lo que enseñaron los datos reales:** la libreta empieza un jueves y el motor daba la primera semana como completa. Su BS de 90 h 01 salía «Cumple». Ahora lo de antes del primer dato es desconocido (`ContextoReglas.datosDesde`): sale «No verificado» en vez de un «Cumple» falso. Lo mismo con las ampliadas de esa semana. Y el motivo que se enseña es el de más horas de incertidumbre.
+- [x] Chips de estado en el Historial (cada jornada y cada semana, con «Ver el informe») y «Esta semana» en Inicio: conducción X / 56 h, días de más de 9 h X / 2, diarios reducidos X / 3 y lo que queda por compensar con su fecha.
+  - Iconos con color y texto al lado (no emojis: el ❔ apenas se veía) y descripción para TalkBack.
+  - La pausa no cuenta para el chip resumen: sin tramos casi siempre es ❔ (D-4) y taparía lo demás. Se ve en el informe.
+- [x] Pantalla **Informe de la semana**: cada regla con su estado, lo que dice el reglamento (con el artículo), el valor medido o el intervalo, y el motivo si no se puede saber; las deudas de la semana y las reglas de cada jornada. Textos en español y ucraniano.
+- [x] Probado en el emulador API 33 con la copia anonimizada.
 
-> 🏁 **Release v0.3.0**
+> 🏁 **Release v0.3.0** → probar en API 33 actualizando desde la v0.2.0 (sin cambios de base de datos en E4).
 
 ---
 

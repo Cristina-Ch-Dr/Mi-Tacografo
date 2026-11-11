@@ -4,6 +4,7 @@ import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.DescansoClasificado
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.clasificarDescansos
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -18,6 +19,12 @@ data class ContextoReglas(
     /** País de la empresa y de residencia (Ajustes), para los semanales reducidos fuera de casa (R-DS-3). */
     val paisEmpresa: String? = null,
     val paisResidencia: String? = null,
+    /**
+     * Desde cuándo está todo apuntado. Lo de antes no se sabe: si la primera semana empieza a mitad
+     * (el conductor empezó a usar la app un jueves), lo conducido antes cuenta como desconocido.
+     * `null` = desde el primer registro (jornada o descanso).
+     */
+    val datosDesde: Instant? = null,
 ) {
     /** Los descansos con su clase (diario, fraccionado, semanal…), en orden. Se calculan una vez. */
     val clasificados: List<DescansoClasificado> by lazy { clasificarDescansos(descansos) }
@@ -81,20 +88,30 @@ internal data class SemanaRepartida(
     val ahora: Instant,
     /** Todo el contexto, para las reglas que miran los descansos. */
     val contexto: ContextoReglas,
+    /** Lo que pudo conducir antes de que empezaran los datos (solo en la primera semana). */
+    val desconocido: Intervalo = Intervalo.CERO,
 ) {
-    val conduccion: Intervalo get() = partes.fold(Intervalo.CERO) { acc, p -> acc + p.conduccion }
+    val conduccion: Intervalo get() = partes.fold(desconocido) { acc, p -> acc + p.conduccion }
 
-    /** El motivo de la incertidumbre, si la hay: primero lo que falta apuntar, luego lo que cruza la semana. */
+    /**
+     * El motivo de la incertidumbre, si la hay: el que suma más horas sin saber (lo que falta apuntar,
+     * lo que cruza la semana o los días antes de empezar los datos).
+     */
     val motivo: MotivoNoVerificado?
         get() {
-            val motivos = partes.mapNotNull { it.motivo }.toSet()
-            return PRIORIDAD.firstOrNull { it in motivos }
+            val horas = mutableMapOf<MotivoNoVerificado, Duration>()
+            partes.forEach { p ->
+                p.motivo?.let { horas.merge(it, p.conduccion.max - p.conduccion.min, Duration::plus) }
+            }
+            if (!desconocido.exacto) {
+                horas.merge(
+                    MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO,
+                    desconocido.max - desconocido.min,
+                    Duration::plus,
+                )
+            }
+            return horas.maxByOrNull { it.value }?.key
         }
-
-    private companion object {
-        val PRIORIDAD =
-            listOf(MotivoNoVerificado.SIN_CONDUCCION_TACOGRAFO, MotivoNoVerificado.JORNADA_CRUZA_SEMANA)
-    }
 }
 
 /**
@@ -125,17 +142,26 @@ class MotorReglas {
         val partes = repartirPorSemanas(jornadas, contexto.zonaReferencia, contexto.ahora)
         val semanaDeInicio = jornadas.groupBy { lunesDe(it.inicio, contexto.zonaReferencia ?: it.zonaInicio) }
         val lunesConDatos = (partes.keys + semanaDeInicio.keys).sorted()
+
+        // La primera semana con datos y lo que pudo conducir en ella antes del primer registro.
+        val zona = contexto.zonaReferencia ?: jornadas.first().zonaInicio
+        val inicioDatos =
+            contexto.datosDesde
+                ?: listOfNotNull(jornadas.first().inicio, contexto.descansos.minOfOrNull { it.inicio }).min()
+        val primera = minOf(lunesDe(inicioDatos, zona), lunesConDatos.first())
+        val antes = Duration.between(primera.atStartOfDay(zona).toInstant(), inicioDatos).coerceAtLeast(Duration.ZERO)
+
         val semanas =
-            lunesConDatos.associateWith { lunes ->
+            (lunesConDatos + primera).distinct().associateWith { lunes ->
                 SemanaRepartida(
                     lunes = lunes,
                     partes = partes[lunes].orEmpty(),
                     jornadas = semanaDeInicio[lunes].orEmpty().filterNot { it.abierta },
                     ahora = contexto.ahora,
                     contexto = contexto,
+                    desconocido = if (lunes == primera) Intervalo(Duration.ZERO, antes) else Intervalo.CERO,
                 )
             }
-        val primera = lunesConDatos.first()
 
         val informes =
             lunesConDatos.map { lunes ->
