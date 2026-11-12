@@ -43,6 +43,14 @@ data class ResumenPeriodo(
     /** `false` si a alguna jornada terminada le falta la conducción: entonces [conduccion] se queda corta. */
     val conduccionCompleta: Boolean get() = jornadas.filterNot { it.abierta }.all { it.conduccionTacografo != null }
 
+    /** Tiempo de descanso diario y semanal (apuntado o calculado entre jornadas); las pausas no cuentan. */
+    val tiempoDescanso: Duration
+        get() =
+            descansos
+                .filter { it.descanso.tipo == TipoDescanso.DESCANSO }
+                .mapNotNull { it.descanso.duracion }
+                .fold(Duration.ZERO, Duration::plus)
+
     /** Lo que falta hasta 45 h en los semanales reducidos del periodo (habrá que compensarlo). */
     val deudaSemanal: Duration get() = descansos.map { it.deuda }.fold(Duration.ZERO, Duration::plus)
 

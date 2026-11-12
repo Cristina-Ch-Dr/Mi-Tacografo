@@ -139,7 +139,6 @@
 
     <!-- Історія -->
     <string name="historial_vacio">Ще немає робочих днів. Коли завершите перший, він з’явиться тут.</string>
-    <string name="historial_semana">Тиждень з %1$s по %2$s</string>
     <string name="historial_total_semana">%1$s км · %2$s водіння</string>
     <string name="historial_total_semana_incompleta">%1$s км · %2$s водіння (не все записано)</string>
     <string name="historial_dia">%1$s · %2$s</string>
@@ -196,7 +195,7 @@
     <string name="descanso_titulo">Відпочинок</string>
     <string name="descanso_titulo_nuevo">Новий відпочинок</string>
     <string name="descansos_vacio">Ще немає перерв і відпочинку. Під час робочого дня натисніть «Почати перерву»; щоб записати минулий, натисніть «Додати».</string>
-    <string name="descansos_explicacion">Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами. Це орієнтовно: правила регламенту ще не перевіряються.</string>
+    <string name="descansos_explicacion">Час між двома робочими днями вже рахується як відпочинок автоматично: тут записуються перерви та відпочинок, який був не між робочими днями. Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами.</string>
     <string name="accion_anadir_descanso">Додати</string>
     <string name="descanso_tipo">Що це було?</string>
     <string name="tipo_pausa">Перерва (під час робочого дня)</string>
@@ -223,9 +222,6 @@
     <string name="accion_iniciar_pausa">Почати перерву</string>
     <string name="accion_terminar_pausa">Закінчити перерву</string>
     <string name="inicio_pausa_en_curso">Перерва з %1$s · %2$s</string>
-    <string name="inicio_propuesta_descanso">Ви відпочивали з %1$s?</string>
-    <string name="inicio_propuesta_detalle">Буде записано відпочинок тривалістю %1$s, до часу початку.</string>
-    <string name="inicio_propuesta_si">Так, записати відпочинок</string>
 
     <!-- Resumen y PDF (MT-32, MT-33B) -->
     <string name="resumen_semana">Тиждень</string>
@@ -242,9 +238,9 @@
     <string name="resumen_km_por_dia">Пробіг по днях</string>
     <string name="resumen_descansos">Відпочинок</string>
     <string name="resumen_deuda">Компенсувати (скорочені тижневі): %1$s</string>
-    <string name="resumen_sin_descansos">У цьому періоді немає записаного відпочинку.</string>
+    <string name="resumen_sin_descansos">У цьому періоді немає відпочинку.</string>
     <string name="resumen_semana_de">Тиждень з %1$s</string>
-    <string name="resumen_aviso_reglas">Правила регламенту ще не перевіряються: це з’явиться разом із перевіркою правил.</string>
+    <string name="resumen_aviso_reglas">Правила регламенту (керування, перерви, відпочинок) дивіться в Історії: «Переглянути звіт» кожного тижня.</string>
     <string name="accion_compartir_pdf">Поділитися PDF</string>
     <string name="accion_guardar_pdf">Зберегти PDF</string>
     <string name="pdf_guardado">PDF збережено.</string>
@@ -369,4 +365,10 @@
     <string name="deuda_compensada">%1$s, компенсовано</string>
     <string name="deuda_vencida">%1$s, строк минув %2$s</string>
     <string name="deuda_no_verificada">%1$s: невідомо, чи компенсовано</string>
+    <!-- Descanso entre jornadas (MT-46) -->
+    <string name="inicio_descansando">Відпочинок з %1$s · %2$s</string>
+    <string name="historial_descanso_antes">Відпочинок перед цим: %1$s · %2$s</string>
+    <string name="resumen_tiempo_descanso">Відпочинок (між робочими днями)</string>
+    <string name="inicio_descanso_previo">Відпочинок з %1$s: %2$s</string>
+    <string name="inicio_descanso_previo_detalle">Час між робочими днями рахується як відпочинок автоматично: записувати його не треба.</string>
 </resources>

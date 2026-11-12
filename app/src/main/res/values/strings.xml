@@ -137,7 +137,6 @@
 
     <!-- Historial -->
     <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí.</string>
-    <string name="historial_semana">Semana del %1$s al %2$s</string>
     <string name="historial_total_semana">%1$s km · %2$s de conducción</string>
     <string name="historial_total_semana_incompleta">%1$s km · %2$s de conducción (falta apuntar alguna)</string>
     <string name="historial_dia">%1$s · %2$s</string>
@@ -192,7 +191,7 @@
     <string name="descanso_titulo">Descanso</string>
     <string name="descanso_titulo_nuevo">Nuevo descanso</string>
     <string name="descansos_vacio">Todavía no hay pausas ni descansos. Durante la jornada, pulsa «Iniciar pausa»; para apuntar uno pasado, pulsa «Añadir».</string>
-    <string name="descansos_explicacion">La clase (diario normal, reducido, fraccionado, semanal…) se calcula con las horas. Es orientativa: no comprueba todavía las reglas del reglamento.</string>
+    <string name="descansos_explicacion">El tiempo entre dos jornadas ya cuenta solo como descanso: aquí se apuntan las pausas y los descansos que no fueron entre dos jornadas. La clase (diario normal, reducido, fraccionado, semanal…) se calcula con las horas.</string>
     <string name="accion_anadir_descanso">Añadir</string>
     <string name="descanso_tipo">¿Qué fue?</string>
     <string name="tipo_pausa">Pausa (en la jornada)</string>
@@ -219,9 +218,6 @@
     <string name="accion_iniciar_pausa">Iniciar pausa</string>
     <string name="accion_terminar_pausa">Terminar pausa</string>
     <string name="inicio_pausa_en_curso">En pausa desde las %1$s · %2$s</string>
-    <string name="inicio_propuesta_descanso">¿Descansaste desde %1$s?</string>
-    <string name="inicio_propuesta_detalle">Se apuntará un descanso de %1$s, hasta la hora de inicio.</string>
-    <string name="inicio_propuesta_si">Sí, apuntar el descanso</string>
 
     <!-- Resumen y PDF (MT-32, MT-33B) -->
     <string name="resumen_semana">Semana</string>
@@ -238,9 +234,9 @@
     <string name="resumen_km_por_dia">Km por día</string>
     <string name="resumen_descansos">Descansos</string>
     <string name="resumen_deuda">Por compensar (semanales reducidos): %1$s</string>
-    <string name="resumen_sin_descansos">No hay descansos apuntados en este periodo.</string>
+    <string name="resumen_sin_descansos">No hay descansos en este periodo.</string>
     <string name="resumen_semana_de">Semana del %1$s</string>
-    <string name="resumen_aviso_reglas">Todavía no comprueba las reglas del reglamento: llegará con el motor de reglas.</string>
+    <string name="resumen_aviso_reglas">Las reglas del reglamento (conducción, pausas, descansos) se ven en Historial: «Ver el informe» de cada semana.</string>
     <string name="accion_compartir_pdf">Compartir PDF</string>
     <string name="accion_guardar_pdf">Guardar PDF</string>
     <string name="pdf_guardado">PDF guardado.</string>
@@ -364,4 +360,10 @@
     <string name="deuda_compensada">%1$s, compensadas</string>
     <string name="deuda_vencida">%1$s, venció el %2$s</string>
     <string name="deuda_no_verificada">%1$s: no se sabe si se compensaron</string>
+    <!-- Descanso entre jornadas (MT-46) -->
+    <string name="inicio_descansando">Descansando desde %1$s · %2$s</string>
+    <string name="historial_descanso_antes">Descanso antes: %1$s · %2$s</string>
+    <string name="resumen_tiempo_descanso">Descanso (entre jornadas)</string>
+    <string name="inicio_descanso_previo">Descanso desde %1$s: %2$s</string>
+    <string name="inicio_descanso_previo_detalle">El tiempo entre jornadas cuenta solo como descanso: no hace falta apuntarlo.</string>
 </resources>

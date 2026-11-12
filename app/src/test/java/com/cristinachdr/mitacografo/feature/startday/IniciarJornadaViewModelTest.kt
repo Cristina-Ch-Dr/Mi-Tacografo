@@ -10,7 +10,6 @@ import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
-import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
@@ -63,7 +62,6 @@ class IniciarJornadaViewModelTest {
         ProponerDatosInicio(repo),
         ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
         ProponerDescansoPrevio(repo, descansos),
-        GuardarDescanso(descansos, reloj),
         reloj,
     )
 
@@ -130,32 +128,15 @@ class IniciarJornadaViewModelTest {
         }
 
     @Test
-    fun `pregunta si descanso desde que termino la jornada anterior, sin apuntarlo todavia`() {
+    fun `ensena cuanto ha descansado desde la jornada anterior`() {
         val estado = viewModel(FakeJornadaRepository(listOf(ayer))).uiState.value
 
         assertEquals(ayer.fin, estado.propuestaDescanso?.desde)
         assertEquals(Duration.ofHours(13), estado.duracionDescanso)
-        assertFalse(estado.apuntarDescanso)
     }
 
     @Test
-    fun `si dice que si, al iniciar se apunta el descanso hasta la hora de inicio`() =
-        runTest {
-            val descansos = FakeDescansoRepository()
-            val vm = viewModel(FakeJornadaRepository(listOf(ayer)), descansos)
-            vm.onApuntarDescanso(true)
-
-            vm.onIniciar()
-
-            val descanso = descansos.guardados.single()
-            assertEquals(TipoDescanso.DESCANSO, descanso.tipo)
-            assertEquals(ayer.fin, descanso.inicio)
-            assertEquals(ahora.atZone(madrid).toInstant(), descanso.fin)
-            assertEquals("FR", descanso.pais)
-        }
-
-    @Test
-    fun `si no lo confirma no se apunta nada`() =
+    fun `al iniciar no se apunta ningun descanso, se calcula solo`() =
         runTest {
             val descansos = FakeDescansoRepository()
             viewModel(FakeJornadaRepository(listOf(ayer)), descansos).onIniciar()

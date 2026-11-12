@@ -92,6 +92,20 @@ internal object DescansoDiario : ReglaJornada {
 
         if (siguiente == null && limite > contexto.ahora) return emptyList()
 
+        // Después de la última jornada sigue descansando (MT-46): cuenta lo que queda del plazo tras su fin.
+        val esLaUltima = contexto.jornadas.none { it.inicio > jornada.inicio }
+        if (siguiente == null && contexto.descansoEntreJornadas && esLaUltima) {
+            val tras = Duration.between(jornada.fin!!, limite).coerceAtLeast(Duration.ZERO)
+            val detalle = Detalle(valor = Intervalo.exacto(tras), limite = MINIMO_DIARIO)
+            return listOf(
+                if (tras >= MINIMO_DIARIO) {
+                    Resultado.Cumple(ReglaId.DESCANSO_DIARIO, detalle)
+                } else {
+                    Resultado.Excedido(ReglaId.DESCANSO_DIARIO, detalle)
+                },
+            )
+        }
+
         val dentro =
             siguiente
                 ?.takeIf { it.descanso.inicio < limite }

@@ -238,6 +238,7 @@ private fun Totales(resumen: ResumenPeriodo) {
         Dato(stringResource(R.string.resumen_jornadas), resumen.numJornadas.toString())
         Dato(stringResource(R.string.resumen_tiempo), textoDuracion(resumen.tiempoJornadas))
         Dato(stringResource(R.string.resumen_conduccion), textoDuracion(resumen.conduccion))
+        Dato(stringResource(R.string.resumen_tiempo_descanso), textoDuracion(resumen.tiempoDescanso))
         if (!resumen.conduccionCompleta) {
             Text(
                 stringResource(R.string.resumen_conduccion_incompleta),

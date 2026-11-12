@@ -6,7 +6,9 @@ import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
+import com.cristinachdr.mitacografo.domain.model.descansoActual
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
+import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.port.ViajeRepository
 import com.cristinachdr.mitacografo.domain.rules.Deuda
@@ -47,6 +49,8 @@ data class HomeUiState(
     val pausa: PausaUi? = null,
     /** Faltan el país de la empresa o el de residencia en Ajustes: la regla R-DS-3 no se puede comprobar. */
     val faltanPaises: Boolean = false,
+    /** Sin jornada en curso: desde cuándo descansa (el fin de la última jornada) y cuánto lleva. */
+    val descanso: PausaUi? = null,
 )
 
 data class PausaUi(
@@ -103,6 +107,7 @@ class HomeViewModel
         settings: SettingsRepository,
         descansos: DescansoRepository,
         viajes: ViajeRepository,
+        jornadas: JornadaRepository,
         private val iniciarPausa: IniciarPausa,
         private val terminarPausa: TerminarPausa,
         obtenerInformeReglas: ObtenerInformeReglas,
@@ -139,15 +144,26 @@ class HomeViewModel
 
         val uiState: StateFlow<HomeUiState> =
             combine(
-                obtenerJornadaActual(),
+                combine(obtenerJornadaActual(), jornadas.observarTodas()) { actual, todas ->
+                    actual to descansoActual(todas)?.let { fin -> fin to todas.maxBy { it.inicio } }
+                },
                 settings.observar(),
                 descansos.observarEnCurso(),
                 viajes.observarTodos(),
                 cadaMinuto(),
-            ) { jornada, ajustes, pausa, todosLosViajes, ahora ->
+            ) { (jornada, ultima), ajustes, pausa, todosLosViajes, ahora ->
                 val viaje = jornada?.viajeId?.let { id -> todosLosViajes.find { it.id == id }?.nombre }
                 crearEstado(jornada, ajustes.avisos, pausa, ahora, viaje)
-                    .copy(faltanPaises = ajustes.paisEmpresa == null || ajustes.paisResidencia == null)
+                    .copy(
+                        faltanPaises = ajustes.paisEmpresa == null || ajustes.paisResidencia == null,
+                        descanso =
+                            ultima?.let { (fin, j) ->
+                                PausaUi(
+                                    desde = fin.atZone(j.zonaFin ?: j.zonaInicio),
+                                    transcurrido = Duration.between(fin, ahora).coerceAtLeast(Duration.ZERO),
+                                )
+                            },
+                    )
             }.stateIn(
                 scope = viewModelScope,
                 // Deja de contar 5 s después de salir de la pantalla (ahorra batería).
