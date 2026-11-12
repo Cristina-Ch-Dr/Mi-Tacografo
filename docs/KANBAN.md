@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | MT-47 | MT-48 | MT-46 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E5 – E7 | — | — | MT-47 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-46, MT-48 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -205,8 +205,11 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Probado en el emulador API 33 con la copia anonimizada.
 
 ### MT-47 · Añadir jornadas pasadas a mano · M · deps: MT-46 · *(petición del conductor)*
-- [ ] Desde el Historial, «Añadir jornada»: inicio y fin, km, conducción del tacógrafo, países. Para lo que el tacógrafo registró pero la app no, y para pasar la libreta atrasada.
-- [ ] Mismas validaciones que al corregir (sin solaparse con otras jornadas) y se asigna al viaje de esas fechas, si hay.
+- [x] Desde el Historial, botón «Añadir jornada»: inicio y fin, km, países, ciudades, conducción del tacógrafo y observaciones. Para lo que el tacógrafo registró pero la app no, y para pasar la libreta atrasada. Es la misma pantalla que «Corregir jornada» (`RutaJornada(0)`), sin «Borrar».
+- [x] Propone de 06:00 a 16:00 el último día antes de hoy sin jornada: al pasar la libreta hacia atrás, cada vez propone el día que falta. Los km en blanco, para copiarlos del tacógrafo.
+- [x] `AnadirJornada`: tiene que estar terminada, las mismas validaciones que al corregir y sin solaparse con otras jornadas. Entra en el viaje de esas fechas, si hay. No programa avisos.
+- [x] Al añadirla, el descanso entre jornadas (MT-46), las reglas y el Resumen la cuentan solos.
+- [x] Textos en español y ucraniano. Probado en el emulador API 33 con la libreta: propone el día que falta, avisa si se solapa y la jornada del día siguiente pasa a tener su «Descanso antes».
 
 ### MT-48 · Historial por semanas, con flechas · S · deps: MT-46 · *(propuesta de Cristina)*
 - [x] Para ver las semanas del mes pasado no hay que bajar mucho: arriba, «‹ Del 9 nov al 15 nov ›» como en el Resumen, y se ve una semana cada vez (empieza en la más reciente).

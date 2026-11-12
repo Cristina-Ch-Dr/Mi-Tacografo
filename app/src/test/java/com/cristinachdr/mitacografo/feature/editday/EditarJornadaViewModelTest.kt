@@ -5,14 +5,17 @@ import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.usecase.AnadirJornada
 import com.cristinachdr.mitacografo.domain.usecase.BorrarJornada
 import com.cristinachdr.mitacografo.domain.usecase.EditarJornada
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPaisesRecientes
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.ui.ErrorCampo
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -64,6 +67,7 @@ class EditarJornadaViewModelTest {
             SavedStateHandle(mapOf("id" to id)),
             repo,
             EditarJornada(repo, gestor, reloj),
+            AnadirJornada(repo, FakeViajeRepository(), reloj),
             BorrarJornada(repo, gestor),
             ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
             reloj,
@@ -180,4 +184,53 @@ class EditarJornadaViewModelTest {
 
         assertTrue(estado.noExiste)
     }
+
+    @Test
+    fun `con id 0 propone el ultimo dia sin jornada con los km en blanco`() {
+        // Hoy es el 3; el 2 ya tiene jornada: propone el 1.
+        val estado = viewModel(FakeJornadaRepository(listOf(lunes)), 0).uiState.value
+
+        assertTrue(estado.nueva)
+        assertTrue(estado.terminada)
+        assertEquals(LocalDateTime.of(2026, 11, 1, 6, 0), estado.inicio)
+        assertEquals(LocalDateTime.of(2026, 11, 1, 16, 0), estado.fin)
+        assertEquals("" to "", estado.kmInicio to estado.kmFin)
+        assertFalse(estado.puedeGuardar)
+    }
+
+    @Test
+    fun `anadir una jornada pasada la guarda como nueva`() =
+        runTest {
+            val repo = FakeJornadaRepository(listOf(martes))
+            val vm = viewModel(repo, 0)
+
+            vm.onInicio(LocalDateTime.of(2026, 11, 1, 7, 0))
+            vm.onFin(LocalDateTime.of(2026, 11, 1, 18, 0))
+            vm.onKmInicio("244800")
+            vm.onKmFin("245310")
+            vm.onConduccionHoras("8")
+            vm.onConduccionMinutos("30")
+            vm.onGuardar()
+
+            assertTrue(vm.uiState.value.terminado)
+            val anadida = repo.observarTodas().first().single { it.id != martes.id }
+            assertEquals(510, anadida.kmRecorridos)
+            assertEquals(Duration.ofMinutes(510), anadida.conduccionTacografo)
+        }
+
+    @Test
+    fun `una jornada nueva que se solapa no se guarda`() =
+        runTest {
+            val repo = FakeJornadaRepository(listOf(lunes))
+            val vm = viewModel(repo, 0)
+
+            vm.onInicio(inicio.plusHours(2))
+            vm.onFin(inicio.plusHours(14))
+            vm.onKmInicio("244800")
+            vm.onKmFin("245310")
+            vm.onGuardar()
+
+            assertEquals(setOf(ErrorJornada.SOLAPA_CON_OTRA_JORNADA), vm.uiState.value.errores)
+            assertEquals(1, repo.observarTodas().first().size)
+        }
 }

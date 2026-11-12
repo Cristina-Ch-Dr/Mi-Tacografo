@@ -9,6 +9,7 @@ import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
+import com.cristinachdr.mitacografo.domain.usecase.AnadirJornada
 import com.cristinachdr.mitacografo.domain.usecase.BorrarJornada
 import com.cristinachdr.mitacografo.domain.usecase.EditarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
@@ -20,16 +21,20 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 
 data class EditarJornadaUiState(
-    /** La jornada tal y como está guardada. `null` mientras carga o si ya no existe. */
+    /** La jornada tal y como está guardada (o la propuesta, si es nueva). `null` mientras carga o si ya no existe. */
     val original: Jornada? = null,
+    /** Una jornada pasada que se añade a mano (MT-47): siempre terminada y no se puede borrar. */
+    val nueva: Boolean = false,
     val inicio: LocalDateTime? = null,
     val kmInicio: String = "",
     val paisInicio: String = "",
@@ -71,6 +76,7 @@ data class EditarJornadaUiState(
 
 /**
  * Detalle de una jornada del historial: se puede corregir cualquier dato o borrarla.
+ * Con id 0, añadir a mano una jornada pasada (MT-47), con los mismos campos.
  *
  * Las horas se editan en la zona donde ocurrieron (la de inicio y la de fin), como las vio el conductor.
  */
@@ -81,22 +87,27 @@ class EditarJornadaViewModel
         savedStateHandle: SavedStateHandle,
         private val repository: JornadaRepository,
         private val editarJornada: EditarJornada,
+        private val anadirJornada: AnadirJornada,
         private val borrarJornada: BorrarJornada,
         private val obtenerPreferenciasPaises: ObtenerPreferenciasPaises,
         private val clock: Clock,
     ) : ViewModel() {
-        /** El id viene de la ruta `RutaJornada(id)`. */
-        private val id: Long = checkNotNull(savedStateHandle[CLAVE_ID])
+        /** El id viene de la ruta `RutaJornada(id)`; 0 = nueva. */
+        private val id: Long = savedStateHandle[CLAVE_ID] ?: Jornada.SIN_ID
 
         private val _uiState = MutableStateFlow(EditarJornadaUiState())
         val uiState: StateFlow<EditarJornadaUiState> = _uiState.asStateFlow()
 
         init {
             viewModelScope.launch {
-                val jornada = repository.obtenerPorId(id)
+                val jornada = if (id == Jornada.SIN_ID) propuestaNueva() else repository.obtenerPorId(id)
                 val paises = obtenerPreferenciasPaises()
                 _uiState.update {
-                    if (jornada == null) it.copy(cargando = false) else desde(jornada).copy(paises = paises).validado()
+                    if (jornada == null) {
+                        it.copy(cargando = false)
+                    } else {
+                        desde(jornada).copy(paises = paises, nueva = id == Jornada.SIN_ID).validado()
+                    }
                 }
             }
         }
@@ -130,7 +141,8 @@ class EditarJornadaViewModel
 
             _uiState.update { it.copy(guardando = true) }
             viewModelScope.launch {
-                when (val resultado = editarJornada(jornada)) {
+                val resultado = if (estado.nueva) anadirJornada(jornada) else editarJornada(jornada)
+                when (resultado) {
                     is ResultadoJornada.Ok -> {
                         _uiState.update { it.copy(terminado = true) }
                     }
@@ -171,12 +183,39 @@ class EditarJornadaViewModel
             }
         }
 
+        /**
+         * Lo que se propone al añadir una jornada: de 06:00 a 16:00 (en la zona del móvil) del último día antes
+         * de hoy sin ninguna jornada. Así, al ir pasando la libreta hacia atrás, propone cada vez el día que falta.
+         * Los km se dejan en blanco para que se copien del tacógrafo.
+         */
+        private suspend fun propuestaNueva(): Jornada {
+            val zona = clock.zone
+            val jornadas = repository.observarTodas().first()
+            val ahora = clock.instant()
+            val ayer = LocalDate.now(clock).minusDays(1)
+            val dia =
+                generateSequence(ayer) { it.minusDays(1) }
+                    .take(DIAS_BUSCANDO_HUECO)
+                    .firstOrNull { dia ->
+                        val desde = dia.atStartOfDay(zona).toInstant()
+                        val hasta = dia.plusDays(1).atStartOfDay(zona).toInstant()
+                        jornadas.none { it.inicio < hasta && (it.fin ?: ahora) > desde }
+                    } ?: ayer
+            return Jornada(
+                inicio = dia.atTime(HORA_INICIO_PROPUESTA, 0).atZone(zona).toInstant(),
+                zonaInicio = zona,
+                kmInicio = 0,
+                fin = dia.atTime(HORA_FIN_PROPUESTA, 0).atZone(zona).toInstant(),
+                zonaFin = zona,
+            )
+        }
+
         private fun desde(jornada: Jornada): EditarJornadaUiState {
             val (horas, minutos) = casillasConduccion(jornada.conduccionTacografo)
             return EditarJornadaUiState(
                 original = jornada,
                 inicio = jornada.inicio.atZone(jornada.zonaInicio).toLocalDateTime(),
-                kmInicio = jornada.kmInicio.toString(),
+                kmInicio = if (jornada.id == Jornada.SIN_ID) "" else jornada.kmInicio.toString(),
                 paisInicio = jornada.paisInicio.orEmpty(),
                 ciudadInicio = jornada.ciudadInicio.orEmpty(),
                 fin = jornada.fin?.atZone(jornada.zonaFin ?: jornada.zonaInicio)?.toLocalDateTime(),
@@ -213,6 +252,9 @@ class EditarJornadaViewModel
 
         private companion object {
             const val CLAVE_ID = "id"
+            const val HORA_INICIO_PROPUESTA = 6
+            const val HORA_FIN_PROPUESTA = 16
+            const val DIAS_BUSCANDO_HUECO = 366
         }
     }
 

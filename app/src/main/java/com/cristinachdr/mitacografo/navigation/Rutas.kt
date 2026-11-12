@@ -39,7 +39,7 @@ import kotlinx.serialization.Serializable
     val id: Long,
 )
 
-/** Detalle de una jornada del historial, para corregirla o borrarla. */
+/** Detalle de una jornada del historial, para corregirla o borrarla; con [id] = 0, añadir una pasada (MT-47). */
 @Serializable data class RutaJornada(
-    val id: Long,
+    val id: Long = 0,
 )
