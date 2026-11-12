@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.feature.history
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,8 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,17 +57,30 @@ import java.time.ZoneId
 @Composable
 fun HistoryScreen(
     onJornada: (Long) -> Unit,
+    modifier: Modifier = Modifier,
     onSemana: (LocalDate) -> Unit = {},
+    onNueva: () -> Unit = {},
     viewModel: HistorialViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
-    HistorialContent(
-        estado = estado,
-        onJornada = onJornada,
-        onSemana = onSemana,
-        onAnterior = viewModel::onAnterior,
-        onSiguiente = viewModel::onSiguiente,
-    )
+    Box(modifier.fillMaxSize()) {
+        HistorialContent(
+            estado = estado,
+            onJornada = onJornada,
+            onSemana = onSemana,
+            onAnterior = viewModel::onAnterior,
+            onSiguiente = viewModel::onSiguiente,
+        )
+        // Para pasar las jornadas que están en el tacógrafo o en la libreta pero no en la app (MT-47).
+        if (!estado.cargando) {
+            ExtendedFloatingActionButton(
+                onClick = onNueva,
+                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                text = { Text(stringResource(R.string.accion_anadir_jornada)) },
+                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            )
+        }
+    }
 }
 
 /**
@@ -93,7 +109,8 @@ fun HistorialContent(
         SelectorSemana(semana, estado, onAnterior, onSiguiente)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            // Abajo, hueco para que el botón «Añadir jornada» no tape la última.
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item(key = "semana-${semana.lunes}") {

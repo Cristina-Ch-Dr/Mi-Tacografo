@@ -55,7 +55,7 @@ class EditarJornada
     }
 
 /** Dos jornadas se solapan si una empieza antes de que termine la otra. Una abierta dura hasta [ahora]. */
-private fun Jornada.solapaCon(
+internal fun Jornada.solapaCon(
     otra: Jornada,
     ahora: Instant,
 ): Boolean = inicio < (otra.fin ?: ahora) && otra.inicio < (fin ?: ahora)

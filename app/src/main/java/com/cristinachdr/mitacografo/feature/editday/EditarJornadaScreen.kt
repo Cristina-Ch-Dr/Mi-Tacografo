@@ -116,6 +116,13 @@ fun EditarJornadaContent(
             Text(stringResource(R.string.error_jornada_no_existe), style = MaterialTheme.typography.headlineSmall)
         }
         if (inicio == null) return@Column
+        if (estado.nueva) {
+            Text(
+                stringResource(R.string.editar_nueva_ayuda),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
         Seccion(stringResource(R.string.editar_seccion_inicio))
         CampoFechaHora(stringResource(R.string.campo_hora_inicio), inicio, acciones.onInicio)
@@ -186,37 +193,53 @@ fun EditarJornadaContent(
         )
         ListaErrores(estado.errores)
         BigButton(
-            text = stringResource(R.string.accion_guardar_cambios),
+            text =
+                stringResource(
+                    if (estado.nueva) R.string.accion_anadir_jornada else R.string.accion_guardar_cambios,
+                ),
             onClick = acciones.onGuardar,
             enabled = estado.puedeGuardar,
             icon = Icons.Filled.Done,
         )
-        OutlinedButton(
-            onClick = acciones.onPedirBorrar,
-            enabled = !estado.guardando,
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(Icons.Filled.Delete, contentDescription = null)
-            Text(stringResource(R.string.accion_borrar_jornada), modifier = Modifier.padding(start = 8.dp))
-        }
+        if (!estado.nueva) BotonBorrar(estado, acciones)
     }
 
     if (estado.confirmandoBorrado) {
-        AlertDialog(
-            onDismissRequest = acciones.onCancelarBorrar,
-            title = { Text(stringResource(R.string.borrar_titulo)) },
-            text = { Text(stringResource(R.string.borrar_texto)) },
-            confirmButton = {
-                TextButton(onClick = acciones.onConfirmarBorrar) {
-                    Text(stringResource(R.string.accion_borrar), color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = acciones.onCancelarBorrar) { Text(stringResource(R.string.accion_cancelar)) }
-            },
-        )
+        DialogoBorrar(acciones)
     }
+}
+
+@Composable
+private fun BotonBorrar(
+    estado: EditarJornadaUiState,
+    acciones: AccionesEditar,
+) {
+    OutlinedButton(
+        onClick = acciones.onPedirBorrar,
+        enabled = !estado.guardando,
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Icon(Icons.Filled.Delete, contentDescription = null)
+        Text(stringResource(R.string.accion_borrar_jornada), modifier = Modifier.padding(start = 8.dp))
+    }
+}
+
+@Composable
+private fun DialogoBorrar(acciones: AccionesEditar) {
+    AlertDialog(
+        onDismissRequest = acciones.onCancelarBorrar,
+        title = { Text(stringResource(R.string.borrar_titulo)) },
+        text = { Text(stringResource(R.string.borrar_texto)) },
+        confirmButton = {
+            TextButton(onClick = acciones.onConfirmarBorrar) {
+                Text(stringResource(R.string.accion_borrar), color = MaterialTheme.colorScheme.error)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = acciones.onCancelarBorrar) { Text(stringResource(R.string.accion_cancelar)) }
+        },
+    )
 }
 
 @Composable

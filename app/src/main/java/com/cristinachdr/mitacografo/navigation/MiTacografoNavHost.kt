@@ -95,7 +95,8 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             }
 
             destinoActual?.hasRoute(RutaJornada::class) == true -> {
-                R.string.editar_titulo
+                val nueva = entradaActual?.toRoute<RutaJornada>()?.id == 0L
+                if (nueva) R.string.editar_titulo_nueva else R.string.editar_titulo
             }
 
             destinoActual?.hasRoute(RutaDescansos::class) == true -> {
@@ -212,6 +213,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 HistoryScreen(
                     onJornada = { navController.navigate(RutaJornada(it)) },
                     onSemana = { navController.navigate(RutaInforme(it.toString())) },
+                    onNueva = { navController.navigate(RutaJornada()) },
                 )
             }
             composable<RutaInforme> { InformeSemanaScreen() }

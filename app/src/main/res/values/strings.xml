@@ -82,6 +82,7 @@
     <string name="error_conduccion_negativa">La conducción no puede ser negativa.</string>
     <string name="error_conduccion_mayor">La conducción es mayor que la duración de la jornada.</string>
     <string name="error_solapa">Se solapa con otra jornada: revisa las horas de inicio y fin.</string>
+    <string name="error_falta_fin">Falta la hora de fin.</string>
 
     <!-- Avisos (notificaciones) -->
     <string name="canal_avisos_nombre">Avisos de jornada</string>
@@ -136,7 +137,7 @@
     <string name="pantalla_pendiente">Próximamente</string>
 
     <!-- Historial -->
-    <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí.</string>
+    <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí. Las que ya hiciste las puedes pasar con «Añadir jornada».</string>
     <string name="historial_total_semana">%1$s km · %2$s de conducción</string>
     <string name="historial_total_semana_incompleta">%1$s km · %2$s de conducción (falta apuntar alguna)</string>
     <string name="historial_dia">%1$s · %2$s</string>
@@ -149,6 +150,9 @@
 
     <!-- Detalle y edición de una jornada -->
     <string name="editar_titulo">Jornada</string>
+    <string name="editar_titulo_nueva">Añadir jornada</string>
+    <string name="editar_nueva_ayuda">Para una jornada que está en el tacógrafo o en la libreta pero no en la app. Copia las horas, los km y la conducción del tacógrafo.</string>
+    <string name="accion_anadir_jornada">Añadir jornada</string>
     <string name="editar_seccion_inicio">Inicio</string>
     <string name="editar_seccion_fin">Fin</string>
     <string name="editar_en_curso_ayuda">Esta jornada sigue en curso: el fin se apunta con «Finalizar jornada» en Inicio.</string>
