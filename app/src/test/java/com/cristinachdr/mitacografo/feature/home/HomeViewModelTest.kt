@@ -56,6 +56,7 @@ class HomeViewModelTest {
             settings,
             descansos,
             FakeViajeRepository(),
+            repo,
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
             TerminarPausa(descansos, reloj),
             ObtenerInformeReglas(repo, descansos, settings, reloj),
@@ -190,5 +191,28 @@ class HomeViewModelTest {
             // Es la primera semana con datos: lo de antes de las 06:00 del lunes no se sabe.
             assertEquals(Duration.ofHours(9).plusMinutes(30), semana.conduccion.min)
             assertEquals(1, semana.ampliadas)
+        }
+
+    @Test
+    fun `sin jornada en curso cuenta el descanso desde la ultima`() =
+        runTest {
+            val ayer =
+                Jornada(
+                    id = 1,
+                    inicio = hora(6, 0).minus(Duration.ofDays(1)),
+                    zonaInicio = madrid,
+                    kmInicio = 0,
+                    fin = hora(18, 0).minus(Duration.ofDays(1)),
+                    zonaFin = madrid,
+                    kmFin = 500,
+                )
+            val vm = viewModel(Clock.fixed(hora(6, 0), madrid), ayer)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+
+            assertEquals(
+                Duration.ofHours(12),
+                vm.uiState.value.descanso
+                    ?.transcurrido,
+            )
         }
 }

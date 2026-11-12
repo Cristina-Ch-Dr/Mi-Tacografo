@@ -1,5 +1,6 @@
 package com.cristinachdr.mitacografo.domain.usecase
 
+import com.cristinachdr.mitacografo.domain.model.completarDescansos
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
@@ -30,7 +31,9 @@ class ObtenerInformeReglas
                 motor.evaluar(
                     ContextoReglas(
                         jornadas = j,
-                        descansos = d,
+                        // El tiempo entre jornadas cuenta como descanso aunque no esté apuntado (MT-46).
+                        descansos = completarDescansos(j, d),
+                        descansoEntreJornadas = true,
                         zonaReferencia = ajustes.zonaReferencia,
                         ahora = clock.instant(),
                         paisEmpresa = ajustes.paisEmpresa,

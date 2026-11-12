@@ -2,15 +2,12 @@ package com.cristinachdr.mitacografo.feature.startday
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
-import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.usecase.DatosInicio
-import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.domain.usecase.ProponerDatosInicio
@@ -40,10 +37,11 @@ data class IniciarJornadaUiState(
     val paises: PreferenciasPaises = PreferenciasPaises(),
     val ciudad: String = "",
     val observaciones: String = "",
-    /** «¿Descansaste desde…?»: desde el fin de la jornada anterior, si no hay descanso apuntado. */
+    /**
+     * Desde el fin de la jornada anterior, si no hay descanso apuntado: se enseña cuánto habrá descansado.
+     * No hace falta apuntarlo: el tiempo entre jornadas ya cuenta como descanso (MT-46).
+     */
     val propuestaDescanso: PropuestaDescanso? = null,
-    /** El conductor ha dicho que sí: al iniciar, se apunta el descanso hasta la hora de inicio. */
-    val apuntarDescanso: Boolean = false,
     val errorKm: ErrorCampo? = ErrorCampo.OBLIGATORIO,
     val errores: Set<ErrorJornada> = emptySet(),
     val cargando: Boolean = true,
@@ -70,7 +68,6 @@ class IniciarJornadaViewModel
         private val proponerDatosInicio: ProponerDatosInicio,
         private val obtenerPreferenciasPaises: ObtenerPreferenciasPaises,
         private val proponerDescansoPrevio: ProponerDescansoPrevio,
-        private val guardarDescanso: GuardarDescanso,
         private val clock: Clock,
     ) : ViewModel() {
         private val _uiState =
@@ -111,8 +108,6 @@ class IniciarJornadaViewModel
 
         fun onObservaciones(valor: String) = actualizar { copy(observaciones = valor) }
 
-        fun onApuntarDescanso(valor: Boolean) = actualizar { copy(apuntarDescanso = valor) }
-
         fun onIniciar() {
             val estado = _uiState.value
             val km = estado.km.toIntOrNull()
@@ -131,7 +126,6 @@ class IniciarJornadaViewModel
                     )
                 when (val resultado = iniciarJornada(datos)) {
                     is ResultadoJornada.Ok -> {
-                        estado.descansoAApuntar(datos.inicio)?.let { guardarDescanso(it) }
                         _uiState.update { it.copy(guardado = true) }
                     }
 
@@ -163,20 +157,3 @@ class IniciarJornadaViewModel
             return copy(errorKm = errorKm, errores = errores)
         }
     }
-
-/**
- * El descanso que se apunta al iniciar, si el conductor dijo que sí: desde el fin de la jornada
- * anterior hasta [inicio], en el país donde terminó. Solo se crea si lo confirma (espec. §8.5).
- */
-internal fun IniciarJornadaUiState.descansoAApuntar(inicio: Instant): Descanso? {
-    val propuesta = propuestaDescanso ?: return null
-    if (!apuntarDescanso || !inicio.isAfter(propuesta.desde)) return null
-    return Descanso(
-        inicio = propuesta.desde,
-        zonaInicio = propuesta.zona,
-        fin = inicio,
-        zonaFin = zona,
-        tipo = TipoDescanso.DESCANSO,
-        pais = propuesta.pais,
-    )
-}

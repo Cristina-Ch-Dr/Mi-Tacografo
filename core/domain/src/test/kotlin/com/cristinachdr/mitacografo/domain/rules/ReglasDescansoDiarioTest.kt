@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.domain.rules
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.completarDescansos
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
@@ -225,6 +226,42 @@ class ReglasDescansoDiarioTest {
             val r = evaluar(jornadas, listOf(descanso(hora(2, 20), h(10)))).reducidos()
 
             assertEquals(MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO, (r as Resultado.NoVerificado).motivo)
+        }
+    }
+
+    @Nested
+    inner class DescansoEntreJornadas {
+        private fun evaluarCalculando(jornadas: List<Jornada>) =
+            MotorReglas().evaluar(
+                ContextoReglas(
+                    jornadas,
+                    completarDescansos(jornadas, listOf(semanalPrevio)),
+                    ahora = ahora,
+                    descansoEntreJornadas = true,
+                ),
+            )
+
+        @Test
+        fun `el hueco entre jornadas cuenta como descanso aunque no este apuntado`() {
+            val lunes = jornada(2)
+            val martes = jornada(3)
+
+            assertTrue(evaluarCalculando(listOf(lunes, martes)).diaria(lunes) is Resultado.Cumple)
+        }
+
+        @Test
+        fun `despues de la ultima jornada sigue descansando`() {
+            val lunes = jornada(2)
+
+            assertTrue(evaluarCalculando(listOf(lunes)).diaria(lunes) is Resultado.Cumple)
+        }
+
+        @Test
+        fun `si la ultima jornada no deja 9 h dentro del plazo se excede`() {
+            // Del lunes 06:00 al martes 00:00: solo quedan 6 h del plazo de 24 h.
+            val larga = jornada(2).copy(fin = hora(3, 0))
+
+            assertTrue(evaluarCalculando(listOf(larga)).diaria(larga) is Resultado.Excedido)
         }
     }
 }

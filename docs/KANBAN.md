@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | — | MT-30 | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-29, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E5 – E7 | MT-47 | MT-48 | MT-46 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -195,6 +195,23 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] En Ajustes: «Sonido actual: …», «Escuchar el sonido» (con el volumen de notificaciones) y «Cambiar sonido o vibración», que abre la pantalla de Android del canal. «Probar aviso» ya existía (llega en 1 minuto).
   - El sonido se lee del canal cada vez que se vuelve a la pantalla: si el conductor elige otro tono en Android, la app lo muestra y reproduce ese (fallo que vio Cristina al probarlo).
 - [ ] Probar en el móvil del conductor con el móvil en vibración y con «No molestar».
+
+### MT-46 · Descanso entre jornadas, calculado solo · M · deps: MT-30 · *(petición del conductor)*
+- [x] El conductor tiene que tener en cuenta a la vez lo que conduce y lo que descansa. El tiempo entre el fin de una jornada y el inicio de la siguiente **cuenta como descanso** sin apuntarlo (`completarDescansos`): descansos calculados, con id negativo y el país donde acabó la jornada anterior. Si apuntó un descanso en ese hueco, manda lo apuntado; las pausas no cuentan.
+- [x] Lo usan las reglas (`ContextoReglas.descansoEntreJornadas`) y el Resumen. Sin jornada en curso, desde el fin de la última también está descansando: su descanso diario ya no sale ❔ «hueco sin descanso apuntado».
+- [x] **Historial:** cada jornada dice cuánto descansó antes y qué fue («Descanso antes: 12 h 36 min · Diario normal»). **Inicio:** «Descansando desde sáb 19:24 · 100 h 38 min». **Resumen y PDF:** total de descanso entre jornadas.
+- [x] **Iniciar jornada:** el interruptor «¿Descansaste desde…?» pasa a ser solo informativo («Descanso desde…: 13 h»), porque ya no hace falta apuntarlo.
+- [x] Textos en español y ucraniano. Corregido el aviso del Resumen, que aún decía que las reglas «llegarán con el motor».
+- [x] Probado en el emulador API 33 con la copia anonimizada.
+
+### MT-47 · Añadir jornadas pasadas a mano · M · deps: MT-46 · *(petición del conductor)*
+- [ ] Desde el Historial, «Añadir jornada»: inicio y fin, km, conducción del tacógrafo, países. Para lo que el tacógrafo registró pero la app no, y para pasar la libreta atrasada.
+- [ ] Mismas validaciones que al corregir (sin solaparse con otras jornadas) y se asigna al viaje de esas fechas, si hay.
+
+### MT-48 · Historial por semanas, con flechas · S · deps: MT-46 · *(propuesta de Cristina)*
+- [x] Para ver las semanas del mes pasado no hay que bajar mucho: arriba, «‹ Del 9 nov al 15 nov ›» como en el Resumen, y se ve una semana cada vez (empieza en la más reciente).
+- [x] Las flechas saltan a la semana más cercana **con jornadas** (las vacaciones no dejan pantallas vacías) y se desactivan en la primera y la última.
+- [x] Probado en el emulador API 33 con la libreta.
 
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
 - [x] `Viaje` (nombre, inicio y fin con zona, observaciones), puerto `ViajeRepository`, entidad, DAO y adaptador de Room.

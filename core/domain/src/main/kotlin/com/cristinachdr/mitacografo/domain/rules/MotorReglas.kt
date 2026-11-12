@@ -25,6 +25,11 @@ data class ContextoReglas(
      * `null` = desde el primer registro (jornada o descanso).
      */
     val datosDesde: Instant? = null,
+    /**
+     * `true` si el tiempo entre jornadas cuenta como descanso (MT-46): [descansos] ya trae los calculados
+     * y, sin jornada en curso, desde el fin de la última también se está descansando.
+     */
+    val descansoEntreJornadas: Boolean = false,
 ) {
     /** Los descansos con su clase (diario, fraccionado, semanal…), en orden. Se calculan una vez. */
     val clasificados: List<DescansoClasificado> by lazy { clasificarDescansos(descansos) }

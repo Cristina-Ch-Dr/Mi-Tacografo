@@ -40,6 +40,7 @@ import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
+import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
 import com.cristinachdr.mitacografo.ui.reglas.ChipEstado
 import com.cristinachdr.mitacografo.ui.reglas.textoIntervalo
@@ -122,6 +123,21 @@ fun HomeContent(
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
             )
+            // El tiempo desde la última jornada es descanso (MT-46): se cuenta solo.
+            state.descanso?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text =
+                        stringResource(
+                            R.string.inicio_descansando,
+                            it.desde.format(formatoDiaSemana()) + " " + it.desde.format(FormatoHora),
+                            textoDuracion(it.transcurrido),
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
             Spacer(Modifier.height(32.dp))
             BigButton(
                 text = stringResource(R.string.accion_iniciar_jornada),
