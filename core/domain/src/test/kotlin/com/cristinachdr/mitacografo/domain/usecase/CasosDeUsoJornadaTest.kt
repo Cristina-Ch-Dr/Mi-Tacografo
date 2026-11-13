@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
+import com.cristinachdr.mitacografo.domain.model.Viaje
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -215,6 +216,84 @@ class CasosDeUsoJornadaTest {
                 val resultado = editar(FakeJornadaRepository())(ayer)
 
                 assertEquals(ResultadoJornada.Invalida(ErrorJornada.JORNADA_NO_EXISTE), resultado)
+            }
+    }
+
+    @Nested
+    inner class Anadir {
+        /** Una jornada del 31 de octubre, de las que estaban solo en el tacógrafo. */
+        private val pasada =
+            Jornada(
+                inicio = hora(1, 6).minus(Duration.ofDays(1)),
+                zonaInicio = madrid,
+                kmInicio = 99_500,
+                paisInicio = " es ",
+                fin = hora(1, 4),
+                zonaFin = madrid,
+                kmFin = 100_000,
+                conduccionTacografo = Duration.ofHours(8),
+            )
+
+        private fun anadir(
+            repo: FakeJornadaRepository,
+            viajes: FakeViajeRepository = FakeViajeRepository(),
+        ) = AnadirJornada(repo, viajes, reloj)
+
+        @Test
+        fun `guarda una jornada pasada ya terminada sin programar avisos`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+
+                val id = (anadir(repo)(pasada) as ResultadoJornada.Ok).valor
+
+                val creada = repo.obtenerPorId(id)!!
+                assertEquals(500, creada.kmRecorridos)
+                assertEquals("ES", creada.paisInicio)
+                assertNull(creada.viajeId)
+                assertTrue(alarmas.programados.isEmpty())
+            }
+
+        @Test
+        fun `no deja que se solape con otra jornada`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer))
+
+                val resultado = anadir(repo)(pasada.copy(fin = hora(1, 7)))
+
+                assertEquals(ResultadoJornada.Invalida(ErrorJornada.SOLAPA_CON_OTRA_JORNADA), resultado)
+                assertEquals(1, repo.observarTodas().first().size)
+            }
+
+        @Test
+        fun `tiene que estar terminada`() =
+            runTest {
+                val resultado = anadir(FakeJornadaRepository())(pasada.copy(fin = null))
+
+                assertEquals(ResultadoJornada.Invalida(ErrorJornada.FALTA_EL_FIN), resultado)
+            }
+
+        @Test
+        fun `entra en el viaje de esas fechas`() =
+            runTest {
+                val repo = FakeJornadaRepository()
+                val viajes =
+                    FakeViajeRepository(
+                        listOf(
+                            Viaje(
+                                1,
+                                "Anterior",
+                                hora(1, 0).minus(Duration.ofDays(10)),
+                                madrid,
+                                fin = hora(1, 0).minus(Duration.ofDays(5)),
+                                zonaFin = madrid,
+                            ),
+                            Viaje(2, "Murcia - Kyiv", hora(1, 0).minus(Duration.ofDays(2)), madrid),
+                        ),
+                    )
+
+                val id = (anadir(repo, viajes)(pasada) as ResultadoJornada.Ok).valor
+
+                assertEquals(2L, repo.obtenerPorId(id)?.viajeId)
             }
     }
 

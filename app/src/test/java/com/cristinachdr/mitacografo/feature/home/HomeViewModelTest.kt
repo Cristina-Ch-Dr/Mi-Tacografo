@@ -5,11 +5,13 @@ import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
+import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,7 +20,9 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
@@ -43,15 +47,19 @@ class HomeViewModelTest {
         reloj: Clock,
         vararg jornadas: Jornada,
         descansos: FakeDescansoRepository = FakeDescansoRepository(),
+        ajustes: Ajustes = Ajustes(),
     ): HomeViewModel {
         val repo = FakeJornadaRepository(jornadas.toList())
+        val settings = FakeSettingsRepository(ajustes)
         return HomeViewModel(
             ObtenerJornadaActual(repo),
-            FakeSettingsRepository(),
+            settings,
             descansos,
             FakeViajeRepository(),
+            repo,
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
             TerminarPausa(descansos, reloj),
+            ObtenerInformeReglas(repo, descansos, settings, reloj),
             reloj,
         )
     }
@@ -144,5 +152,67 @@ class HomeViewModelTest {
 
             assertNull(vm.uiState.value.pausa)
             assertEquals(hora(11, 0), descansos.guardados.single().fin)
+        }
+
+    @Test
+    fun `avisa si faltan el pais de la empresa o el de residencia`() =
+        runTest {
+            val sinPaises = viewModel(Clock.fixed(hora(11, 0), madrid))
+            observar(sinPaises)
+            assertTrue(sinPaises.uiState.value.faltanPaises)
+
+            val conPaises =
+                viewModel(
+                    Clock.fixed(hora(11, 0), madrid),
+                    ajustes = Ajustes(paisEmpresa = "ES", paisResidencia = "UA"),
+                )
+            observar(conPaises)
+            assertFalse(conPaises.uiState.value.faltanPaises)
+        }
+
+    @Test
+    fun `esta semana muestra la conduccion y las ampliadas`() =
+        runTest {
+            val lunes =
+                Jornada(
+                    id = 1,
+                    inicio = hora(6, 0),
+                    zonaInicio = madrid,
+                    kmInicio = 0,
+                    fin = hora(17, 0),
+                    zonaFin = madrid,
+                    kmFin = 500,
+                    conduccionTacografo = Duration.ofHours(9).plusMinutes(30),
+                )
+            val vm = viewModel(Clock.fixed(hora(20, 0), madrid), lunes)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.semana.collect {} }
+
+            val semana = vm.semana.value!!
+            // Es la primera semana con datos: lo de antes de las 06:00 del lunes no se sabe.
+            assertEquals(Duration.ofHours(9).plusMinutes(30), semana.conduccion.min)
+            assertEquals(1, semana.ampliadas)
+        }
+
+    @Test
+    fun `sin jornada en curso cuenta el descanso desde la ultima`() =
+        runTest {
+            val ayer =
+                Jornada(
+                    id = 1,
+                    inicio = hora(6, 0).minus(Duration.ofDays(1)),
+                    zonaInicio = madrid,
+                    kmInicio = 0,
+                    fin = hora(18, 0).minus(Duration.ofDays(1)),
+                    zonaFin = madrid,
+                    kmFin = 500,
+                )
+            val vm = viewModel(Clock.fixed(hora(6, 0), madrid), ayer)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+
+            assertEquals(
+                Duration.ofHours(12),
+                vm.uiState.value.descanso
+                    ?.transcurrido,
+            )
         }
 }

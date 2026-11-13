@@ -1,6 +1,7 @@
 package com.cristinachdr.mitacografo.domain.usecase
 
 import com.cristinachdr.mitacografo.domain.model.ResumenPeriodo
+import com.cristinachdr.mitacografo.domain.model.completarDescansos
 import com.cristinachdr.mitacografo.domain.model.resumirPeriodo
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
@@ -30,7 +31,7 @@ class ObtenerResumen
             semanas: Int,
         ): Flow<ResumenPeriodo> =
             combine(jornadas.observarTodas(), descansos.observarTodos(), settings.observar()) { j, d, ajustes ->
-                resumirPeriodo(j, d, desde, semanas, ajustes.zonaReferencia)
+                resumirPeriodo(j, completarDescansos(j, d), desde, semanas, ajustes.zonaReferencia)
             }
 
         /** El lunes de la semana de hoy (en la zona de referencia, o la del móvil). */

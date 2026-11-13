@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E4 – E7 | — | MT-18 | — | MT-01 … MT-17, MT-20, MT-22, MT-32, MT-41 … MT-45 · MT-33B sin reglas · **v0.1.0 publicada** |
+| E5 – E7 | — | — | MT-47 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-46, MT-48 · MT-33B sin reglas · **v0.2.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -196,6 +196,26 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
   - El sonido se lee del canal cada vez que se vuelve a la pantalla: si el conductor elige otro tono en Android, la app lo muestra y reproduce ese (fallo que vio Cristina al probarlo).
 - [ ] Probar en el móvil del conductor con el móvil en vibración y con «No molestar».
 
+### MT-46 · Descanso entre jornadas, calculado solo · M · deps: MT-30 · *(petición del conductor)*
+- [x] El conductor tiene que tener en cuenta a la vez lo que conduce y lo que descansa. El tiempo entre el fin de una jornada y el inicio de la siguiente **cuenta como descanso** sin apuntarlo (`completarDescansos`): descansos calculados, con id negativo y el país donde acabó la jornada anterior. Si apuntó un descanso en ese hueco, manda lo apuntado; las pausas no cuentan.
+- [x] Lo usan las reglas (`ContextoReglas.descansoEntreJornadas`) y el Resumen. Sin jornada en curso, desde el fin de la última también está descansando: su descanso diario ya no sale ❔ «hueco sin descanso apuntado».
+- [x] **Historial:** cada jornada dice cuánto descansó antes y qué fue («Descanso antes: 12 h 36 min · Diario normal»). **Inicio:** «Descansando desde sáb 19:24 · 100 h 38 min». **Resumen y PDF:** total de descanso entre jornadas.
+- [x] **Iniciar jornada:** el interruptor «¿Descansaste desde…?» pasa a ser solo informativo («Descanso desde…: 13 h»), porque ya no hace falta apuntarlo.
+- [x] Textos en español y ucraniano. Corregido el aviso del Resumen, que aún decía que las reglas «llegarán con el motor».
+- [x] Probado en el emulador API 33 con la copia anonimizada.
+
+### MT-47 · Añadir jornadas pasadas a mano · M · deps: MT-46 · *(petición del conductor)*
+- [x] Desde el Historial, botón «Añadir jornada»: inicio y fin, km, países, ciudades, conducción del tacógrafo y observaciones. Para lo que el tacógrafo registró pero la app no, y para pasar la libreta atrasada. Es la misma pantalla que «Corregir jornada» (`RutaJornada(0)`), sin «Borrar».
+- [x] Propone de 06:00 a 16:00 el último día antes de hoy sin jornada: al pasar la libreta hacia atrás, cada vez propone el día que falta. Los km en blanco, para copiarlos del tacógrafo.
+- [x] `AnadirJornada`: tiene que estar terminada, las mismas validaciones que al corregir y sin solaparse con otras jornadas. Entra en el viaje de esas fechas, si hay. No programa avisos.
+- [x] Al añadirla, el descanso entre jornadas (MT-46), las reglas y el Resumen la cuentan solos.
+- [x] Textos en español y ucraniano. Probado en el emulador API 33 con la libreta: propone el día que falta, avisa si se solapa y la jornada del día siguiente pasa a tener su «Descanso antes».
+
+### MT-48 · Historial por semanas, con flechas · S · deps: MT-46 · *(propuesta de Cristina)*
+- [x] Para ver las semanas del mes pasado no hay que bajar mucho: arriba, «‹ Del 9 nov al 15 nov ›» como en el Resumen, y se ve una semana cada vez (empieza en la más reciente).
+- [x] Las flechas saltan a la semana más cercana **con jornadas** (las vacaciones no dejan pantallas vacías) y se desactivan en la primera y la última.
+- [x] Probado en el emulador API 33 con la libreta.
+
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
 - [x] `Viaje` (nombre, inicio y fin con zona, observaciones), puerto `ViajeRepository`, entidad, DAO y adaptador de Room.
 - [x] **Primera migración de verdad, 1 → 2** (`AutoMigration`): tabla `viaje` y clave ajena `jornada.viaje_id` con `ON DELETE SET NULL` (borrar un viaje no borra sus jornadas). Room rehace la tabla `jornada` copiando todas las filas.
@@ -206,6 +226,8 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Al iniciar una jornada con un viaje en curso, se asigna sola. Si se inicia un viaje con una jornada ya empezada, también entra. En Inicio sale «Viaje: …».
 - [x] Copia de seguridad con los viajes (`viajes`; las copias antiguas se siguen leyendo). Restaurar comprueba que ninguna jornada apunte a un viaje que no está en la copia.
 - [ ] Km por viaje en Resumen y PDF de un viaje (MT-33B).
+
+> 🏁 **Release v0.2.0** ✅ (9 nov 2026): viajes, descansos, resumen con PDF, sonido de los avisos y colores del logo. Probada actualizando en un emulador API 33 desde la v0.1.0 de la Release (las dos firmadas con la misma clave), con jornadas, descansos y una jornada en curso: la base de datos pasa de la versión 1 a la 2 sin perder nada y los avisos siguen programados.
 
 ---
 
@@ -228,8 +250,6 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Textos en español y ucraniano. Probado en el emulador API 33, en claro y oscuro.
 - [ ] Pendiente de decidir con el conductor: avisos durante la pausa (p. ej. a los 45 min) y si el ucraniano de los textos nuevos se entiende bien.
 
-> 🏁 **Release v0.2.0**
-
 ---
 
 ## E4 · Motor del Reglamento 561/2006 → **v0.3**
@@ -237,31 +257,46 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 > **TDD estricto:** primero los tests de la tabla §13 de la especificación y luego la regla. Antes de cada tarjeta, **releer el artículo** en EUR-Lex.
 
 ### MT-24 · Núcleo del motor, conducción y pausas · XL · (antes MT-24, MT-25 y MT-26)
-- [ ] `Resultado` (Cumple, Excedido, NoVerificado), `MotivoNoVerificado`, intervalo `[min, max]` y `RuleEngine`.
-- [ ] `AsignadorSemanas`: semana lunes 00:00 en la zona de referencia, reparto de la conducción con intervalos (T20) y asignación de semanales (D-2).
-- [ ] R-COND-1/2/3/4. Tests T1–T6 y T21.
-- [ ] R-PAUSA: ≤ 4 h 30 → Cumple; si no → No verificado. Test T22.
+- [x] Art. 4, 6 y 7 releídos en EUR-Lex (consolidado a 22/05/2024) antes de escribir las reglas: coinciden con la espec. §7.2 y §7.3.
+- [x] `Resultado` (Cumple, Excedido, NoVerificado), `MotivoNoVerificado`, `Intervalo [min, max]` con la comparación de §8.2, y `MotorReglas` con reglas independientes (`ReglaJornada`, `ReglaSemana`). Paquete `domain/rules`.
+- [x] `repartirPorSemanas`: semana de lunes 00:00 en la zona de referencia (o la de cada jornada). Una jornada que cruza el domingo reparte su conducción con un intervalo (T20); sin conducción apuntada, entre 0 y lo que duró; en curso, entre 0 y lo que lleva.
+  - La asignación de semanales (D-2) se hará con las reglas de descanso semanal (MT-28).
+- [x] R-COND-1/2/3/4. Tests T1–T6 y T21. La semana anterior a la primera apuntada cuenta como [0, 56 h] para las 90 h (`DATOS_INSUFICIENTES_PERIODO`).
+- [x] R-PAUSA: ≤ 4 h 30 → Cumple; si no → No verificado (`SIN_TRAMOS_CONDUCCION`). Test T22.
+- [x] Caso de uso `ObtenerInformeReglas` (se recalcula al corregir una jornada, T24). Aún sin pantalla: los chips llegan en MT-30.
 
 ### MT-27 · Reglas de descanso diario · L · deps: MT-24, MT-20
-- [ ] R-DD-1 (24 h, con huecos → No verificado) y R-DD-3 (máx. 3 reducidos). Tests T11 y T23.
+- [x] Art. 8.1–8.5 releídos (EUR-Lex bloqueaba la descarga: texto de legislation.gov.uk a 20/08/2020, ya con el Paquete de Movilidad; estos apartados no cambiaron).
+- [x] R-DD-1 (8.2), por jornada: después del descanso que la precede, otro descanso con ≥ 9 h dentro de las 24 h. Fraccionado 3 + 9 completo = cumple. Sin el descanso previo apuntado, o con un hueco sin nada apuntado de ≥ 9 h en el plazo → No verificado (`DESCANSO_NO_REGISTRADO`, T23). Mientras no han pasado las 24 h, sin resultado.
+- [x] R-DD-3 (8.4), por semana: reducidos desde el último semanal apuntado. > 3 → Excedido (T11). Sin semanal apuntado antes → `DATOS_INSUFICIENTES_PERIODO`; con jornadas seguidas sin descanso apuntado entre medias → `DESCANSO_NO_REGISTRADO`.
+- [x] 11 tests nuevos; los de conducción siguen igual.
 
 ### MT-28 · Reglas de descanso semanal (nacional e internacional) · XL · deps: MT-27
-- [ ] R-DS-1 (patrón bisemanal) y R-DS-2 (6 × 24 h).
-- [ ] R-DS-3: 2 reducidos consecutivos permitidos solo si **ambos** son fuera del país de la empresa y del de residencia, más la regla de 4 semanas. En otro caso se aplica el patrón nacional (espec. §7.7).
-- [ ] Motivos `SIN_PAIS_DESCANSO` y `PAISES_NO_CONFIGURADOS`, y aviso en Inicio si faltan los países.
-- [ ] Tests T15, T16, T17, T17b, T17c y T17d.
+- [x] Art. 8.6 y 8.9 releídos (legislation.gov.uk a 20/08/2020, con el Reglamento (UE) 2020/1054).
+- [x] D-2 (`asignarSemanales`): cada semanal cuenta en la semana en que empieza, salvo que ya tenga uno; entonces en la siguiente. ⚠️ Validar con la guía de la Comisión.
+- [x] R-DS-1 (patrón bisemanal): 2 normales o 1 normal + 1 reducido en dos semanas seguidas. Dos reducidos seguidos: solo si los dos son fuera de casa. Sin semanal apuntado y con un hueco de ≥ 24 h sin nada → `DESCANSO_NO_REGISTRADO`; semana anterior a los primeros datos → `DATOS_INSUFICIENTES_PERIODO`.
+- [x] R-DS-2 (6 × 24 h): el semanal empieza como muy tarde 144 h después de acabar el anterior (T15). Con un hueco de ≥ 24 h sin nada entre medias → No verificado.
+- [x] R-DS-3: 2 reducidos seguidos solo si **ambos** son fuera del país de la empresa y del de residencia, y en las 4 semanas desde el primero hay ≥ 4 semanales y ≥ 2 normales. Si no, se aplica el patrón nacional (espec. §7.7).
+- [x] Motivos `SIN_PAIS_DESCANSO` y `PAISES_NO_CONFIGURADOS` (los países van en `ContextoReglas`), y **aviso en Inicio** con «Ir a Ajustes» si faltan los países.
+- [x] Tests T15, T16, T17, T17b, T17c y T17d, más D-2 y casos límite (13 en total).
 
 ### MT-29 · Compensaciones · XL · deps: MT-28
-- [ ] Deudas (45 h − duración), fecha límite (fin de la 3ª semana siguiente), detección de compensación unida a un descanso ≥ 9 h, FIFO y estados.
-- [ ] R-DS-5: tras 2 reducidos consecutivos, el siguiente semanal va precedido de la compensación.
-- [ ] Tests T13, T14, T17e y T24. Resolver D-3.
+- [x] Art. 8.6 ter y 8.7 releídos: compensación equivalente, **en bloque**, antes del final de la 3ª semana siguiente, unida a un descanso de ≥ 9 h.
+- [x] `calcularDeudas`: deuda = 45 h − duración de cada reducido, fecha límite = lunes de 4 semanas después a las 00:00. Lo que un descanso tiene de más paga deudas enteras, de la más antigua a la más nueva (FIFO), si acaba antes del plazo. Estados `PENDIENTE`, `COMPENSADA`, `VENCIDA` y `NO_VERIFICADO` (hueco sin apuntar de ≥ deuda + 9 h). Van en `InformeReglas.deudas`.
+- [x] R-DS-4 en la semana del reducido (sin resultado mientras está pendiente) y R-DS-5: tras 2 reducidos seguidos, las dos deudas pagadas antes de acabar el siguiente semanal (vale la unida a ese mismo semanal).
+- [x] **D-3 resuelta:** cuenta como compensación lo que pasa de 45 h en un semanal normal y lo que pasa de 11 h en un diario. Limitación: un descanso de 24 h a < 45 h se toma siempre como semanal reducido (no se puede distinguir de diario + compensación con lo que se apunta).
+- [x] Tests T13, T14, T17e, D-3, FIFO, «en bloque» y estados (9). T24 ya estaba (MT-24).
 
 ### MT-30 · Semanas reales y estados en la UI · L · deps: MT-29 · (antes MT-30 y MT-31)
-- [ ] 2–3 semanas de la libreta, **anonimizadas**, como fixtures JSON. Comparar los resultados con lo que el conductor sabe que pasó.
-- [ ] Chips ✅⚠️❔ en Historial e Inicio, y el resumen semanal en Inicio (conducción X/56 h, ampliaciones X/2, reducidos X/3, deuda pendiente).
-- [ ] Pantalla de detalle del informe con la explicación de cada regla (textos traducidos).
+- [x] 1–17 de octubre de la libreta, **anonimizados** (solo horas, conducción y km, con el cuentakilómetros desplazado; sin lugares ni países) en `LibretaAnonimizada.kt`, y `LibretaRealTest` comparando con lo que él sumó a mano: S 29 h 16 exacta, S 43 h 08 y BS 72 h 24 dentro del intervalo del motor, ampliadas los días 3, 7 y 12, deudas de 21 h y 6 h 40. Va en Kotlin y no en JSON: el dominio no tiene librería de JSON y así es más fácil de leer.
+- [x] **Lo que enseñaron los datos reales:** la libreta empieza un jueves y el motor daba la primera semana como completa. Su BS de 90 h 01 salía «Cumple». Ahora lo de antes del primer dato es desconocido (`ContextoReglas.datosDesde`): sale «No verificado» en vez de un «Cumple» falso. Lo mismo con las ampliadas de esa semana. Y el motivo que se enseña es el de más horas de incertidumbre.
+- [x] Chips de estado en el Historial (cada jornada y cada semana, con «Ver el informe») y «Esta semana» en Inicio: conducción X / 56 h, días de más de 9 h X / 2, diarios reducidos X / 3 y lo que queda por compensar con su fecha.
+  - Iconos con color y texto al lado (no emojis: el ❔ apenas se veía) y descripción para TalkBack.
+  - La pausa no cuenta para el chip resumen: sin tramos casi siempre es ❔ (D-4) y taparía lo demás. Se ve en el informe.
+- [x] Pantalla **Informe de la semana**: cada regla con su estado, lo que dice el reglamento (con el artículo), el valor medido o el intervalo, y el motivo si no se puede saber; las deudas de la semana y las reglas de cada jornada. Textos en español y ucraniano.
+- [x] Probado en el emulador API 33 con la copia anonimizada.
 
-> 🏁 **Release v0.3.0**
+> 🏁 **Release v0.3.0** → probar en API 33 actualizando desde la v0.2.0 (sin cambios de base de datos en E4).
 
 ---
 

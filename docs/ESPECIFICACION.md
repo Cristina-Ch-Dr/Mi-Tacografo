@@ -621,7 +621,7 @@ Con un toque se crea el descanso. Es el usuario quien lo confirma, así que no s
 |---|---|---|
 | D-1 | ¿Qué zona horaria marca el «lunes 00:00»? | Zona de referencia configurable. Por defecto, la del país de la empresa. |
 | D-2 | ¿A qué semana se asigna un semanal que cae entre dos semanas? | A la semana en que empieza, salvo que esa semana ya tenga uno. En ese caso, a la siguiente. Validar con la guía de la Comisión. |
-| D-3 | ¿Qué parte de un descanso diario cuenta como compensación? | La que supera 11 h, unida a un descanso ≥ 9 h. Confirmar la interpretación. |
+| ~~D-3~~ | ~~¿Qué parte de un descanso diario cuenta como compensación?~~ | ✅ **Resuelto (MT-29):** lo que supera 45 h en un semanal normal y lo que supera 11 h en un diario (las 11 h ya son el descanso de ≥ 9 h al que va unida, art. 8.7), y en bloque (deuda entera). Un descanso de 24 h a < 45 h se toma como semanal reducido: con lo que se apunta no se distingue de diario + compensación. |
 | D-4 | ¿Se registran pausas o solo descansos? | Ambos son opcionales. Las pausas solo sirven para mostrar información, porque sin tramos de conducción no se puede verificar R-PAUSA. |
 | ~~D-5~~ | ~~`minSdk`~~ | ✅ **Resuelto:** el conductor tiene Android 13 (API 33) → **`minSdk = 26`** (Android 8.0, `java.time` nativo, sin *desugaring*). `targetSdk` y `compileSdk` = el último estable. Así cubre su móvil, móviles nuevos y casi cualquier móvil de un amigo. |
 | D-6 | `applicationId` | Elegir antes del primer APK. No se puede cambiar después. |

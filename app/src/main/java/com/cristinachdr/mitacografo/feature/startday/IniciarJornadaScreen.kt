@@ -66,7 +66,6 @@ fun IniciarJornadaScreen(
         onCiudad = viewModel::onCiudad,
         onObservaciones = viewModel::onObservaciones,
         onIniciar = viewModel::onIniciar,
-        onApuntarDescanso = viewModel::onApuntarDescanso,
     )
 }
 
@@ -80,7 +79,6 @@ fun IniciarJornadaContent(
     onObservaciones: (String) -> Unit,
     onIniciar: () -> Unit,
     modifier: Modifier = Modifier,
-    onApuntarDescanso: (Boolean) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -99,7 +97,7 @@ fun IniciarJornadaContent(
         val propuesta = estado.propuestaDescanso
         val duracion = estado.duracionDescanso
         if (propuesta != null && duracion != null) {
-            PropuestaDescansoCard(propuesta, duracion, estado.apuntarDescanso, onApuntarDescanso)
+            DescansoPrevioCard(propuesta, duracion)
         }
         CampoNumero(
             valor = estado.km,
@@ -130,16 +128,11 @@ fun IniciarJornadaContent(
     }
 }
 
-/**
- * «¿Descansaste desde el martes 19:40?» con un interruptor. No se apunta nada si no se activa:
- * es el conductor quien lo confirma, la app no se inventa el descanso.
- */
+/** «Descanso desde el martes 19:40: 11 h 20 min». Solo informa: el tiempo entre jornadas ya cuenta como descanso. */
 @Composable
-private fun PropuestaDescansoCard(
+private fun DescansoPrevioCard(
     propuesta: PropuestaDescanso,
     duracion: Duration,
-    apuntar: Boolean,
-    onApuntar: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val desde = propuesta.desde.atZone(propuesta.zona)
@@ -147,32 +140,15 @@ private fun PropuestaDescansoCard(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 stringResource(
-                    R.string.inicio_propuesta_descanso,
+                    R.string.inicio_descanso_previo,
                     "${desde.format(formatoDiaSemana())} ${desde.format(FormatoHora)}",
+                    textoDuracion(duracion),
                 ),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
             )
-            Text(
-                stringResource(R.string.inicio_propuesta_detalle, textoDuracion(duracion)),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp)
-                        .toggleable(value = apuntar, onValueChange = onApuntar, role = Role.Switch),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    stringResource(R.string.inicio_propuesta_si),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f),
-                )
-                Switch(checked = apuntar, onCheckedChange = null)
-            }
+            Text(stringResource(R.string.inicio_descanso_previo_detalle), style = MaterialTheme.typography.bodyLarge)
         }
     }
 }

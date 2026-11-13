@@ -82,6 +82,7 @@
     <string name="error_conduccion_negativa">Керування не може бути відʼємним.</string>
     <string name="error_conduccion_mayor">Керування довше, ніж робочий день.</string>
     <string name="error_solapa">Перетинається з іншим робочим днем: перевірте час початку й кінця.</string>
+    <string name="error_falta_fin">Бракує часу закінчення.</string>
 
     <!-- Avisos (notificaciones) -->
     <string name="canal_avisos_nombre">Нагадування робочого дня</string>
@@ -138,8 +139,7 @@
     <string name="pantalla_pendiente">Незабаром</string>
 
     <!-- Історія -->
-    <string name="historial_vacio">Ще немає робочих днів. Коли завершите перший, він з’явиться тут.</string>
-    <string name="historial_semana">Тиждень з %1$s по %2$s</string>
+    <string name="historial_vacio">Ще немає робочих днів. Коли завершите перший, він з’явиться тут. Попередні можна внести кнопкою «Додати робочий день».</string>
     <string name="historial_total_semana">%1$s км · %2$s водіння</string>
     <string name="historial_total_semana_incompleta">%1$s км · %2$s водіння (не все записано)</string>
     <string name="historial_dia">%1$s · %2$s</string>
@@ -152,6 +152,9 @@
 
     <!-- Деталі та редагування робочого дня -->
     <string name="editar_titulo">Робочий день</string>
+    <string name="editar_titulo_nueva">Додати робочий день</string>
+    <string name="editar_nueva_ayuda">Для робочого дня, який є в тахографі чи в записнику, але не в застосунку. Перепишіть час, км і керування з тахографа.</string>
+    <string name="accion_anadir_jornada">Додати робочий день</string>
     <string name="editar_seccion_inicio">Початок</string>
     <string name="editar_seccion_fin">Кінець</string>
     <string name="editar_en_curso_ayuda">Цей робочий день ще триває: кінець записується кнопкою «Завершити робочий день» на головній.</string>
@@ -196,7 +199,7 @@
     <string name="descanso_titulo">Відпочинок</string>
     <string name="descanso_titulo_nuevo">Новий відпочинок</string>
     <string name="descansos_vacio">Ще немає перерв і відпочинку. Під час робочого дня натисніть «Почати перерву»; щоб записати минулий, натисніть «Додати».</string>
-    <string name="descansos_explicacion">Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами. Це орієнтовно: правила регламенту ще не перевіряються.</string>
+    <string name="descansos_explicacion">Час між двома робочими днями вже рахується як відпочинок автоматично: тут записуються перерви та відпочинок, який був не між робочими днями. Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами.</string>
     <string name="accion_anadir_descanso">Додати</string>
     <string name="descanso_tipo">Що це було?</string>
     <string name="tipo_pausa">Перерва (під час робочого дня)</string>
@@ -223,9 +226,6 @@
     <string name="accion_iniciar_pausa">Почати перерву</string>
     <string name="accion_terminar_pausa">Закінчити перерву</string>
     <string name="inicio_pausa_en_curso">Перерва з %1$s · %2$s</string>
-    <string name="inicio_propuesta_descanso">Ви відпочивали з %1$s?</string>
-    <string name="inicio_propuesta_detalle">Буде записано відпочинок тривалістю %1$s, до часу початку.</string>
-    <string name="inicio_propuesta_si">Так, записати відпочинок</string>
 
     <!-- Resumen y PDF (MT-32, MT-33B) -->
     <string name="resumen_semana">Тиждень</string>
@@ -242,9 +242,9 @@
     <string name="resumen_km_por_dia">Пробіг по днях</string>
     <string name="resumen_descansos">Відпочинок</string>
     <string name="resumen_deuda">Компенсувати (скорочені тижневі): %1$s</string>
-    <string name="resumen_sin_descansos">У цьому періоді немає записаного відпочинку.</string>
+    <string name="resumen_sin_descansos">У цьому періоді немає відпочинку.</string>
     <string name="resumen_semana_de">Тиждень з %1$s</string>
-    <string name="resumen_aviso_reglas">Правила регламенту ще не перевіряються: це з’явиться разом із перевіркою правил.</string>
+    <string name="resumen_aviso_reglas">Правила регламенту (керування, перерви, відпочинок) дивіться в Історії: «Переглянути звіт» кожного тижня.</string>
     <string name="accion_compartir_pdf">Поділитися PDF</string>
     <string name="accion_guardar_pdf">Зберегти PDF</string>
     <string name="pdf_guardado">PDF збережено.</string>
@@ -309,4 +309,70 @@
         <item quantity="many">%1$s км · %2$d робочих днів</item>
         <item quantity="other">%1$s км · %2$d робочого дня</item>
     </plurals>
+
+    <!-- Reglas de descanso semanal (MT-28) -->
+    <string name="inicio_faltan_paises">Щоб перевіряти скорочений тижневий відпочинок поза домом, вкажіть у налаштуваннях країну компанії та країну, де ви живете.</string>
+    <string name="accion_ir_ajustes">Перейти до налаштувань</string>
+
+    <!-- Reglas en la app (MT-30) -->
+    <string name="estado_cumple">Відповідає</string>
+    <string name="estado_excedido">Перевищено</string>
+    <string name="estado_no_verificado">Не перевірено</string>
+    <string name="regla_conduccion_diaria">Керування за день</string>
+    <string name="regla_conduccion_diaria_exp">Не більше 9 год; до 10 год двічі на тиждень (ст. 6.1).</string>
+    <string name="regla_ampliaciones">Дні понад 9 год</string>
+    <string name="regla_ampliaciones_exp">Не більше 2 на тиждень (ст. 6.1).</string>
+    <string name="regla_conduccion_semanal">Керування за тиждень</string>
+    <string name="regla_conduccion_semanal_exp">Не більше 56 год (ст. 6.2).</string>
+    <string name="regla_conduccion_bisemanal">Керування за 2 тижні</string>
+    <string name="regla_conduccion_bisemanal_exp">Цей і попередній тиждень разом — не більше 90 год (ст. 6.3).</string>
+    <string name="regla_pausa">Перерва</string>
+    <string name="regla_pausa_exp">Після 4 год 30 хв керування — 45 хв (або 15 + 30) (ст. 7).</string>
+    <string name="regla_descanso_diario">Щоденний відпочинок</string>
+    <string name="regla_descanso_diario_exp">Щонайменше 9 год протягом 24 год після попереднього відпочинку (ст. 8.2).</string>
+    <string name="regla_reducidos">Скорочені щоденні</string>
+    <string name="regla_reducidos_exp">Не більше 3 між двома тижневими відпочинками (ст. 8.4).</string>
+    <string name="regla_semanal">Тижневий відпочинок</string>
+    <string name="regla_semanal_exp">За 2 тижні: 2 звичайних або 1 звичайний і 1 скорочений (ст. 8.6).</string>
+    <string name="regla_seis_periodos">Строк тижневого</string>
+    <string name="regla_seis_periodos_exp">Починається не пізніше ніж через 6 × 24 год після попереднього (ст. 8.6).</string>
+    <string name="regla_fuera_de_casa">Скорочені поза домом</string>
+    <string name="regla_fuera_de_casa_exp">2 скорочені поспіль — лише поза країною компанії та країною проживання, і 2 звичайних за 4 тижні (ст. 8.6).</string>
+    <string name="regla_compensacion">Компенсація</string>
+    <string name="regla_compensacion_exp">Те, чого скороченому бракує до 45 год, — одним блоком до кінця 3-го наступного тижня (ст. 8.6b).</string>
+    <string name="regla_compensacion_antes">Компенсація після 2 скорочених</string>
+    <string name="regla_compensacion_antes_exp">Наступному тижневому має передувати компенсація обох (ст. 8.6b).</string>
+    <string name="motivo_sin_conduccion">В якомусь робочому дні не записано керування з тахографа.</string>
+    <string name="motivo_sin_tramos">Додаток знає лише загальний час керування, а не коли саме ви їхали.</string>
+    <string name="motivo_descanso_no_registrado">Є проміжок без записаного відпочинку: можливо, ви відпочивали, але не записали.</string>
+    <string name="motivo_cruza_semana">Робочий день переходить через північ неділі, і невідомо, скільки ви їхали з кожного боку.</string>
+    <string name="motivo_datos_insuficientes">Бракує даних за час до початку користування додатком.</string>
+    <string name="motivo_sin_pais">Не вказано країну якогось скороченого тижневого відпочинку.</string>
+    <string name="motivo_paises">У налаштуваннях не вказано країну компанії або країну проживання.</string>
+    <string name="semana_reglas_titulo">Цей тиждень</string>
+    <string name="semana_conduccion">Керування: %1$s / 56 год</string>
+    <string name="semana_ampliaciones">Дні понад 9 год: %1$d / 2</string>
+    <string name="semana_reducidos">Скорочені щоденні: %1$d / 3</string>
+    <string name="semana_deuda">Компенсувати: %1$s до %2$s включно</string>
+    <string name="accion_ver_informe">Переглянути звіт</string>
+    <string name="informe_titulo">Звіт за тиждень</string>
+    <string name="informe_aviso">Орієнтовно: залежить від того, що записано. Не замінює тахограф.</string>
+    <string name="informe_reglas_semana">Правила тижня</string>
+    <string name="informe_reglas_jornadas">Правила кожного робочого дня</string>
+    <string name="informe_valor">%1$s (межа %2$s)</string>
+    <string name="informe_cuenta">%1$d (не більше %2$d)</string>
+    <string name="informe_cuenta_minimo">%1$d (потрібно щонайменше %2$d)</string>
+    <string name="intervalo">від %1$s до %2$s</string>
+    <string name="informe_sin_reglas">Для цього тижня ще немає результатів.</string>
+    <string name="informe_deudas">Відпочинок до компенсації</string>
+    <string name="deuda_pendiente">%1$s, до %2$s включно</string>
+    <string name="deuda_compensada">%1$s, компенсовано</string>
+    <string name="deuda_vencida">%1$s, строк минув %2$s</string>
+    <string name="deuda_no_verificada">%1$s: невідомо, чи компенсовано</string>
+    <!-- Descanso entre jornadas (MT-46) -->
+    <string name="inicio_descansando">Відпочинок з %1$s · %2$s</string>
+    <string name="historial_descanso_antes">Відпочинок перед цим: %1$s · %2$s</string>
+    <string name="resumen_tiempo_descanso">Відпочинок (між робочими днями)</string>
+    <string name="inicio_descanso_previo">Відпочинок з %1$s: %2$s</string>
+    <string name="inicio_descanso_previo_detalle">Час між робочими днями рахується як відпочинок автоматично: записувати його не треба.</string>
 </resources>

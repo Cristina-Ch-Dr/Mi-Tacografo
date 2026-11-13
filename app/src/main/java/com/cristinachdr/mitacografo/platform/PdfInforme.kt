@@ -209,6 +209,7 @@ private class Maquetador(
                     t.s(R.string.resumen_conduccion) to
                         t.duracion(r.conduccion) + if (r.conduccionCompleta) "" else " *",
                 )
+                add(t.s(R.string.resumen_tiempo_descanso) to t.duracion(r.tiempoDescanso))
                 CLASES_RESUMEN.forEach { clase ->
                     val n = r.cuantos(clase)
                     if (n > 0) add(t.clase(clase, Duration.ZERO).substringBefore(" ·") to n.toString())

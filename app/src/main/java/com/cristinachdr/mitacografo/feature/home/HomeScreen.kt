@@ -40,7 +40,10 @@ import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
+import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
+import com.cristinachdr.mitacografo.ui.reglas.ChipEstado
+import com.cristinachdr.mitacografo.ui.reglas.textoIntervalo
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.textoKm
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
@@ -56,16 +59,22 @@ import java.time.format.FormatStyle
 fun HomeScreen(
     onIniciarJornada: () -> Unit,
     onFinalizarJornada: () -> Unit,
+    onAjustes: () -> Unit = {},
+    onInforme: (LocalDate) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
+    val semana by viewModel.semana.collectAsStateWithLifecycle()
     HomeContent(
         state = estado,
         onIniciarJornada = onIniciarJornada,
         onFinalizarJornada = onFinalizarJornada,
         onIniciarPausa = viewModel::onIniciarPausa,
         onTerminarPausa = viewModel::onTerminarPausa,
+        onAjustes = onAjustes,
         permisos = { EstadoPermisosAvisos(soloSiFalta = true) },
+        semana = semana,
+        onInforme = onInforme,
     )
 }
 
@@ -78,7 +87,10 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     onIniciarPausa: () -> Unit = {},
     onTerminarPausa: () -> Unit = {},
+    onAjustes: () -> Unit = {},
     permisos: @Composable () -> Unit = {},
+    semana: ResumenSemanaUi? = null,
+    onInforme: (LocalDate) -> Unit = {},
 ) {
     Column(
         modifier =
@@ -91,6 +103,10 @@ fun HomeContent(
     ) {
         // Solo aparece si faltan permisos para que los avisos lleguen.
         permisos()
+        if (state.faltanPaises) {
+            Spacer(Modifier.height(12.dp))
+            AvisoPaises(onAjustes)
+        }
         Spacer(Modifier.height(16.dp))
         Text(
             text = state.hoy.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
@@ -107,6 +123,21 @@ fun HomeContent(
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
             )
+            // El tiempo desde la última jornada es descanso (MT-46): se cuenta solo.
+            state.descanso?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text =
+                        stringResource(
+                            R.string.inicio_descansando,
+                            it.desde.format(formatoDiaSemana()) + " " + it.desde.format(FormatoHora),
+                            textoDuracion(it.transcurrido),
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+            }
             Spacer(Modifier.height(32.dp))
             BigButton(
                 text = stringResource(R.string.accion_iniciar_jornada),
@@ -123,6 +154,63 @@ fun HomeContent(
                 onClick = onFinalizarJornada,
                 icon = Icons.Filled.Done,
             )
+        }
+        semana?.let {
+            Spacer(Modifier.height(24.dp))
+            EstaSemana(it, onInforme = { onInforme(it.lunes) })
+        }
+    }
+}
+
+/** Lo que el conductor sumaba a mano en la libreta (S, ampliaciones, reducidos), con el estado de las reglas. */
+@Composable
+private fun EstaSemana(
+    semana: ResumenSemanaUi,
+    onInforme: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.semana_reglas_titulo),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                semana.estado?.let { ChipEstado(it) }
+            }
+            Text(
+                stringResource(R.string.semana_conduccion, textoIntervalo(semana.conduccion)),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                stringResource(R.string.semana_ampliaciones, semana.ampliadas),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            semana.reducidos?.let {
+                Text(stringResource(R.string.semana_reducidos, it), style = MaterialTheme.typography.bodyLarge)
+            }
+            semana.deuda?.let { deuda ->
+                val hasta =
+                    deuda.fechaLimite
+                        .atZone(deuda.semanal.zonaInicio)
+                        .toLocalDate()
+                        .minusDays(1)
+                Text(
+                    stringResource(R.string.semana_deuda, textoDuracion(deuda.horas), hasta.format(formatoFecha())),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            OutlinedButton(onClick = onInforme, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.accion_ver_informe))
+            }
         }
     }
 }
@@ -200,6 +288,29 @@ private fun JornadaEnCursoCard(
                     hora = stringResource(R.string.inicio_proximo_aviso, aviso.hora.format(FormatoHora)),
                     detalle = stringResource(R.string.inicio_proximo_aviso_jornada, textoDuracion(aviso.desdeInicio)),
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Sin el país de la empresa y el de residencia no se puede saber si un semanal reducido se tomó
+ * fuera de casa (R-DS-3). Se avisa hasta que se completen en Ajustes.
+ */
+@Composable
+private fun AvisoPaises(
+    onAjustes: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.inicio_faltan_paises), style = MaterialTheme.typography.bodyLarge)
+            OutlinedButton(onClick = onAjustes, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.accion_ir_ajustes))
             }
         }
     }
