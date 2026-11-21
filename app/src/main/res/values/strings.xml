@@ -359,6 +359,8 @@
     <string name="informe_valor">%1$s (límite %2$s)</string>
     <string name="informe_cuenta">%1$d (como mucho %2$d)</string>
     <string name="informe_cuenta_minimo">%1$d (hacen falta al menos %2$d)</string>
+    <string name="informe_semanales">Semanales: %1$d (hacen falta %2$d) · normales: %3$d (hace falta al menos %4$d)</string>
+    <string name="informe_reducidos_en_casa">Los dos reducidos seguidos no fueron fuera de casa: alguno se tomó en el país de la empresa o en el de residencia, y ahí no valen.</string>
     <string name="intervalo">entre %1$s y %2$s</string>
     <string name="informe_sin_reglas">Todavía no hay resultados para esta semana.</string>
     <string name="informe_deudas">Descansos por compensar</string>
