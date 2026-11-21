@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | MT-49, MT-33, MT-33B, MT-50 | — | MT-51 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48 · MT-33B sin reglas · **v0.3.0 publicada** |
+| E5 – E7 | MT-33, MT-33B, MT-50 | — | MT-49 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48, MT-51 · MT-33B sin reglas · **v0.3.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -235,9 +235,9 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [ ] Km de hoy y del viaje en Inicio (en su app están; aquí el viaje sale con su nombre). Se deja para cuando lo pida.
 
 ### MT-49 · Texto claro en «Descanso semanal» del informe · S · deps: MT-30 · *(visto al probar la v0.3.0)*
-- [ ] Con dos semanales reducidos seguidos en casa, el informe decía «2 (hacen falta al menos 2)» y «Excedido»: parecía un error. Decir cuántos semanales y cuántos normales hay y cuántos hacen falta, en «Descanso semanal» y en «Reducidos fuera de casa».
-- [ ] Si los dos reducidos fueron en el país de la empresa o de residencia, decirlo.
-- [ ] Textos en español y ucraniano, y tests.
+- [x] Con dos semanales reducidos seguidos en casa, el informe decía «2 (hacen falta al menos 2)» y «Excedido»: parecía un error. Ahora: «Semanales: 2 (hacen falta 2) · normales: 0 (hace falta al menos 1)», y en «Reducidos fuera de casa» lo mismo con 4 y 2 (antes solo contaba los normales). `Detalle.normales` y `minimoNormales`.
+- [x] Si los dos reducidos no fueron fuera de casa, lo dice en rojo (`Detalle.reducidosEnCasa`).
+- [x] Textos en español y ucraniano, y tests (T17 y T17b comprueban el detalle). Probado en el emulador API 33 con dos reducidos seguidos en España.
 
 ### MT-50 · Conducción antes de medianoche del domingo · M · deps: MT-30 · *(idea de la libreta del conductor)*
 - [ ] El 04/10 trabajó la noche del domingo al lunes y repartió a mano la conducción entre las dos semanas. La app solo tiene el total, así que la conducción de esas semanas sale como un intervalo y a veces «No verificado» (`JORNADA_CRUZA_SEMANA`).

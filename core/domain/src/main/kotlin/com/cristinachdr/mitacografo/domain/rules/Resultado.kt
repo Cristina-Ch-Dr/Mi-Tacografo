@@ -107,6 +107,11 @@ data class Detalle(
     val maximo: Int? = null,
     /** Para las reglas que piden un mínimo (semanales en 2 semanas, normales en 4…). */
     val minimo: Int? = null,
+    /** En las de descanso semanal: cuántos de los semanales contados son normales, y cuántos hacen falta (MT-49). */
+    val normales: Int? = null,
+    val minimoNormales: Int? = null,
+    /** Dos reducidos seguidos, y alguno en el país de la empresa o de residencia: ahí no valen (MT-49). */
+    val reducidosEnCasa: Boolean = false,
     /** Solo en la conducción diaria: si la jornada pasa de 9 h (cuenta como ampliada). */
     val ampliada: Boolean? = null,
 )

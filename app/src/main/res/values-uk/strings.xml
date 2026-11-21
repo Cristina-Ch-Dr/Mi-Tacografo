@@ -364,6 +364,8 @@
     <string name="informe_valor">%1$s (межа %2$s)</string>
     <string name="informe_cuenta">%1$d (не більше %2$d)</string>
     <string name="informe_cuenta_minimo">%1$d (потрібно щонайменше %2$d)</string>
+    <string name="informe_semanales">Тижневих: %1$d (потрібно %2$d) · звичайних: %3$d (потрібно щонайменше %4$d)</string>
+    <string name="informe_reducidos_en_casa">Два скорочені поспіль були не за межами дому: якийсь із них узято в країні компанії або проживання, а там вони не зараховуються.</string>
     <string name="intervalo">від %1$s до %2$s</string>
     <string name="informe_sin_reglas">Для цього тижня ще немає результатів.</string>
     <string name="informe_deudas">Відпочинок до компенсації</string>
