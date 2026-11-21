@@ -16,12 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -60,6 +62,7 @@ fun HistoryScreen(
     modifier: Modifier = Modifier,
     onSemana: (LocalDate) -> Unit = {},
     onNueva: () -> Unit = {},
+    onResumen: () -> Unit = {},
     viewModel: HistorialViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,6 +71,7 @@ fun HistoryScreen(
             estado = estado,
             onJornada = onJornada,
             onSemana = onSemana,
+            onResumen = onResumen,
             onAnterior = viewModel::onAnterior,
             onSiguiente = viewModel::onSiguiente,
         )
@@ -93,6 +97,7 @@ fun HistorialContent(
     onJornada: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onSemana: (LocalDate) -> Unit = {},
+    onResumen: () -> Unit = {},
     onAnterior: () -> Unit = {},
     onSiguiente: () -> Unit = {},
 ) {
@@ -106,6 +111,7 @@ fun HistorialContent(
     }
     val semana = estado.semana ?: return
     Column(modifier.fillMaxSize()) {
+        Totales(estado, onResumen)
         SelectorSemana(semana, estado, onAnterior, onSiguiente)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -124,6 +130,43 @@ fun HistorialContent(
                     onClick = { onJornada(jornada.id) },
                 )
             }
+        }
+    }
+}
+
+/**
+ * Arriba del Historial, como en la app que se hizo el conductor: lo que lleva en total y el botón al Resumen
+ * (con el PDF), que desde MT-51 ya no es una pestaña.
+ */
+@Composable
+private fun Totales(
+    estado: HistorialUiState,
+    onResumen: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.historial_total_titulo),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                stringResource(R.string.historial_total_km, textoKm(estado.kmTotal)),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                stringResource(R.string.historial_total_conduccion, textoDuracion(estado.conduccionTotal)),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        OutlinedButton(onClick = onResumen) {
+            Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+            Text(stringResource(R.string.accion_resumen_pdf))
         }
     }
 }

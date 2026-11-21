@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | — | — | MT-47 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-46, MT-48 · MT-33B sin reglas · **v0.2.0 publicada** |
+| E5 – E7 | MT-49, MT-33, MT-33B, MT-50 | MT-51 (Inicio) | MT-51 (pestañas) | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48 · MT-33B sin reglas · **v0.3.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -216,6 +216,31 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Las flechas saltan a la semana más cercana **con jornadas** (las vacaciones no dejan pantallas vacías) y se desactivan en la primera y la última.
 - [x] Probado en el emulador API 33 con la libreta.
 
+### MT-51 · Navegación como la app del conductor · L · *(petición del conductor)*
+> Le costaba moverse por la app y se hizo con una IA otra (una página web dentro de una app) que entiende mejor. Se copia su organización, no sus colores ni su código. La carpeta `App de ejemplo/` está en el `.gitignore`: lleva la clave de firma de esa app.
+
+**Parte 1 · Pestañas**
+- [x] Abajo, como en su app: **Inicio · Viajes · Descanso · Historial**. Descanso pasa a ser pestaña (se quita el icono de la cama de arriba) y Resumen deja de serlo.
+- [x] **Descanso:** por semanas, los descansos entre una jornada y la siguiente (calculados, «Entre jornadas») junto a lo apuntado a mano. Para él, «descanso» es el de entre jornadas, no la pausa de 45 min. `ObtenerDescansos` ahora completa con los calculados (test nuevo).
+- [x] **Historial:** arriba, el total de km y conducción y el botón «Resumen y PDF», que abre el Resumen de antes con flecha atrás.
+- [x] Textos en español y ucraniano. Probado en el emulador API 33 con una copia de prueba inventada (solo horas y km).
+
+**Parte 2 · Inicio**
+- [ ] Avisos arriba en un recuadro de color (13 h de jornada, plazo del semanal…).
+- [ ] Iniciar y finalizar la jornada en la misma pantalla, sin pasar a otra.
+- [ ] Contadores con barra y «restan»: semana (56 h), dos semanas (90 h), días de más de 9 h, diarios reducidos, cuándo tiene que empezar el semanal y lo que queda por compensar. Km de hoy y del viaje.
+
+### MT-49 · Texto claro en «Descanso semanal» del informe · S · deps: MT-30 · *(visto al probar la v0.3.0)*
+- [ ] Con dos semanales reducidos seguidos en casa, el informe decía «2 (hacen falta al menos 2)» y «Excedido»: parecía un error. Decir cuántos semanales y cuántos normales hay y cuántos hacen falta, en «Descanso semanal» y en «Reducidos fuera de casa».
+- [ ] Si los dos reducidos fueron en el país de la empresa o de residencia, decirlo.
+- [ ] Textos en español y ucraniano, y tests.
+
+### MT-50 · Conducción antes de medianoche del domingo · M · deps: MT-30 · *(idea de la libreta del conductor)*
+- [ ] El 04/10 trabajó la noche del domingo al lunes y repartió a mano la conducción entre las dos semanas. La app solo tiene el total, así que la conducción de esas semanas sale como un intervalo y a veces «No verificado» (`JORNADA_CRUZA_SEMANA`).
+- [ ] Si una jornada cruza la medianoche del domingo, un campo opcional «Conducción antes de medianoche» al finalizarla y al corregirla o añadirla.
+- [ ] Con el dato, el reparto por semanas es exacto (T20). Migración de la base de datos (columna nueva, opcional) y copia de seguridad que siga leyendo las antiguas.
+- [ ] Textos en español y ucraniano, y tests.
+
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
 - [x] `Viaje` (nombre, inicio y fin con zona, observaciones), puerto `ViajeRepository`, entidad, DAO y adaptador de Room.
 - [x] **Primera migración de verdad, 1 → 2** (`AutoMigration`): tabla `viaje` y clave ajena `jornada.viaje_id` con `ON DELETE SET NULL` (borrar un viaje no borra sus jornadas). Room rehace la tabla `jornada` copiando todas las filas.
@@ -278,6 +303,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] R-DS-2 (6 × 24 h): el semanal empieza como muy tarde 144 h después de acabar el anterior (T15). Con un hueco de ≥ 24 h sin nada entre medias → No verificado.
 - [x] R-DS-3: 2 reducidos seguidos solo si **ambos** son fuera del país de la empresa y del de residencia, y en las 4 semanas desde el primero hay ≥ 4 semanales y ≥ 2 normales. Si no, se aplica el patrón nacional (espec. §7.7).
 - [x] Motivos `SIN_PAIS_DESCANSO` y `PAISES_NO_CONFIGURADOS` (los países van en `ContextoReglas`), y **aviso en Inicio** con «Ir a Ajustes» si faltan los países.
+  - **Países del conductor** (confirmado el 13 nov 2026): vive en España y trabaja para una empresa española. En su móvil, Ajustes → país de la empresa y de residencia: **España** los dos. Así, dos semanales reducidos seguidos solo valen si los dos se toman fuera de España.
 - [x] Tests T15, T16, T17, T17b, T17c y T17d, más D-2 y casos límite (13 en total).
 
 ### MT-29 · Compensaciones · XL · deps: MT-28
@@ -296,7 +322,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Pantalla **Informe de la semana**: cada regla con su estado, lo que dice el reglamento (con el artículo), el valor medido o el intervalo, y el motivo si no se puede saber; las deudas de la semana y las reglas de cada jornada. Textos en español y ucraniano.
 - [x] Probado en el emulador API 33 con la copia anonimizada.
 
-> 🏁 **Release v0.3.0** → probar en API 33 actualizando desde la v0.2.0 (sin cambios de base de datos en E4).
+> 🏁 **Release v0.3.0** ✅ (13 nov 2026): motor del Reglamento 561/2006 con «No verificado», chips en Historial e Inicio, informe de la semana, descanso entre jornadas calculado solo, Historial por semanas y añadir jornadas pasadas. Probada actualizando en un emulador API 33 desde la v0.2.0 de la Release (las dos firmadas con la misma clave): sin cambios de base de datos, siguen las 10 jornadas y la jornada en curso.
 
 ---
 

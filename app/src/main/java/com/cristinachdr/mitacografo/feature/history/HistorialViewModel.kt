@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import java.time.Duration
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -31,6 +32,12 @@ data class HistorialUiState(
     val elegida: LocalDate? = null,
 ) {
     val vacio: Boolean get() = !cargando && semanas.isEmpty()
+
+    /** Los km de todas las jornadas apuntadas, arriba del Historial (MT-51). */
+    val kmTotal: Int get() = semanas.sumOf { it.km }
+
+    /** La conducción del tacógrafo de todas las jornadas apuntadas. */
+    val conduccionTotal: Duration get() = semanas.fold(Duration.ZERO) { total, semana -> total + semana.conduccion }
 
     /** Posición de la semana que se ve en [semanas] (0 = la más reciente). */
     private val indice: Int get() = semanas.indexOfFirst { it.lunes == elegida }.coerceAtLeast(0)
