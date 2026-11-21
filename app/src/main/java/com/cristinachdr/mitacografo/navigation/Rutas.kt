@@ -18,10 +18,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object RutaAjustes
 
-@Serializable data object RutaIniciarJornada
-
-@Serializable data object RutaFinalizarJornada
-
 /** Lista de pausas y descansos: la pestaña Descanso (MT-51). */
 @Serializable data object RutaDescansos
 

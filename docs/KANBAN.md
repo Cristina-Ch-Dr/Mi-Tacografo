@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | MT-49, MT-33, MT-33B, MT-50 | MT-51 (Inicio) | MT-51 (pestañas) | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48 · MT-33B sin reglas · **v0.3.0 publicada** |
+| E5 – E7 | MT-49, MT-33, MT-33B, MT-50 | — | MT-51 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48 · MT-33B sin reglas · **v0.3.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -226,9 +226,13 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Textos en español y ucraniano. Probado en el emulador API 33 con una copia de prueba inventada (solo horas y km).
 
 **Parte 2 · Inicio**
-- [ ] Avisos arriba en un recuadro de color (13 h de jornada, plazo del semanal…).
-- [ ] Iniciar y finalizar la jornada en la misma pantalla, sin pasar a otra.
-- [ ] Contadores con barra y «restan»: semana (56 h), dos semanas (90 h), días de más de 9 h, diarios reducidos, cuándo tiene que empezar el semanal y lo que queda por compensar. Km de hoy y del viaje.
+- [x] **Avisos arriba**, en naranja o en rojo y siempre con texto (`AvisoInicio`, con tests): más de 13 h y más de 15 h desde el inicio de la jornada, y el semanal si queda menos de un día o ya pasó el plazo (no, si ya lleva 24 h descansando).
+- [x] **Iniciar y finalizar en Inicio**, sin pasar a otra pantalla: los mismos formularios, campos y validaciones (se quitan `RutaIniciarJornada` y `RutaFinalizarJornada`). Un formulario nuevo para cada jornada, y la hora se queda en la de ahora mientras no la cambie.
+- [x] **«Lo que te queda»**, con barras: conducción de la semana (56 h) y de dos semanas (90 h) con lo que resta, días de más de 9 h (2), diarios reducidos (3), **cuándo tiene que empezar el semanal** (`plazoSiguienteSemanal`: fin del último + 144 h, con tests) y lo que queda por compensar.
+  - Cuenta lo apuntado. Con la jornada en curso la app aún no sabe lo conducido hoy: contar lo máximo le decía «Pasado» sin serlo, así que lo dice en una nota.
+- [x] La fecha de arriba, en el idioma de la app (salía en el del móvil).
+- [x] Textos en español y ucraniano. Probado en el emulador API 33: avisos, contadores, finalizar e iniciar desde Inicio.
+- [ ] Km de hoy y del viaje en Inicio (en su app están; aquí el viaje sale con su nombre). Se deja para cuando lo pida.
 
 ### MT-49 · Texto claro en «Descanso semanal» del informe · S · deps: MT-30 · *(visto al probar la v0.3.0)*
 - [ ] Con dos semanales reducidos seguidos en casa, el informe decía «2 (hacen falta al menos 2)» y «Excedido»: parecía un error. Decir cuántos semanales y cuántos normales hay y cuántos hacen falta, en «Descanso semanal» y en «Reducidos fuera de casa».

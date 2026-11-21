@@ -355,10 +355,6 @@
     <string name="motivo_datos_insuficientes">Бракує даних за час до початку користування додатком.</string>
     <string name="motivo_sin_pais">Не вказано країну якогось скороченого тижневого відпочинку.</string>
     <string name="motivo_paises">У налаштуваннях не вказано країну компанії або країну проживання.</string>
-    <string name="semana_reglas_titulo">Цей тиждень</string>
-    <string name="semana_conduccion">Керування: %1$s / 56 год</string>
-    <string name="semana_ampliaciones">Дні понад 9 год: %1$d / 2</string>
-    <string name="semana_reducidos">Скорочені щоденні: %1$d / 3</string>
     <string name="semana_deuda">Компенсувати: %1$s до %2$s включно</string>
     <string name="accion_ver_informe">Переглянути звіт</string>
     <string name="informe_titulo">Звіт за тиждень</string>
@@ -381,4 +377,19 @@
     <string name="resumen_tiempo_descanso">Відпочинок (між робочими днями)</string>
     <string name="inicio_descanso_previo">Відпочинок з %1$s: %2$s</string>
     <string name="inicio_descanso_previo_detalle">Час між робочими днями рахується як відпочинок автоматично: записувати його не треба.</string>
+    <!-- Inicio como la app del conductor (MT-51) -->
+    <string name="inicio_queda_titulo">Що залишилось</string>
+    <string name="contador_semana">Керування за тиждень (макс. 56 год)</string>
+    <string name="contador_bisemana">Керування за 2 тижні (макс. 90 год)</string>
+    <string name="contador_ampliaciones">Дні понад 9 год цього тижня</string>
+    <string name="contador_reducidos">Скорочені щоденні після останнього тижневого</string>
+    <string name="contador_restan">Залишилось %1$s</string>
+    <string name="contador_pasado">Перевищено на %1$s</string>
+    <string name="contador_semanal">Тижневий відпочинок: почати не пізніше</string>
+    <string name="aviso_jornada_13h">Понад 13 год від початку робочого дня: сьогоднішній відпочинок може бути лише скороченим (9 год).</string>
+    <string name="aviso_jornada_15h">Понад 15 год від початку робочого дня: уже не вміщується навіть щоденний відпочинок 9 год.</string>
+    <string name="aviso_semanal_pronto">Тижневий відпочинок має початися до %1$s.</string>
+    <string name="aviso_semanal_vencido">Термін тижневого відпочинку минув %1$s.</string>
+    <string name="contador_nota_hoy">Без урахування сьогоднішнього керування: запишіть його, коли завершите робочий день.</string>
+    <string name="contador_nota_falta">Не записано керування за якийсь день: може бути більше.</string>
 </resources>

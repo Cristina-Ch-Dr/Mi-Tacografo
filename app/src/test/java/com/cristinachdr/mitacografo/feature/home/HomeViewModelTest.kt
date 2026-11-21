@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
@@ -60,6 +61,7 @@ class HomeViewModelTest {
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
             TerminarPausa(descansos, reloj),
             ObtenerInformeReglas(repo, descansos, settings, reloj),
+            ObtenerDescansos(descansos, repo),
             reloj,
         )
     }
