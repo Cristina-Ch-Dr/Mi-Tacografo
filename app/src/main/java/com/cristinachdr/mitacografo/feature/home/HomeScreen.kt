@@ -4,30 +4,31 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,28 +38,33 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
+import com.cristinachdr.mitacografo.domain.rules.Intervalo
+import com.cristinachdr.mitacografo.feature.endday.AccionesFinalizar
+import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaContent
+import com.cristinachdr.mitacografo.feature.endday.FinalizarJornadaViewModel
+import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaContent
+import com.cristinachdr.mitacografo.feature.startday.IniciarJornadaViewModel
 import com.cristinachdr.mitacografo.ui.FormatoHora
-import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
+import com.cristinachdr.mitacografo.ui.idiomaApp
 import com.cristinachdr.mitacografo.ui.reglas.ChipEstado
-import com.cristinachdr.mitacografo.ui.reglas.textoIntervalo
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.textoKm
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-/** Versión "con estado": obtiene el ViewModel de Hilt. */
+/** Versión "con estado": obtiene los ViewModels de Hilt. */
 @Composable
 fun HomeScreen(
-    onIniciarJornada: () -> Unit,
-    onFinalizarJornada: () -> Unit,
+    modifier: Modifier = Modifier,
     onAjustes: () -> Unit = {},
     onInforme: (LocalDate) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
@@ -67,23 +73,82 @@ fun HomeScreen(
     val semana by viewModel.semana.collectAsStateWithLifecycle()
     HomeContent(
         state = estado,
-        onIniciarJornada = onIniciarJornada,
-        onFinalizarJornada = onFinalizarJornada,
+        modifier = modifier,
         onIniciarPausa = viewModel::onIniciarPausa,
         onTerminarPausa = viewModel::onTerminarPausa,
         onAjustes = onAjustes,
         permisos = { EstadoPermisosAvisos(soloSiFalta = true) },
         semana = semana,
         onInforme = onInforme,
+        formulario = {
+            // Un formulario nuevo para cada jornada: al iniciar o finalizar, cambia la clave y se vacía.
+            val jornada = estado.jornada
+            if (jornada == null) {
+                FormularioIniciar(clave = "iniciar-${estado.descanso?.desde}", ahora = estado.ahora)
+            } else {
+                FormularioFinalizar(clave = "finalizar-${jornada.inicio}", ahora = estado.ahora)
+            }
+        },
     )
 }
 
-/** Versión "sin estado": solo pinta. Se puede previsualizar y testear sin Hilt. */
+/** «Iniciar jornada» dentro de Inicio (MT-51), con los mismos campos y validaciones que tenía su pantalla. */
+@Composable
+private fun FormularioIniciar(
+    clave: String,
+    ahora: Instant,
+    viewModel: IniciarJornadaViewModel = hiltViewModel(key = clave),
+) {
+    val estado by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(ahora) { viewModel.onPasaElTiempo() }
+    IniciarJornadaContent(
+        estado = estado,
+        onFechaHora = viewModel::onFechaHora,
+        onKm = viewModel::onKm,
+        onPais = viewModel::onPais,
+        onCiudad = viewModel::onCiudad,
+        onObservaciones = viewModel::onObservaciones,
+        onIniciar = viewModel::onIniciar,
+        enPantallaPropia = false,
+    )
+}
+
+/** «Finalizar jornada» dentro de Inicio (MT-51). */
+@Composable
+private fun FormularioFinalizar(
+    clave: String,
+    ahora: Instant,
+    viewModel: FinalizarJornadaViewModel = hiltViewModel(key = clave),
+) {
+    val estado by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(ahora) { viewModel.onPasaElTiempo() }
+    FinalizarJornadaContent(
+        estado = estado,
+        acciones =
+            AccionesFinalizar(
+                onFechaHora = viewModel::onFechaHora,
+                onKm = viewModel::onKm,
+                onConduccionHoras = viewModel::onConduccionHoras,
+                onConduccionMinutos = viewModel::onConduccionMinutos,
+                onPais = viewModel::onPais,
+                onCiudad = viewModel::onCiudad,
+                onObservaciones = viewModel::onObservaciones,
+                onFinalizar = viewModel::onFinalizar,
+            ),
+        enPantallaPropia = false,
+    )
+}
+
+/**
+ * Versión "sin estado": solo pinta. Se puede previsualizar y testear sin Hilt.
+ *
+ * Organizada como la app que se hizo el conductor (MT-51): arriba los avisos, luego la jornada con el formulario
+ * para iniciarla o finalizarla ahí mismo, y debajo lo que le queda (conducción, ampliaciones, reducidos,
+ * semanal).
+ */
 @Composable
 fun HomeContent(
     state: HomeUiState,
-    onIniciarJornada: () -> Unit,
-    onFinalizarJornada: () -> Unit,
     modifier: Modifier = Modifier,
     onIniciarPausa: () -> Unit = {},
     onTerminarPausa: () -> Unit = {},
@@ -91,81 +156,158 @@ fun HomeContent(
     permisos: @Composable () -> Unit = {},
     semana: ResumenSemanaUi? = null,
     onInforme: (LocalDate) -> Unit = {},
+    formulario: @Composable () -> Unit = {},
 ) {
     Column(
         modifier =
             modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+                .imePadding()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Solo aparece si faltan permisos para que los avisos lleguen.
         permisos()
-        if (state.faltanPaises) {
-            Spacer(Modifier.height(12.dp))
-            AvisoPaises(onAjustes)
-        }
-        Spacer(Modifier.height(16.dp))
+        avisosInicio(state, semana?.plazoSemanal).forEach { TarjetaAviso(it) }
+        if (state.faltanPaises) AvisoPaises(onAjustes)
         Text(
-            text = state.hoy.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
+            text = state.hoy.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(idiomaApp())),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
         )
-        Spacer(Modifier.height(16.dp))
 
         val jornada = state.jornada
         if (jornada == null) {
+            SinJornadaCard(state.descanso)
+            TarjetaFormulario(stringResource(R.string.accion_iniciar_jornada), formulario)
+        } else {
+            JornadaEnCursoCard(jornada, state.pausa)
+            BotonPausa(enPausa = state.pausa != null, onIniciar = onIniciarPausa, onTerminar = onTerminarPausa)
+            TarjetaFormulario(stringResource(R.string.accion_finalizar_jornada), formulario)
+        }
+        semana?.let { LoQueQueda(it, enCurso = jornada != null, onInforme = { onInforme(it.lunes) }) }
+    }
+}
+
+/** Sin jornada en curso: desde cuándo descansa (el tiempo desde la última jornada ya es descanso, MT-46). */
+@Composable
+private fun SinJornadaCard(
+    descanso: PausaUi?,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+    ) {
+        Column(
+            Modifier.fillMaxWidth().padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             Text(
-                text = stringResource(R.string.inicio_sin_jornada),
-                style = MaterialTheme.typography.headlineMedium,
+                stringResource(R.string.inicio_sin_jornada),
+                style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
             )
-            // El tiempo desde la última jornada es descanso (MT-46): se cuenta solo.
-            state.descanso?.let {
-                Spacer(Modifier.height(8.dp))
+            descanso?.let {
                 Text(
-                    text =
-                        stringResource(
-                            R.string.inicio_descansando,
-                            it.desde.format(formatoDiaSemana()) + " " + it.desde.format(FormatoHora),
-                            textoDuracion(it.transcurrido),
-                        ),
+                    stringResource(
+                        R.string.inicio_descansando,
+                        it.desde.format(formatoDiaSemana()) + " " + it.desde.format(FormatoHora),
+                        textoDuracion(it.transcurrido),
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                 )
             }
-            Spacer(Modifier.height(32.dp))
-            BigButton(
-                text = stringResource(R.string.accion_iniciar_jornada),
-                onClick = onIniciarJornada,
-                icon = Icons.Filled.PlayArrow,
-            )
-        } else {
-            JornadaEnCursoCard(jornada, state.pausa)
-            Spacer(Modifier.height(24.dp))
-            BotonPausa(enPausa = state.pausa != null, onIniciar = onIniciarPausa, onTerminar = onTerminarPausa)
-            Spacer(Modifier.height(16.dp))
-            BigButton(
-                text = stringResource(R.string.accion_finalizar_jornada),
-                onClick = onFinalizarJornada,
-                icon = Icons.Filled.Done,
-            )
-        }
-        semana?.let {
-            Spacer(Modifier.height(24.dp))
-            EstaSemana(it, onInforme = { onInforme(it.lunes) })
         }
     }
 }
 
-/** Lo que el conductor sumaba a mano en la libreta (S, ampliaciones, reducidos), con el estado de las reglas. */
+/** El formulario de iniciar o finalizar, en una tarjeta con su título. */
 @Composable
-private fun EstaSemana(
+private fun TarjetaFormulario(
+    titulo: String,
+    formulario: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                titulo,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            formulario()
+        }
+    }
+}
+
+/** Un aviso de arriba: naranja si es para prepararse, rojo si ya se ha pasado. Siempre con texto. */
+@Composable
+private fun TarjetaAviso(
+    aviso: AvisoInicio,
+    modifier: Modifier = Modifier,
+) {
+    val texto =
+        when (aviso) {
+            AvisoInicio.Jornada13h -> {
+                stringResource(R.string.aviso_jornada_13h)
+            }
+
+            AvisoInicio.Jornada15h -> {
+                stringResource(R.string.aviso_jornada_15h)
+            }
+
+            is AvisoInicio.SemanalPronto -> {
+                stringResource(R.string.aviso_semanal_pronto, textoDiaHora(aviso.plazo))
+            }
+
+            is AvisoInicio.SemanalVencido -> {
+                stringResource(R.string.aviso_semanal_vencido, textoDiaHora(aviso.plazo))
+            }
+        }
+    val colores = MaterialTheme.colorScheme
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = if (aviso.grave) colores.errorContainer else colores.secondaryContainer,
+        contentColor = if (aviso.grave) colores.onErrorContainer else colores.onSecondaryContainer,
+    ) {
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(painterResource(R.drawable.ic_aviso), contentDescription = null, modifier = Modifier.size(28.dp))
+            Text(texto, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+/** «sáb 21 nov 2026 18:00». */
+@Composable
+private fun textoDiaHora(hora: ZonedDateTime): String =
+    "${hora.format(formatoDiaSemana())} ${hora.format(formatoFecha())} ${hora.format(FormatoHora)}"
+
+/**
+ * Lo que le queda, en grande y con barras, como en su app: lo que antes sumaba a mano en la libreta.
+ * Todo sale del motor de reglas; si la conducción no se sabe exacta, se cuenta con lo más que pudo ser.
+ */
+@Composable
+private fun LoQueQueda(
     semana: ResumenSemanaUi,
+    enCurso: Boolean,
     onInforme: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -174,26 +316,37 @@ private fun EstaSemana(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    stringResource(R.string.semana_reglas_titulo),
+                    stringResource(R.string.inicio_queda_titulo),
                     style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f),
                 )
                 semana.estado?.let { ChipEstado(it) }
             }
-            Text(
-                stringResource(R.string.semana_conduccion, textoIntervalo(semana.conduccion)),
-                style = MaterialTheme.typography.bodyLarge,
+            ContadorTiempo(stringResource(R.string.contador_semana), semana.conduccion, LIMITE_SEMANA, enCurso)
+            ContadorTiempo(
+                stringResource(R.string.contador_bisemana),
+                semana.conduccion + semana.conduccionAnterior,
+                LIMITE_DOS_SEMANAS,
+                enCurso,
             )
-            Text(
-                stringResource(R.string.semana_ampliaciones, semana.ampliadas),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            ContadorCuenta(stringResource(R.string.contador_ampliaciones), semana.ampliadas, MAXIMO_AMPLIADAS)
             semana.reducidos?.let {
-                Text(stringResource(R.string.semana_reducidos, it), style = MaterialTheme.typography.bodyLarge)
+                ContadorCuenta(stringResource(R.string.contador_reducidos), it, MAXIMO_REDUCIDOS)
+            }
+            semana.plazoSemanal?.let { plazo ->
+                Column {
+                    Text(stringResource(R.string.contador_semanal), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        textoDiaHora(plazo),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
             semana.deuda?.let { deuda ->
                 val hasta =
@@ -213,6 +366,94 @@ private fun EstaSemana(
             }
         }
     }
+}
+
+private val LIMITE_SEMANA: Duration = Duration.ofHours(56)
+private val LIMITE_DOS_SEMANAS: Duration = Duration.ofHours(90)
+private const val MAXIMO_AMPLIADAS = 2
+private const val MAXIMO_REDUCIDOS = 3
+
+/**
+ * «43 h 20 min», una barra y «Restan 12 h 40 min» (o «Pasado en …», en rojo).
+ *
+ * Cuenta lo que ya está apuntado (lo mínimo seguro). Con la jornada en curso la app aún no sabe cuánto lleva
+ * conducido hoy, y contar lo máximo posible le diría que se ha pasado sin ser verdad: se le avisa en una nota.
+ */
+@Composable
+private fun ContadorTiempo(
+    titulo: String,
+    valor: Intervalo,
+    limite: Duration,
+    enCurso: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val apuntado = valor.min
+    val queda = limite - apuntado
+    val pasado = queda.isNegative
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(titulo, style = MaterialTheme.typography.bodyLarge)
+        Text(textoDuracion(apuntado), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Barra(apuntado.toMinutes().toFloat() / limite.toMinutes(), pasado)
+        Text(
+            if (pasado) {
+                stringResource(R.string.contador_pasado, textoDuracion(queda.negated()))
+            } else {
+                stringResource(R.string.contador_restan, textoDuracion(queda))
+            },
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = if (pasado) FontWeight.Bold else FontWeight.Normal,
+            color = if (pasado) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+        )
+        if (!valor.exacto) {
+            Text(
+                stringResource(if (enCurso) R.string.contador_nota_hoy else R.string.contador_nota_falta),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/** «1 / 2», una barra y «Restan 1». */
+@Composable
+private fun ContadorCuenta(
+    titulo: String,
+    cuenta: Int,
+    maximo: Int,
+    modifier: Modifier = Modifier,
+) {
+    val pasado = cuenta > maximo
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(titulo, style = MaterialTheme.typography.bodyLarge)
+        Text("$cuenta / $maximo", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Barra(cuenta.toFloat() / maximo, pasado)
+        Text(
+            if (pasado) {
+                stringResource(R.string.contador_pasado, (cuenta - maximo).toString())
+            } else {
+                stringResource(R.string.contador_restan, (maximo - cuenta).toString())
+            },
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (pasado) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+        )
+    }
+}
+
+@Composable
+private fun Barra(
+    fraccion: Float,
+    pasado: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    LinearProgressIndicator(
+        progress = { fraccion.coerceIn(0f, 1f) },
+        modifier = modifier.fillMaxWidth().height(10.dp),
+        color = if (pasado) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.primaryContainer,
+        strokeCap = StrokeCap.Round,
+        gapSize = 0.dp,
+        drawStopIndicator = {},
+    )
 }
 
 @Composable
@@ -374,8 +615,6 @@ private fun HomeSinJornadaPreview() {
     MiTacografoTheme {
         HomeContent(
             state = HomeUiState(hoy = LocalDate.of(2026, 11, 4)),
-            onIniciarJornada = {},
-            onFinalizarJornada = {},
         )
     }
 }
@@ -398,8 +637,6 @@ private fun HomeConJornadaPreview() {
                             proximoAviso = AvisoUi(inicio.plusHours(12).plusMinutes(30), Duration.ofMinutes(750)),
                         ),
                 ),
-            onIniciarJornada = {},
-            onFinalizarJornada = {},
         )
     }
 }

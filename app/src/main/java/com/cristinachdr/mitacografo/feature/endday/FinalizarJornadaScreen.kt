@@ -42,33 +42,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-@Composable
-fun FinalizarJornadaScreen(
-    onGuardado: () -> Unit,
-    viewModel: FinalizarJornadaViewModel = hiltViewModel(),
-) {
-    val estado by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // rememberUpdatedState: el efecto usa siempre la última versión del callback.
-    val alGuardar by rememberUpdatedState(onGuardado)
-    LaunchedEffect(estado.guardado) { if (estado.guardado) alGuardar() }
-
-    FinalizarJornadaContent(
-        estado = estado,
-        acciones =
-            AccionesFinalizar(
-                onFechaHora = viewModel::onFechaHora,
-                onKm = viewModel::onKm,
-                onConduccionHoras = viewModel::onConduccionHoras,
-                onConduccionMinutos = viewModel::onConduccionMinutos,
-                onPais = viewModel::onPais,
-                onCiudad = viewModel::onCiudad,
-                onObservaciones = viewModel::onObservaciones,
-                onFinalizar = viewModel::onFinalizar,
-            ),
-    )
-}
-
 /** Todas las acciones del formulario juntas, para no pasar 8 parámetros sueltos. */
 data class AccionesFinalizar(
     val onFechaHora: (LocalDateTime) -> Unit = {},
@@ -86,14 +59,20 @@ fun FinalizarJornadaContent(
     estado: FinalizarJornadaUiState,
     acciones: AccionesFinalizar,
     modifier: Modifier = Modifier,
+    enPantallaPropia: Boolean = true,
 ) {
+    // Dentro de Inicio (MT-51) el formulario no se desplaza solo: lo hace la pantalla entera.
     Column(
         modifier =
-            modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .padding(16.dp),
+            if (enPantallaPropia) {
+                modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
+                    .padding(16.dp)
+            } else {
+                modifier.fillMaxWidth()
+            },
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         val jornada = estado.jornada
@@ -104,17 +83,20 @@ fun FinalizarJornadaContent(
             return@Column
         }
 
-        Text(
-            text =
-                stringResource(
-                    R.string.fin_resumen_inicio,
-                    jornada.inicio.atZone(jornada.zonaInicio).format(FormatoHora),
-                    jornada.inicio.atZone(jornada.zonaInicio).format(formatoFecha()),
-                    textoKm(jornada.kmInicio),
-                ),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // En Inicio la tarjeta de la jornada en curso ya lo dice.
+        if (enPantallaPropia) {
+            Text(
+                text =
+                    stringResource(
+                        R.string.fin_resumen_inicio,
+                        jornada.inicio.atZone(jornada.zonaInicio).format(FormatoHora),
+                        jornada.inicio.atZone(jornada.zonaInicio).format(formatoFecha()),
+                        textoKm(jornada.kmInicio),
+                    ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         CampoFechaHora(
             etiqueta = stringResource(R.string.campo_hora_fin),
             valor = estado.fechaHora,

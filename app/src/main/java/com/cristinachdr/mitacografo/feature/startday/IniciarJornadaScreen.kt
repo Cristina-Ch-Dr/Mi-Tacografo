@@ -48,28 +48,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 @Composable
-fun IniciarJornadaScreen(
-    onGuardado: () -> Unit,
-    viewModel: IniciarJornadaViewModel = hiltViewModel(),
-) {
-    val estado by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // rememberUpdatedState: el efecto usa siempre la última versión del callback.
-    val alGuardar by rememberUpdatedState(onGuardado)
-    LaunchedEffect(estado.guardado) { if (estado.guardado) alGuardar() }
-
-    IniciarJornadaContent(
-        estado = estado,
-        onFechaHora = viewModel::onFechaHora,
-        onKm = viewModel::onKm,
-        onPais = viewModel::onPais,
-        onCiudad = viewModel::onCiudad,
-        onObservaciones = viewModel::onObservaciones,
-        onIniciar = viewModel::onIniciar,
-    )
-}
-
-@Composable
 fun IniciarJornadaContent(
     estado: IniciarJornadaUiState,
     onFechaHora: (LocalDateTime) -> Unit,
@@ -79,14 +57,20 @@ fun IniciarJornadaContent(
     onObservaciones: (String) -> Unit,
     onIniciar: () -> Unit,
     modifier: Modifier = Modifier,
+    enPantallaPropia: Boolean = true,
 ) {
+    // Dentro de Inicio (MT-51) el formulario no se desplaza solo: lo hace la pantalla entera.
     Column(
         modifier =
-            modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .padding(16.dp),
+            if (enPantallaPropia) {
+                modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
+                    .padding(16.dp)
+            } else {
+                modifier.fillMaxWidth()
+            },
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         CampoFechaHora(
@@ -96,7 +80,8 @@ fun IniciarJornadaContent(
         )
         val propuesta = estado.propuestaDescanso
         val duracion = estado.duracionDescanso
-        if (propuesta != null && duracion != null) {
+        // En Inicio ya pone arriba desde cuándo descansa: aquí solo en la pantalla propia.
+        if (enPantallaPropia && propuesta != null && duracion != null) {
             DescansoPrevioCard(propuesta, duracion)
         }
         CampoNumero(

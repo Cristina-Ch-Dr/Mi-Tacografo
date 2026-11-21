@@ -350,10 +350,6 @@
     <string name="motivo_datos_insuficientes">Faltan datos de antes de empezar a usar la app.</string>
     <string name="motivo_sin_pais">Falta el país de algún descanso semanal reducido.</string>
     <string name="motivo_paises">Faltan en Ajustes el país de la empresa o el de residencia.</string>
-    <string name="semana_reglas_titulo">Esta semana</string>
-    <string name="semana_conduccion">Conducción: %1$s / 56 h</string>
-    <string name="semana_ampliaciones">Días de más de 9 h: %1$d / 2</string>
-    <string name="semana_reducidos">Diarios reducidos: %1$d / 3</string>
     <string name="semana_deuda">Por compensar: %1$s, hasta el %2$s</string>
     <string name="accion_ver_informe">Ver el informe</string>
     <string name="informe_titulo">Informe de la semana</string>
@@ -376,4 +372,19 @@
     <string name="resumen_tiempo_descanso">Descanso (entre jornadas)</string>
     <string name="inicio_descanso_previo">Descanso desde %1$s: %2$s</string>
     <string name="inicio_descanso_previo_detalle">El tiempo entre jornadas cuenta solo como descanso: no hace falta apuntarlo.</string>
+    <!-- Inicio como la app del conductor (MT-51) -->
+    <string name="inicio_queda_titulo">Lo que te queda</string>
+    <string name="contador_semana">Conducción de la semana (máx. 56 h)</string>
+    <string name="contador_bisemana">Conducción de 2 semanas (máx. 90 h)</string>
+    <string name="contador_ampliaciones">Días de más de 9 h esta semana</string>
+    <string name="contador_reducidos">Diarios reducidos desde el último semanal</string>
+    <string name="contador_restan">Restan %1$s</string>
+    <string name="contador_pasado">Pasado en %1$s</string>
+    <string name="contador_semanal">Descanso semanal: empezar como muy tarde el</string>
+    <string name="aviso_jornada_13h">Más de 13 h desde el inicio de la jornada: el descanso de hoy ya solo puede ser reducido (9 h).</string>
+    <string name="aviso_jornada_15h">Más de 15 h desde el inicio de la jornada: ya no cabe ni un descanso diario de 9 h.</string>
+    <string name="aviso_semanal_pronto">El descanso semanal tiene que empezar antes del %1$s.</string>
+    <string name="aviso_semanal_vencido">El plazo del descanso semanal venció el %1$s.</string>
+    <string name="contador_nota_hoy">Sin contar lo que lleva conducido hoy: apúntalo al finalizar la jornada.</string>
+    <string name="contador_nota_falta">Falta apuntar la conducción de alguna jornada: puede ser más.</string>
 </resources>

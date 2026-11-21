@@ -95,7 +95,23 @@ class FinalizarJornadaViewModel
             }
         }
 
-        fun onFechaHora(valor: LocalDateTime) = actualizar { copy(fechaHora = valor) }
+        /** `true` cuando el conductor cambia la hora a mano: desde entonces ya no se mueve sola. */
+        private var horaElegida = false
+
+        fun onFechaHora(valor: LocalDateTime) {
+            horaElegida = true
+            actualizar { copy(fechaHora = valor) }
+        }
+
+        /**
+         * En Inicio el formulario está siempre a la vista (MT-51), así que la pantalla avisa cada minuto:
+         * mientras el conductor no haya cambiado la hora, se queda en la de ahora.
+         */
+        fun onPasaElTiempo() {
+            if (horaElegida) return
+            val ahora = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES)
+            if (ahora != _uiState.value.fechaHora) actualizar { copy(fechaHora = ahora) }
+        }
 
         fun onKm(valor: String) = actualizar { copy(km = valor) }
 
