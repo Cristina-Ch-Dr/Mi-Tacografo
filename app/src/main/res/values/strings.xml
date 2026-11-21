@@ -7,6 +7,11 @@
     <string name="nav_viajes">Viajes</string>
     <string name="nav_resumen">Resumen</string>
     <string name="nav_ajustes">Ajustes</string>
+    <string name="nav_descanso">Descanso</string>
+    <string name="accion_resumen_pdf">Resumen y PDF</string>
+    <string name="historial_total_titulo">En total</string>
+    <string name="historial_total_km">%1$s km</string>
+    <string name="historial_total_conduccion">%1$s de conducción</string>
 
     <!-- Acciones -->
     <string name="accion_volver">Volver</string>
@@ -195,7 +200,8 @@
     <string name="descanso_titulo">Descanso</string>
     <string name="descanso_titulo_nuevo">Nuevo descanso</string>
     <string name="descansos_vacio">Todavía no hay pausas ni descansos. Durante la jornada, pulsa «Iniciar pausa»; para apuntar uno pasado, pulsa «Añadir».</string>
-    <string name="descansos_explicacion">El tiempo entre dos jornadas ya cuenta solo como descanso: aquí se apuntan las pausas y los descansos que no fueron entre dos jornadas. La clase (diario normal, reducido, fraccionado, semanal…) se calcula con las horas.</string>
+    <string name="descansos_explicacion">Los descansos entre jornadas se calculan solos. Con «Añadir» apuntas las pausas y otros descansos.</string>
+    <string name="descanso_entre_jornadas">Entre jornadas</string>
     <string name="accion_anadir_descanso">Añadir</string>
     <string name="descanso_tipo">¿Qué fue?</string>
     <string name="tipo_pausa">Pausa (en la jornada)</string>

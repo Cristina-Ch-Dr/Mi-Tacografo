@@ -8,6 +8,11 @@
     <string name="nav_viajes">Поїздки</string>
     <string name="nav_resumen">Підсумок</string>
     <string name="nav_ajustes">Налаштування</string>
+    <string name="nav_descanso">Відпочинок</string>
+    <string name="accion_resumen_pdf">Підсумок і PDF</string>
+    <string name="historial_total_titulo">Усього</string>
+    <string name="historial_total_km">%1$s км</string>
+    <string name="historial_total_conduccion">%1$s водіння</string>
 
     <!-- Acciones -->
     <string name="accion_volver">Назад</string>
@@ -199,7 +204,8 @@
     <string name="descanso_titulo">Відпочинок</string>
     <string name="descanso_titulo_nuevo">Новий відпочинок</string>
     <string name="descansos_vacio">Ще немає перерв і відпочинку. Під час робочого дня натисніть «Почати перерву»; щоб записати минулий, натисніть «Додати».</string>
-    <string name="descansos_explicacion">Час між двома робочими днями вже рахується як відпочинок автоматично: тут записуються перерви та відпочинок, який був не між робочими днями. Вид (щоденний звичайний, скорочений, розділений, тижневий…) рахується за годинами.</string>
+    <string name="descansos_explicacion">Відпочинок між робочими днями рахується автоматично. Кнопкою «Додати» записуються перерви та інший відпочинок.</string>
+    <string name="descanso_entre_jornadas">Між робочими днями</string>
     <string name="accion_anadir_descanso">Додати</string>
     <string name="descanso_tipo">Що це було?</string>
     <string name="tipo_pausa">Перерва (під час робочого дня)</string>

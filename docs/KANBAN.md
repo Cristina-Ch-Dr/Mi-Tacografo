@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | MT-49, MT-33, MT-33B, MT-50 | — | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48 · MT-33B sin reglas · **v0.3.0 publicada** |
+| E5 – E7 | MT-49, MT-33, MT-33B, MT-50 | MT-51 (Inicio) | MT-51 (pestañas) | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48 · MT-33B sin reglas · **v0.3.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -215,6 +215,20 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Para ver las semanas del mes pasado no hay que bajar mucho: arriba, «‹ Del 9 nov al 15 nov ›» como en el Resumen, y se ve una semana cada vez (empieza en la más reciente).
 - [x] Las flechas saltan a la semana más cercana **con jornadas** (las vacaciones no dejan pantallas vacías) y se desactivan en la primera y la última.
 - [x] Probado en el emulador API 33 con la libreta.
+
+### MT-51 · Navegación como la app del conductor · L · *(petición del conductor)*
+> Le costaba moverse por la app y se hizo con una IA otra (una página web dentro de una app) que entiende mejor. Se copia su organización, no sus colores ni su código. La carpeta `App de ejemplo/` está en el `.gitignore`: lleva la clave de firma de esa app.
+
+**Parte 1 · Pestañas**
+- [x] Abajo, como en su app: **Inicio · Viajes · Descanso · Historial**. Descanso pasa a ser pestaña (se quita el icono de la cama de arriba) y Resumen deja de serlo.
+- [x] **Descanso:** por semanas, los descansos entre una jornada y la siguiente (calculados, «Entre jornadas») junto a lo apuntado a mano. Para él, «descanso» es el de entre jornadas, no la pausa de 45 min. `ObtenerDescansos` ahora completa con los calculados (test nuevo).
+- [x] **Historial:** arriba, el total de km y conducción y el botón «Resumen y PDF», que abre el Resumen de antes con flecha atrás.
+- [x] Textos en español y ucraniano. Probado en el emulador API 33 con una copia de prueba inventada (solo horas y km).
+
+**Parte 2 · Inicio**
+- [ ] Avisos arriba en un recuadro de color (13 h de jornada, plazo del semanal…).
+- [ ] Iniciar y finalizar la jornada en la misma pantalla, sin pasar a otra.
+- [ ] Contadores con barra y «restan»: semana (56 h), dos semanas (90 h), días de más de 9 h, diarios reducidos, cuándo tiene que empezar el semanal y lo que queda por compensar. Km de hoy y del viaje.
 
 ### MT-49 · Texto claro en «Descanso semanal» del informe · S · deps: MT-30 · *(visto al probar la v0.3.0)*
 - [ ] Con dos semanales reducidos seguidos en casa, el informe decía «2 (hacen falta al menos 2)» y «Excedido»: parecía un error. Decir cuántos semanales y cuántos normales hay y cuántos hacen falta, en «Descanso semanal» y en «Reducidos fuera de casa».

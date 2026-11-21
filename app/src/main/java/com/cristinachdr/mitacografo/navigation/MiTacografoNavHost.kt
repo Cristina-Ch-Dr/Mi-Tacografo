@@ -1,5 +1,6 @@
 package com.cristinachdr.mitacografo.navigation
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
@@ -8,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
@@ -28,7 +28,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -58,18 +60,26 @@ import com.cristinachdr.mitacografo.ui.theme.SobreAzul
 import com.cristinachdr.mitacografo.ui.theme.coloresPestanas
 import kotlin.reflect.KClass
 
-/** Pestañas de la barra inferior. */
+/**
+ * Pestañas de la barra inferior, en el orden de la app que se hizo el conductor (MT-51): lo de cada día
+ * (Inicio), los viajes, los descansos y lo pasado (Historial, con el Resumen dentro).
+ */
 private enum class Pestana(
     val ruta: Any,
     val clase: KClass<*>,
     @StringRes val titulo: Int,
-    val icono: ImageVector,
+    val icono: ImageVector? = null,
+    @DrawableRes val dibujo: Int? = null,
 ) {
-    INICIO(RutaInicio, RutaInicio::class, R.string.nav_inicio, Icons.Filled.Home),
-    HISTORIAL(RutaHistorial, RutaHistorial::class, R.string.nav_historial, Icons.AutoMirrored.Filled.List),
-    VIAJES(RutaViajes, RutaViajes::class, R.string.nav_viajes, Icons.Filled.Place),
-    RESUMEN(RutaResumen, RutaResumen::class, R.string.nav_resumen, Icons.Filled.DateRange),
+    INICIO(RutaInicio, RutaInicio::class, R.string.nav_inicio, icono = Icons.Filled.Home),
+    VIAJES(RutaViajes, RutaViajes::class, R.string.nav_viajes, icono = Icons.Filled.Place),
+    DESCANSO(RutaDescansos, RutaDescansos::class, R.string.nav_descanso, dibujo = R.drawable.ic_descanso),
+    HISTORIAL(RutaHistorial, RutaHistorial::class, R.string.nav_historial, icono = Icons.AutoMirrored.Filled.List),
 }
+
+/** El icono de la pestaña: uno de Material o, para Descanso, la cama de la app. */
+@Composable
+private fun Pestana.pintor(): Painter = dibujo?.let { painterResource(it) } ?: rememberVectorPainter(icono!!)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,8 +109,8 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 if (nueva) R.string.editar_titulo_nueva else R.string.editar_titulo
             }
 
-            destinoActual?.hasRoute(RutaDescansos::class) == true -> {
-                R.string.nav_descansos
+            destinoActual?.hasRoute(RutaResumen::class) == true -> {
+                R.string.nav_resumen
             }
 
             destinoActual?.hasRoute(RutaViaje::class) == true -> {
@@ -146,12 +156,6 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 },
                 actions = {
                     if (!pantallaSecundaria) {
-                        IconButton(onClick = { navController.navigate(RutaDescansos) { launchSingleTop = true } }) {
-                            Icon(
-                                painterResource(R.drawable.ic_descanso),
-                                contentDescription = stringResource(R.string.nav_descansos),
-                            )
-                        }
                         IconButton(onClick = { navController.navigate(RutaAjustes) { launchSingleTop = true } }) {
                             Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_ajustes))
                         }
@@ -182,7 +186,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(pestana.icono, contentDescription = null) },
+                            icon = { Icon(pestana.pintor(), contentDescription = null) },
                             label = { Text(stringResource(pestana.titulo)) },
                             colors =
                                 NavigationBarItemDefaults.colors(
@@ -214,6 +218,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                     onJornada = { navController.navigate(RutaJornada(it)) },
                     onSemana = { navController.navigate(RutaInforme(it.toString())) },
                     onNueva = { navController.navigate(RutaJornada()) },
+                    onResumen = { navController.navigate(RutaResumen) { launchSingleTop = true } },
                 )
             }
             composable<RutaInforme> { InformeSemanaScreen() }
