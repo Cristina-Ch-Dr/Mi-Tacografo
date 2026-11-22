@@ -6,24 +6,33 @@ import com.cristinachdr.mitacografo.domain.model.ErrorDescanso
 import com.cristinachdr.mitacografo.domain.model.ResultadoDescanso
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.clasificarDescansos
+import com.cristinachdr.mitacografo.domain.model.completarDescansos
 import com.cristinachdr.mitacografo.domain.model.validarDescanso
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 import javax.inject.Inject
 
-/** Caso de uso: la lista de descansos con su clase, del más reciente al más antiguo. */
+/**
+ * Caso de uso: la lista de descansos con su clase, del más reciente al más antiguo.
+ *
+ * Incluye los calculados entre una jornada y la siguiente (MT-46): son los que más le importan al conductor,
+ * y en la pestaña Descanso tienen que salir aunque no los haya apuntado (MT-51).
+ */
 class ObtenerDescansos
     @Inject
     constructor(
         private val repository: DescansoRepository,
+        private val jornadas: JornadaRepository,
     ) {
         operator fun invoke(): Flow<List<DescansoClasificado>> =
-            repository.observarTodos().map { clasificarDescansos(it).asReversed() }
+            combine(jornadas.observarTodas(), repository.observarTodos()) { j, d ->
+                clasificarDescansos(completarDescansos(j, d)).asReversed()
+            }
     }
 
 /**

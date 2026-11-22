@@ -8,6 +8,7 @@ import com.cristinachdr.mitacografo.domain.model.ErrorDescanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoDescanso
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.calculado
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -227,9 +228,24 @@ class CasosDeUsoDescansoTest {
                         descanso(2, hora(2, 12), hora(2, 12, 30), TipoDescanso.PAUSA),
                     ),
                 )
-            val lista = ObtenerDescansos(descansos)().first()
+            val lista = ObtenerDescansos(descansos, FakeJornadaRepository())().first()
 
             assertEquals(listOf(2L, 1L), lista.map { it.descanso.id })
             assertEquals(listOf(ClaseDescanso.PAUSA, ClaseDescanso.DIARIO_NORMAL), lista.map { it.clase })
+        }
+
+    @Test
+    fun `la lista incluye el descanso entre dos jornadas aunque no esté apuntado`() =
+        runTest {
+            // Ayer acabó a las 17:00 en Francia y hoy empezó a las 8:00: 15 h de descanso diario sin apuntar.
+            val jornadas = FakeJornadaRepository(listOf(ayer, hoyEnCurso))
+            val lista = ObtenerDescansos(FakeDescansoRepository(), jornadas)().first()
+
+            val entreJornadas = lista.single()
+            assertTrue(entreJornadas.descanso.calculado)
+            assertEquals(hora(1, 17), entreJornadas.descanso.inicio)
+            assertEquals(hora(2, 8), entreJornadas.descanso.fin)
+            assertEquals("FR", entreJornadas.descanso.pais)
+            assertEquals(ClaseDescanso.DIARIO_NORMAL, entreJornadas.clase)
         }
 }

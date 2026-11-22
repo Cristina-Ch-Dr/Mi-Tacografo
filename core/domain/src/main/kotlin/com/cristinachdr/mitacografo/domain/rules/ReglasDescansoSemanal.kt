@@ -96,7 +96,8 @@ internal object SemanalDosSemanas : ReglaSemana {
         val asignados = asignarSemanales(contexto)
         val enLasDos = asignados[anterior].orEmpty() + asignados[semana.lunes].orEmpty()
         val normales = enLasDos.count { it.clase == ClaseDescanso.SEMANAL_NORMAL }
-        val detalle = Detalle(cuenta = enLasDos.size, minimo = 2)
+        // Antes decía solo «2 (hacen falta al menos 2)» y, con dos reducidos en casa, parecía un error (MT-49).
+        val detalle = Detalle(cuenta = enLasDos.size, minimo = 2, normales = normales, minimoNormales = 1)
         val regla = ReglaId.SEMANAL_DOS_SEMANAS
 
         if (enLasDos.size >= 2 && normales >= 1) return listOf(Resultado.Cumple(regla, detalle))
@@ -105,7 +106,7 @@ internal object SemanalDosSemanas : ReglaSemana {
             return listOf(
                 when (val fuera = contexto.fueraDeCasa(enLasDos)) {
                     FueraDeCasa.Si -> Resultado.Cumple(regla, detalle)
-                    FueraDeCasa.EnCasa -> Resultado.Excedido(regla, detalle)
+                    FueraDeCasa.EnCasa -> Resultado.Excedido(regla, detalle.copy(reducidosEnCasa = true))
                     is FueraDeCasa.NoSeSabe -> Resultado.NoVerificado(regla, fuera.motivo, detalle)
                 },
             )
@@ -203,7 +204,7 @@ internal object ReducidosFueraDeCasa : ReglaSemana {
         val regla = ReglaId.REDUCIDOS_FUERA_DE_CASA
 
         when (val fuera = contexto.fueraDeCasa(par)) {
-            FueraDeCasa.EnCasa -> return listOf(Resultado.Excedido(regla, Detalle()))
+            FueraDeCasa.EnCasa -> return listOf(Resultado.Excedido(regla, Detalle(reducidosEnCasa = true)))
             is FueraDeCasa.NoSeSabe -> return listOf(Resultado.NoVerificado(regla, fuera.motivo))
             FueraDeCasa.Si -> Unit
         }
@@ -213,7 +214,7 @@ internal object ReducidosFueraDeCasa : ReglaSemana {
         if (!contexto.terminada(cuatro.last())) return emptyList()
         val enLasCuatro = cuatro.flatMap { asignados[it].orEmpty() }
         val normales = enLasCuatro.count { it.clase == ClaseDescanso.SEMANAL_NORMAL }
-        val detalle = Detalle(cuenta = normales, minimo = 2)
+        val detalle = Detalle(cuenta = enLasCuatro.size, minimo = 4, normales = normales, minimoNormales = 2)
         val resultado =
             when {
                 enLasCuatro.size >= 4 && normales >= 2 -> {

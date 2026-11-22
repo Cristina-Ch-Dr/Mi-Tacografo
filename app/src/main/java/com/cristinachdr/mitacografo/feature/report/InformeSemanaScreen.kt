@@ -127,6 +127,14 @@ private fun FilaRegla(
             }
             Text(stringResource(resultado.regla.explicacion), style = MaterialTheme.typography.bodyMedium)
             valor(resultado)?.let { Text(it, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold) }
+            if (resultado.detalle.reducidosEnCasa) {
+                Text(
+                    stringResource(R.string.informe_reducidos_en_casa),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             if (resultado is Resultado.NoVerificado) {
                 Text(
                     stringResource(resultado.motivo.texto),
@@ -147,6 +155,8 @@ private fun valor(resultado: Resultado): String? {
     val cuenta = detalle.cuenta
     val maximo = detalle.maximo
     val minimo = detalle.minimo
+    val normales = detalle.normales
+    val minimoNormales = detalle.minimoNormales
     return when {
         valor != null && limite != null -> {
             stringResource(
@@ -162,6 +172,10 @@ private fun valor(resultado: Resultado): String? {
 
         cuenta != null && maximo != null -> {
             stringResource(R.string.informe_cuenta, cuenta, maximo)
+        }
+
+        cuenta != null && minimo != null && normales != null && minimoNormales != null -> {
+            stringResource(R.string.informe_semanales, cuenta, minimo, normales, minimoNormales)
         }
 
         cuenta != null && minimo != null -> {

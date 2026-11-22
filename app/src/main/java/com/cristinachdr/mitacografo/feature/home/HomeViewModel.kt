@@ -7,6 +7,7 @@ import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
 import com.cristinachdr.mitacografo.domain.model.descansoActual
+import com.cristinachdr.mitacografo.domain.model.plazoSiguienteSemanal
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
@@ -16,6 +17,7 @@ import com.cristinachdr.mitacografo.domain.rules.EstadoDeuda
 import com.cristinachdr.mitacografo.domain.rules.Intervalo
 import com.cristinachdr.mitacografo.domain.rules.ReglaId
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
@@ -28,7 +30,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -51,6 +52,8 @@ data class HomeUiState(
     val faltanPaises: Boolean = false,
     /** Sin jornada en curso: desde cuándo descansa (el fin de la última jornada) y cuánto lleva. */
     val descanso: PausaUi? = null,
+    /** La hora de este estado: cambia cada minuto (para los avisos de arriba y la hora de los formularios). */
+    val ahora: Instant = Instant.EPOCH,
 )
 
 data class PausaUi(
@@ -83,6 +86,8 @@ data class AvisoUi(
 data class ResumenSemanaUi(
     val lunes: LocalDate,
     val conduccion: Intervalo,
+    /** La conducción de la semana anterior, para las 90 h de dos semanas (cero si no hay jornadas). */
+    val conduccionAnterior: Intervalo = Intervalo.exacto(Duration.ZERO),
     /** Jornadas de más de 9 h (como mucho 2). */
     val ampliadas: Int,
     /** Diarios reducidos desde el último semanal (como mucho 3); `null` si no se sabe. */
@@ -91,6 +96,8 @@ data class ResumenSemanaUi(
     val deuda: Deuda?,
     /** El peor estado de las reglas de la semana y de sus jornadas; `null` si aún no hay resultados. */
     val estado: EstadoRegla?,
+    /** Hasta cuándo puede empezar el siguiente semanal (en la zona del móvil); `null` si no se sabe. */
+    val plazoSemanal: ZonedDateTime? = null,
 )
 
 private const val UN_MINUTO_MS = 60_000L
@@ -111,36 +118,45 @@ class HomeViewModel
         private val iniciarPausa: IniciarPausa,
         private val terminarPausa: TerminarPausa,
         obtenerInformeReglas: ObtenerInformeReglas,
+        obtenerDescansos: ObtenerDescansos,
         private val clock: Clock,
     ) : ViewModel() {
-        /** «Esta semana»: `null` si en la semana de hoy aún no hay jornadas. */
+        /**
+         * «Lo que te queda» (MT-51): lo que antes sumaba a mano en la libreta. `null` si aún no hay ni jornadas
+         * en esta semana o la anterior ni ningún semanal.
+         */
         val semana: StateFlow<ResumenSemanaUi?> =
-            obtenerInformeReglas()
-                .map { informe ->
-                    val lunes = LocalDate.now(clock).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                    informe.semanas.find { it.lunes == lunes }?.let { s ->
-                        ResumenSemanaUi(
-                            lunes = lunes,
-                            conduccion = s.conduccion,
-                            ampliadas =
-                                s.resultados
-                                    .find { it.regla == ReglaId.AMPLIACIONES_SEMANA }
-                                    ?.detalle
-                                    ?.cuenta ?: 0,
-                            reducidos =
-                                s.resultados
-                                    .find { it.regla == ReglaId.REDUCIDOS_ENTRE_SEMANALES }
-                                    ?.detalle
-                                    ?.cuenta,
-                            deuda =
-                                informe.deudas
-                                    .filter {
-                                        it.estado == EstadoDeuda.PENDIENTE
-                                    }.minByOrNull { it.fechaLimite },
-                            estado = (s.resultados + s.jornadas.flatMap { it.resultados }).peor(),
-                        )
-                    }
-                }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+            combine(obtenerInformeReglas(), obtenerDescansos()) { informe, clasificados ->
+                val lunes = LocalDate.now(clock).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                val esta = informe.semanas.find { it.lunes == lunes }
+                val anterior = informe.semanas.find { it.lunes == lunes.minusWeeks(1) }
+                val plazo = plazoSiguienteSemanal(clasificados)
+                if (esta == null && anterior == null && plazo == null) return@combine null
+                val cero = Intervalo.exacto(Duration.ZERO)
+                ResumenSemanaUi(
+                    lunes = lunes,
+                    conduccion = esta?.conduccion ?: cero,
+                    conduccionAnterior = anterior?.conduccion ?: cero,
+                    ampliadas =
+                        esta
+                            ?.resultados
+                            ?.find { it.regla == ReglaId.AMPLIACIONES_SEMANA }
+                            ?.detalle
+                            ?.cuenta ?: 0,
+                    reducidos =
+                        esta
+                            ?.resultados
+                            ?.find { it.regla == ReglaId.REDUCIDOS_ENTRE_SEMANALES }
+                            ?.detalle
+                            ?.cuenta,
+                    deuda =
+                        informe.deudas
+                            .filter { it.estado == EstadoDeuda.PENDIENTE }
+                            .minByOrNull { it.fechaLimite },
+                    estado = esta?.let { s -> (s.resultados + s.jornadas.flatMap { it.resultados }).peor() },
+                    plazoSemanal = plazo?.atZone(clock.zone),
+                )
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
         val uiState: StateFlow<HomeUiState> =
             combine(
@@ -199,6 +215,7 @@ class HomeViewModel
         ): HomeUiState =
             HomeUiState(
                 hoy = ahora.atZone(clock.zone).toLocalDate(),
+                ahora = ahora,
                 jornada = jornada?.let { enCurso(it, avisos, ahora).copy(viaje = viaje) },
                 pausa =
                     pausa?.let {

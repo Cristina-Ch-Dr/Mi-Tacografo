@@ -149,7 +149,13 @@ class ReglasDescansoSemanalTest {
         @Test
         fun `T17 - dos reducidos seguidos y uno en el pais de la empresa (caso nacional) se excede`() {
             val informe = semanas(listOf(h(30) to "ES", reducidoFuera))
-            assertTrue(informe.de(lunes9, ReglaId.SEMANAL_DOS_SEMANAS) is Resultado.Excedido)
+            val resultado = informe.de(lunes9, ReglaId.SEMANAL_DOS_SEMANAS)
+            assertTrue(resultado is Resultado.Excedido)
+            // MT-49: el informe tiene con qué explicarlo: 2 semanales, 0 normales, y reducidos en casa.
+            assertEquals(
+                Detalle(cuenta = 2, minimo = 2, normales = 0, minimoNormales = 1, reducidosEnCasa = true),
+                resultado.detalle,
+            )
         }
 
         @Test
@@ -244,7 +250,9 @@ class ReglasDescansoSemanalTest {
         @Test
         fun `T17b - dos reducidos fuera de casa pero solo un normal en las 4 semanas se excede`() {
             val informe = semanas(listOf(reducidoFuera, reducidoFuera, normal, reducidoFuera))
-            assertTrue(informe.de(lunes9, ReglaId.REDUCIDOS_FUERA_DE_CASA) is Resultado.Excedido)
+            val resultado = informe.de(lunes9, ReglaId.REDUCIDOS_FUERA_DE_CASA)
+            assertTrue(resultado is Resultado.Excedido)
+            assertEquals(Detalle(cuenta = 4, minimo = 4, normales = 1, minimoNormales = 2), resultado.detalle)
         }
 
         @Test

@@ -37,15 +37,19 @@ import com.cristinachdr.mitacografo.domain.model.ClaseDescanso
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.DescansoClasificado
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.calculado
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
 import com.cristinachdr.mitacografo.ui.nombre
 import com.cristinachdr.mitacografo.ui.textoDuracion
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
+import java.time.DayOfWeek
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
 
 @Composable
 fun DescansosScreen(
@@ -57,7 +61,11 @@ fun DescansosScreen(
     DescansosContent(estado = estado, onDescanso = onDescanso, onNuevo = onNuevo)
 }
 
-/** Pausas y descansos, del más reciente al más antiguo, con su clase calculada. Tocar uno lo abre. */
+/**
+ * La pestaña Descanso (MT-51): por semanas, del más reciente al más antiguo, los descansos entre una jornada
+ * y la siguiente (calculados solos) y lo que se apuntó a mano (pausas y otros descansos), con su clase.
+ * Tocar uno apuntado lo abre; los calculados se cambian corrigiendo las horas de las jornadas.
+ */
 @Composable
 fun DescansosContent(
     estado: DescansosUiState,
@@ -80,9 +88,28 @@ fun DescansosContent(
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
-            items(estado.descansos, key = { it.descanso.id }) { clasificado ->
-                FilaDescanso(clasificado, onClick = { onDescanso(clasificado.descanso.id) })
-            }
+            estado.descansos
+                .groupBy { lunesDe(it.descanso) }
+                .forEach { (lunes, descansos) ->
+                    item(key = "semana-$lunes") {
+                        Text(
+                            stringResource(
+                                R.string.resumen_periodo,
+                                lunes.format(formatoFecha()),
+                                lunes.plusDays(6).format(formatoFecha()),
+                            ),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                    }
+                    items(descansos, key = { it.descanso.id }) { clasificado ->
+                        val descanso = clasificado.descanso
+                        val alTocar: (() -> Unit)? = if (descanso.calculado) null else { -> onDescanso(descanso.id) }
+                        FilaDescanso(clasificado, onClick = alTocar)
+                    }
+                }
         }
         ExtendedFloatingActionButton(
             onClick = onNuevo,
@@ -96,14 +123,14 @@ fun DescansosContent(
 @Composable
 private fun FilaDescanso(
     clasificado: DescansoClasificado,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     val descanso = clasificado.descanso
     val inicio = descanso.inicio.atZone(descanso.zonaInicio)
     val fin = descanso.fin?.atZone(descanso.zonaFin ?: descanso.zonaInicio)
     Card(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = modifier.fillMaxWidth().then(onClick?.let { Modifier.clickable(onClick = it) } ?: Modifier),
         colors =
             if (descanso.enCurso) {
                 CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -165,10 +192,26 @@ private fun FilaDescanso(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            ChipClase(clasificado)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ChipClase(clasificado)
+                if (descanso.calculado) {
+                    Text(
+                        stringResource(R.string.descanso_entre_jornadas),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }
+
+/** El lunes de la semana en la que empieza el descanso, en su zona. */
+private fun lunesDe(descanso: Descanso): LocalDate =
+    descanso.inicio
+        .atZone(descanso.zonaInicio)
+        .toLocalDate()
+        .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
 /** La clase en una etiqueta: azul para los descansos que cuentan, gris para pausas y los que no cuentan. */
 @Composable

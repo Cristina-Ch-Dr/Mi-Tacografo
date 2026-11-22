@@ -20,6 +20,9 @@ keystore.properties
 # --- Datos reales del conductor (NUNCA subir) ---
 ejemplos-libreta/
 
+# --- App de ejemplo del conductor (lleva su clave de firma y contraseñas: NUNCA subir) ---
+App de ejemplo/
+
 # --- APKs generados ---
 *.apk
 *.aab
