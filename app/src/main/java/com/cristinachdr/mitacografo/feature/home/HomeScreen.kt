@@ -130,6 +130,9 @@ private fun FormularioFinalizar(
                 onKm = viewModel::onKm,
                 onConduccionHoras = viewModel::onConduccionHoras,
                 onConduccionMinutos = viewModel::onConduccionMinutos,
+                onApuntarConduccion = viewModel::onApuntarConduccion,
+                onAntesHoras = viewModel::onAntesHoras,
+                onAntesMinutos = viewModel::onAntesMinutos,
                 onPais = viewModel::onPais,
                 onCiudad = viewModel::onCiudad,
                 onObservaciones = viewModel::onObservaciones,
@@ -188,7 +191,14 @@ fun HomeContent(
             BotonPausa(enPausa = state.pausa != null, onIniciar = onIniciarPausa, onTerminar = onTerminarPausa)
             TarjetaFormulario(stringResource(R.string.accion_finalizar_jornada), formulario)
         }
-        semana?.let { LoQueQueda(it, enCurso = jornada != null, onInforme = { onInforme(it.lunes) }) }
+        semana?.let {
+            LoQueQueda(
+                it,
+                enCurso = jornada != null,
+                conduccionApuntadaEn = jornada?.conduccionApuntadaEn,
+                onInforme = { onInforme(it.lunes) },
+            )
+        }
     }
 }
 
@@ -308,6 +318,7 @@ private fun textoDiaHora(hora: ZonedDateTime): String =
 private fun LoQueQueda(
     semana: ResumenSemanaUi,
     enCurso: Boolean,
+    conduccionApuntadaEn: ZonedDateTime?,
     onInforme: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -327,12 +338,13 @@ private fun LoQueQueda(
                 )
                 semana.estado?.let { ChipEstado(it) }
             }
-            ContadorTiempo(stringResource(R.string.contador_semana), semana.conduccion, LIMITE_SEMANA, enCurso)
+            val nota = notaContador(enCurso, conduccionApuntadaEn)
+            ContadorTiempo(stringResource(R.string.contador_semana), semana.conduccion, LIMITE_SEMANA, nota)
             ContadorTiempo(
                 stringResource(R.string.contador_bisemana),
                 semana.conduccion + semana.conduccionAnterior,
                 LIMITE_DOS_SEMANAS,
-                enCurso,
+                nota,
             )
             ContadorCuenta(stringResource(R.string.contador_ampliaciones), semana.ampliadas, MAXIMO_AMPLIADAS)
             semana.reducidos?.let {
@@ -374,17 +386,44 @@ private const val MAXIMO_AMPLIADAS = 2
 private const val MAXIMO_REDUCIDOS = 3
 
 /**
+ * La nota de debajo de los contadores cuando la conducción no se sabe exacta. Con la jornada en curso,
+ * si apuntó la de «hasta ahora» (MT-53), se cuenta desde esa hora; si no, se le recuerda que puede apuntarla.
+ */
+@Composable
+private fun notaContador(
+    enCurso: Boolean,
+    conduccionApuntadaEn: ZonedDateTime?,
+): String =
+    when {
+        !enCurso -> {
+            stringResource(R.string.contador_nota_falta)
+        }
+
+        conduccionApuntadaEn != null -> {
+            stringResource(
+                R.string.contador_nota_apuntada,
+                conduccionApuntadaEn.format(FormatoHora),
+            )
+        }
+
+        else -> {
+            stringResource(R.string.contador_nota_hoy)
+        }
+    }
+
+/**
  * «43 h 20 min», una barra y «Restan 12 h 40 min» (o «Pasado en …», en rojo).
  *
- * Cuenta lo que ya está apuntado (lo mínimo seguro). Con la jornada en curso la app aún no sabe cuánto lleva
- * conducido hoy, y contar lo máximo posible le diría que se ha pasado sin ser verdad: se le avisa en una nota.
+ * Cuenta lo que ya está apuntado (lo mínimo seguro). Con la jornada en curso la app no sabe cuánto ha
+ * conducido desde la última vez que lo apuntó, y contar lo máximo posible le diría que se ha pasado sin
+ * ser verdad: se le avisa con [nota].
  */
 @Composable
 private fun ContadorTiempo(
     titulo: String,
     valor: Intervalo,
     limite: Duration,
-    enCurso: Boolean,
+    nota: String,
     modifier: Modifier = Modifier,
 ) {
     val apuntado = valor.min
@@ -406,7 +445,7 @@ private fun ContadorTiempo(
         )
         if (!valor.exacto) {
             Text(
-                stringResource(if (enCurso) R.string.contador_nota_hoy else R.string.contador_nota_falta),
+                nota,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

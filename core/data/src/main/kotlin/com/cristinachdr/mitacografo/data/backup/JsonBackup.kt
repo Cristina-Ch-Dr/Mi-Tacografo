@@ -95,6 +95,8 @@ private fun Jornada.aDto() =
         paisFin = paisFin,
         ciudadFin = ciudadFin,
         conduccionMinutos = conduccionTacografo?.toMinutes(),
+        conduccionApuntadaEn = conduccionApuntadaEn?.toString(),
+        conduccionAntesMedianocheMinutos = conduccionAntesMedianoche?.toMinutes(),
         viajeId = viajeId,
         observaciones = observaciones,
     )
@@ -113,6 +115,8 @@ private fun JornadaDto.aDominio() =
         paisFin = paisFin,
         ciudadFin = ciudadFin,
         conduccionTacografo = conduccionMinutos?.let(Duration::ofMinutes),
+        conduccionApuntadaEn = conduccionApuntadaEn?.let(Instant::parse),
+        conduccionAntesMedianoche = conduccionAntesMedianocheMinutos?.let(Duration::ofMinutes),
         viajeId = viajeId,
         observaciones = observaciones,
     )

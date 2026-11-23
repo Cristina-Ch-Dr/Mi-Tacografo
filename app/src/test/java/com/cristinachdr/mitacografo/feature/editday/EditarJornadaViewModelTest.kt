@@ -66,10 +66,11 @@ class EditarJornadaViewModelTest {
         return EditarJornadaViewModel(
             SavedStateHandle(mapOf("id" to id)),
             repo,
-            EditarJornada(repo, gestor, reloj),
-            AnadirJornada(repo, FakeViajeRepository(), reloj),
+            EditarJornada(repo, gestor, FakeSettingsRepository(), reloj),
+            AnadirJornada(repo, FakeViajeRepository(), FakeSettingsRepository(), reloj),
             BorrarJornada(repo, gestor),
             ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
+            FakeSettingsRepository(),
             reloj,
         )
     }

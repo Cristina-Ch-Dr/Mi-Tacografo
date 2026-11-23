@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.Viaje
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Duration
@@ -48,10 +49,18 @@ class JsonBackupTest {
                         paisFin = "UA",
                         ciudadFin = "Ciudad B",
                         conduccionTacografo = Duration.ofMinutes(525),
+                        conduccionAntesMedianoche = Duration.ofMinutes(232),
                         viajeId = 3,
                         observaciones = "Nota con \"comillas\" y ñ",
                     ),
-                    Jornada(id = 2, inicio = hora(3, 6), zonaInicio = madrid, kmInicio = 245_872),
+                    Jornada(
+                        id = 2,
+                        inicio = hora(3, 6),
+                        zonaInicio = madrid,
+                        kmInicio = 245_872,
+                        conduccionTacografo = Duration.ofMinutes(190),
+                        conduccionApuntadaEn = hora(3, 11),
+                    ),
                 ),
             ajustes =
                 Ajustes(
@@ -142,6 +151,9 @@ class JsonBackupTest {
 
         assertEquals(500, leida.jornadas.single().kmRecorridos)
         assertEquals(Duration.ofHours(9), leida.jornadas.single().conduccionTacografo)
+        // Las de antes de MT-53 no traen la conducción «hasta ahora» ni la de antes de medianoche.
+        assertNull(leida.jornadas.single().conduccionApuntadaEn)
+        assertNull(leida.jornadas.single().conduccionAntesMedianoche)
         assertEquals(Ajustes(paisEmpresa = "ES"), leida.ajustes)
         // Las copias de antes de MT-20 no traen descansos.
         assertEquals(emptyList<Descanso>(), leida.descansos)

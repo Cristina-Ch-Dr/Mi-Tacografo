@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.ui.components.BigButton
+import com.cristinachdr.mitacografo.ui.components.CampoAntesMedianoche
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
@@ -69,6 +70,8 @@ fun EditarJornadaScreen(
                 onCiudadFin = viewModel::onCiudadFin,
                 onConduccionHoras = viewModel::onConduccionHoras,
                 onConduccionMinutos = viewModel::onConduccionMinutos,
+                onAntesHoras = viewModel::onAntesHoras,
+                onAntesMinutos = viewModel::onAntesMinutos,
                 onObservaciones = viewModel::onObservaciones,
                 onGuardar = viewModel::onGuardar,
                 onPedirBorrar = viewModel::onPedirBorrar,
@@ -89,6 +92,8 @@ data class AccionesEditar(
     val onCiudadFin: (String) -> Unit = {},
     val onConduccionHoras: (String) -> Unit = {},
     val onConduccionMinutos: (String) -> Unit = {},
+    val onAntesHoras: (String) -> Unit = {},
+    val onAntesMinutos: (String) -> Unit = {},
     val onObservaciones: (String) -> Unit = {},
     val onGuardar: () -> Unit = {},
     val onPedirBorrar: () -> Unit = {},
@@ -173,6 +178,16 @@ fun EditarJornadaContent(
                     etiqueta = stringResource(R.string.campo_minutos),
                     error = estado.errorMinutos,
                     modifier = Modifier.weight(1f),
+                )
+            }
+            estado.medianoche?.let { medianoche ->
+                CampoAntesMedianoche(
+                    medianoche = medianoche,
+                    horas = estado.antesHoras,
+                    minutos = estado.antesMinutos,
+                    onHoras = acciones.onAntesHoras,
+                    onMinutos = acciones.onAntesMinutos,
+                    errorMinutos = estado.errorMinutosAntes,
                 )
             }
             Resumen(estado)

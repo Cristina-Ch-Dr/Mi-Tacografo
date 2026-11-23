@@ -71,6 +71,8 @@ data class JornadaEnCursoUi(
     val proximoAviso: AvisoUi?,
     /** Nombre del viaje en el que se apunta, o `null` si no va en ninguno. */
     val viaje: String? = null,
+    /** Cuándo apuntó la conducción «hasta ahora» (MT-53), en la zona del móvil; `null` si no lo ha hecho. */
+    val conduccionApuntadaEn: ZonedDateTime? = null,
 )
 
 data class AvisoUi(
@@ -237,6 +239,7 @@ class HomeViewModel
                 transcurrido = Duration.between(jornada.inicio, ahora).coerceAtLeast(Duration.ZERO),
                 kmInicio = jornada.kmInicio,
                 proximoAviso = proximo?.let { AvisoUi(it.disparo.atZone(clock.zone), it.desdeInicio) },
+                conduccionApuntadaEn = jornada.conduccionApuntadaEn?.atZone(clock.zone),
             )
         }
     }

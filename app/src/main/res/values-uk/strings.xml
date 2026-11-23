@@ -392,6 +392,15 @@
     <string name="aviso_jornada_15h">Понад 15 год від початку робочого дня: уже не вміщується навіть щоденний відпочинок 9 год.</string>
     <string name="aviso_semanal_pronto">Тижневий відпочинок має початися до %1$s.</string>
     <string name="aviso_semanal_vencido">Термін тижневого відпочинку минув %1$s.</string>
-    <string name="contador_nota_hoy">Без урахування сьогоднішнього керування: запишіть його, коли завершите робочий день.</string>
+    <string name="contador_nota_hoy">Без урахування сьогоднішнього керування: запишіть його кнопкою «Записати керування зараз» або коли завершите робочий день.</string>
     <string name="contador_nota_falta">Не записано керування за якийсь день: може бути більше.</string>
+    <!-- MT-53: conducción durante la jornada y antes de medianoche del domingo -->
+    <string name="accion_apuntar_conduccion">Записати керування зараз</string>
+    <string name="apuntar_conduccion_ayuda">Без завершення робочого дня: так «Що залишилось» його враховує.</string>
+    <string name="conduccion_apuntada_a_las">Записано о %1$s. Коли завершите, вкажіть те, що показує тахограф.</string>
+    <string name="contador_nota_apuntada">З керуванням, записаним о %1$s: те, що після цього, ще не враховано.</string>
+    <string name="campo_antes_medianoche">Керування до півночі (необовʼязково)</string>
+    <string name="antes_medianoche_ayuda">Робочий день переходить через північ (%1$s), коли змінюється тиждень. Якщо вказати, що показував тахограф о 24:00, керування точно розподілиться між двома тижнями.</string>
+    <string name="error_antes_medianoche_sin_total">Щоб розподілити керування між двома тижнями, вкажіть також загальне.</string>
+    <string name="error_antes_medianoche_no_cuadra">Керування до півночі не сходиться: воно не може бути більшим за загальне чи за години роботи з кожного боку від півночі.</string>
 </resources>

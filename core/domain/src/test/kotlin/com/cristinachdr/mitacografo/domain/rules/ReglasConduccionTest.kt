@@ -224,6 +224,30 @@ class ReglasConduccionTest {
 
             assertEquals(MotivoNoVerificado.JORNADA_CRUZA_SEMANA, (r as Resultado.NoVerificado).motivo)
         }
+
+        @Test
+        fun `T20 - con la conduccion antes de medianoche apuntada, el reparto es exacto`() {
+            // Como el 04/10 de la libreta: 6 h en total, 3 h 52 antes de medianoche y el resto el lunes.
+            val cruza =
+                jornada(8, h(6), dura = h(10), empieza = hora(8, 20)).copy(conduccionAntesMedianoche = h(3, 52))
+            val semana = (0..5).map { jornada(2 + it, h(9)) }
+            val informe = evaluar(*(semana + cruza).toTypedArray())
+
+            assertEquals(Intervalo.exacto(h(57, 52)), informe.semanas.single { it.lunes == lunes2 }.conduccion)
+            assertEquals(Intervalo.exacto(h(2, 8)), informe.semanas.single { it.lunes == lunes9 }.conduccion)
+            // Ahora sí se sabe: 57 h 52 en la semana del 2 pasa de 56 h.
+            assertTrue(informe.deSemana(lunes2, ReglaId.CONDUCCION_SEMANAL) is Resultado.Excedido)
+        }
+
+        @Test
+        fun `si la conduccion antes de medianoche no cuadra, se sigue repartiendo con un intervalo`() {
+            // 5 h antes de medianoche no caben: la jornada empezó a las 20:00 del domingo (solo hay 4 h).
+            val cruza =
+                jornada(8, h(6), dura = h(10), empieza = hora(8, 20)).copy(conduccionAntesMedianoche = h(5))
+            val informe = evaluar(cruza)
+
+            assertEquals(Intervalo(h(0), h(4)), informe.semanas.single { it.lunes == lunes2 }.conduccion)
+        }
     }
 
     @Nested
@@ -256,6 +280,28 @@ class ReglasConduccionTest {
                 .resultados
                 .isEmpty(),
         )
+    }
+
+    @Test
+    fun `con la conduccion de hasta ahora apuntada, la jornada en curso cuenta como poco esa`() {
+        // Empezó hace 5 h y hace 1 h apuntó 3 h 30 del tacógrafo: lleva entre 3 h 30 y 4 h 30.
+        val enCurso =
+            Jornada(
+                id = 51,
+                inicio = ahora.minus(h(5)),
+                zonaInicio = madrid,
+                kmInicio = 0,
+                conduccionTacografo = h(3, 30),
+                conduccionApuntadaEn = ahora.minus(h(1)),
+            )
+        val semana = MotorReglas().evaluar(ContextoReglas(listOf(enCurso), ahora = ahora, datosDesde = desdeSiempre))
+
+        assertEquals(Intervalo(h(3, 30), h(4, 30)), semana.semanas.single().conduccion)
+
+        // Justo al apuntarla, es exacta: en Inicio ya no sale la nota.
+        val justoAhora = enCurso.copy(conduccionApuntadaEn = ahora)
+        val exacta = MotorReglas().evaluar(ContextoReglas(listOf(justoAhora), ahora = ahora, datosDesde = desdeSiempre))
+        assertEquals(Intervalo.exacto(h(3, 30)), exacta.semanas.single().conduccion)
     }
 
     @Test

@@ -21,12 +21,13 @@ import com.cristinachdr.mitacografo.data.room.viaje.ViajeEntity
     // La tabla `descanso` se creó vacía en la versión 1 para no tener que migrar
     // la base de datos del conductor; desde MT-20 se usa (el DAO no cambia el esquema).
     entities = [JornadaEntity::class, DescansoEntity::class, ViajeEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = true,
     // 1 → 2 (MT-18): tabla `viaje` y clave ajena `jornada.viaje_id`. Room la genera comparando
     // `schemas/1.json` y `2.json`: rehace la tabla `jornada` copiando todas sus filas.
     // Se prueba en `MigracionesTest` con la base de datos de la versión 1.
-    autoMigrations = [AutoMigration(from = 1, to = 2)],
+    // 2 → 3 (MT-53): dos columnas opcionales en `jornada` (conducción «hasta ahora» y antes de medianoche).
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun jornadaDao(): JornadaDao

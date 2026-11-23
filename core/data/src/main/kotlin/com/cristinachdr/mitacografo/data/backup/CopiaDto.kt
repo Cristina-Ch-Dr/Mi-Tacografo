@@ -35,6 +35,9 @@ internal data class JornadaDto(
     val paisFin: String? = null,
     val ciudadFin: String? = null,
     val conduccionMinutos: Long? = null,
+    // Desde MT-53. Opcionales: las copias antiguas se leen sin ellos.
+    val conduccionApuntadaEn: String? = null,
+    val conduccionAntesMedianocheMinutos: Long? = null,
     val viajeId: Long? = null,
     val observaciones: String? = null,
 )

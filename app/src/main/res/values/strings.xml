@@ -387,6 +387,15 @@
     <string name="aviso_jornada_15h">Más de 15 h desde el inicio de la jornada: ya no cabe ni un descanso diario de 9 h.</string>
     <string name="aviso_semanal_pronto">El descanso semanal tiene que empezar antes del %1$s.</string>
     <string name="aviso_semanal_vencido">El plazo del descanso semanal venció el %1$s.</string>
-    <string name="contador_nota_hoy">Sin contar lo que lleva conducido hoy: apúntalo al finalizar la jornada.</string>
+    <string name="contador_nota_hoy">Sin contar lo que lleva conducido hoy: apúntalo con «Apuntar la conducción de ahora» o al finalizar la jornada.</string>
     <string name="contador_nota_falta">Falta apuntar la conducción de alguna jornada: puede ser más.</string>
+    <!-- MT-53: conducción durante la jornada y antes de medianoche del domingo -->
+    <string name="accion_apuntar_conduccion">Apuntar la conducción de ahora</string>
+    <string name="apuntar_conduccion_ayuda">Sin finalizar la jornada: así «Lo que te queda» cuenta con ella.</string>
+    <string name="conduccion_apuntada_a_las">Apuntada a las %1$s. Al finalizar, pon la que marque el tacógrafo.</string>
+    <string name="contador_nota_apuntada">Con la conducción apuntada a las %1$s: lo conducido después aún no cuenta.</string>
+    <string name="campo_antes_medianoche">Conducción antes de medianoche (opcional)</string>
+    <string name="antes_medianoche_ayuda">La jornada cruza la medianoche del %1$s, cuando cambia la semana. Si apuntas lo que marcaba el tacógrafo a las 24:00, la conducción se reparte exacta entre las dos semanas.</string>
+    <string name="error_antes_medianoche_sin_total">Para repartir la conducción entre las dos semanas, apunta también la total.</string>
+    <string name="error_antes_medianoche_no_cuadra">La conducción antes de medianoche no cuadra: no puede pasar de la total ni de las horas trabajadas a cada lado de la medianoche.</string>
 </resources>
