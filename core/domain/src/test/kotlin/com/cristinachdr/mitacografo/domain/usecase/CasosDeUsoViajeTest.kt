@@ -176,4 +176,74 @@ class CasosDeUsoViajeTest {
             assertTrue(viajes.guardados.isEmpty())
             assertNull(jornadas.guardadas.single().viajeId)
         }
+
+    @Nested
+    inner class AnadirViajePasado {
+        /** Del lunes 2 al jueves 5: lo mismo que «terminado», pero sin guardar. */
+        private val pasado = terminado.copy(id = Viaje.SIN_ID, nombre = "  Viaje del 2 nov  ")
+
+        @Test
+        fun `lo guarda y le asigna las jornadas sin viaje que empiezan dentro`() =
+            runTest {
+                val jornadas =
+                    FakeJornadaRepository(
+                        listOf(
+                            jornada(1, 2, 500, viajeId = null),
+                            jornada(2, 4, 600, viajeId = null),
+                            // El viernes 6 ya es después del fin: no entra.
+                            jornada(3, 6, 450, viajeId = null),
+                        ),
+                    )
+                val viajes = FakeViajeRepository()
+
+                val resultado = AnadirViaje(viajes, jornadas, reloj)(pasado)
+
+                val id = (resultado as ResultadoViaje.Ok).valor
+                assertEquals("Viaje del 2 nov", viajes.obtenerPorId(id)?.nombre)
+                assertEquals(listOf(id, id, null), jornadas.guardadas.sortedBy { it.inicio }.map { it.viajeId })
+            }
+
+        @Test
+        fun `no quita las jornadas que ya tienen otro viaje`() =
+            runTest {
+                val otro = terminado.copy(id = 7, inicio = hora(1, 5), fin = hora(1, 20))
+                val jornadas = FakeJornadaRepository(listOf(jornada(1, 3, 500, viajeId = 7)))
+
+                AnadirViaje(FakeViajeRepository(listOf(otro)), jornadas, reloj)(pasado)
+
+                assertEquals(7L, jornadas.guardadas.single().viajeId)
+            }
+
+        @Test
+        fun `tiene que estar terminado`() =
+            runTest {
+                val resultado =
+                    AnadirViaje(FakeViajeRepository(), FakeJornadaRepository(), reloj)(pasado.copy(fin = null))
+
+                assertEquals(ResultadoViaje.Invalido(ErrorViaje.FALTA_EL_FIN), resultado)
+            }
+
+        @Test
+        fun `no puede pisar a otro viaje, tampoco al que esta en curso`() =
+            runTest {
+                val enCurso = Viaje(id = 3, nombre = "Ahora", inicio = hora(4, 6), zonaInicio = madrid)
+                val viajes = FakeViajeRepository(listOf(enCurso))
+
+                val resultado = AnadirViaje(viajes, FakeJornadaRepository(), reloj)(pasado)
+
+                assertEquals(ResultadoViaje.Invalido(ErrorViaje.SOLAPA_CON_OTRO_VIAJE), resultado)
+                assertEquals(listOf(enCurso), viajes.guardados)
+            }
+
+        @Test
+        fun `uno pegado a otro no se solapa`() =
+            runTest {
+                val siguiente = terminado.copy(id = 4, inicio = hora(5, 18), fin = hora(8, 18))
+
+                val resultado =
+                    AnadirViaje(FakeViajeRepository(listOf(siguiente)), FakeJornadaRepository(), reloj)(pasado)
+
+                assertTrue(resultado is ResultadoViaje.Ok)
+            }
+    }
 }

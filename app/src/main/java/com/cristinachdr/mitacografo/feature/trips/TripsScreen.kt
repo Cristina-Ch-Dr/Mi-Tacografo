@@ -5,22 +5,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +50,7 @@ import java.time.ZoneId
 @Composable
 fun TripsScreen(
     onViaje: (Long) -> Unit,
+    onNuevo: () -> Unit = {},
     viewModel: ViajesViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
@@ -54,6 +61,7 @@ fun TripsScreen(
         acciones =
             AccionesViajes(
                 onViaje = onViaje,
+                onNuevo = onNuevo,
                 onPedirIniciar = { viewModel.onPedirIniciar { hoy -> propuesto.format(hoy.format(formato)) } },
                 onNombreNuevo = viewModel::onNombreNuevo,
                 onCancelarIniciar = viewModel::onCancelarIniciar,
@@ -67,6 +75,8 @@ fun TripsScreen(
 
 data class AccionesViajes(
     val onViaje: (Long) -> Unit = {},
+    /** «Añadir viaje pasado» (MT-52). */
+    val onNuevo: () -> Unit = {},
     val onPedirIniciar: () -> Unit = {},
     val onNombreNuevo: (String) -> Unit = {},
     val onCancelarIniciar: () -> Unit = {},
@@ -116,12 +126,22 @@ fun ViajesContent(
             }
         }
         item(key = "titulo-anteriores") {
-            Text(
-                stringResource(R.string.viajes_anteriores),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 12.dp),
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            ) {
+                Text(
+                    stringResource(R.string.viajes_anteriores),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                // Para pasar los viajes de antes de usar la app (MT-52).
+                OutlinedButton(onClick = acciones.onNuevo, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Icon(Icons.Filled.Add, contentDescription = null)
+                    Text(stringResource(R.string.accion_anadir_viaje_pasado), modifier = Modifier.padding(start = 4.dp))
+                }
+            }
             if (estado.anteriores.isEmpty()) {
                 Text(stringResource(R.string.viajes_vacio), style = MaterialTheme.typography.bodyLarge)
             }

@@ -142,7 +142,7 @@
     <string name="pantalla_pendiente">Próximamente</string>
 
     <!-- Historial -->
-    <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí. Las que ya hiciste las puedes pasar con «Añadir jornada».</string>
+    <string name="historial_vacio">Todavía no hay jornadas. Cuando termines la primera, saldrá aquí. Las que ya hiciste las puedes pasar desde Inicio, con «Añadir una jornada pasada».</string>
     <string name="historial_total_semana">%1$s km · %2$s de conducción</string>
     <string name="historial_total_semana_incompleta">%1$s km · %2$s de conducción (falta apuntar alguna)</string>
     <string name="historial_dia">%1$s · %2$s</string>
@@ -398,4 +398,11 @@
     <string name="antes_medianoche_ayuda">La jornada cruza la medianoche del %1$s, cuando cambia la semana. Si apuntas lo que marcaba el tacógrafo a las 24:00, la conducción se reparte exacta entre las dos semanas.</string>
     <string name="error_antes_medianoche_sin_total">Para repartir la conducción entre las dos semanas, apunta también la total.</string>
     <string name="error_antes_medianoche_no_cuadra">La conducción antes de medianoche no cuadra: no puede pasar de la total ni de las horas trabajadas a cada lado de la medianoche.</string>
+    <!-- MT-52: añadir jornadas desde Inicio y viajes pasados -->
+    <string name="accion_anadir_jornada_pasada">Añadir una jornada pasada</string>
+    <string name="accion_anadir_viaje_pasado">Añadir pasado</string>
+    <string name="accion_anadir_viaje">Añadir viaje</string>
+    <string name="viaje_titulo_nuevo">Añadir viaje pasado</string>
+    <string name="viaje_pasado_ayuda">Para los viajes de antes de usar la app. Las jornadas sin viaje que empiecen entre la salida y la vuelta entrarán en él.</string>
+    <string name="error_viaje_solapa">Se solapa con otro viaje: cambia las fechas.</string>
 </resources>

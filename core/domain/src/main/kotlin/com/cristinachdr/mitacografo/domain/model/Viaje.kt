@@ -63,7 +63,19 @@ enum class ErrorViaje {
     INICIO_EN_EL_FUTURO,
     FIN_NO_POSTERIOR_AL_INICIO,
     FIN_EN_EL_FUTURO,
+
+    /** Un viaje pasado (MT-52) tiene que estar terminado. */
+    FALTA_EL_FIN,
+
+    /** Un viaje pasado no puede pisar a otro (el que está en curso cuenta hasta ahora). */
+    SOLAPA_CON_OTRO_VIAJE,
 }
+
+/** Dos viajes se solapan si uno empieza antes de que termine el otro. Uno en curso dura hasta [ahora]. */
+fun Viaje.solapaCon(
+    otro: Viaje,
+    ahora: Instant,
+): Boolean = inicio < (otro.fin ?: ahora) && otro.inicio < (fin ?: ahora)
 
 /** Reglas de un viaje frente a los demás: con nombre, fechas con sentido y solo uno en curso. */
 fun validarViaje(

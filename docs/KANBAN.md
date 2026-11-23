@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-52, MT-54, MT-55, MT-56, MT-33, MT-33B | MT-53 (con MT-50), hecha en `feature/MT-53-conduccion-jornada` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-54, MT-55, MT-56, MT-57, MT-58, MT-59, MT-33, MT-33B | MT-52, hecha en `feature/MT-52-anadir-pasados` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -394,11 +394,12 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Van **antes que MT-33 y MT-33B** (decidido el 23 nov 2026). Casi todo sale de su app de ejemplo (versión b20), que ha crecido: es lo que tiene y aquí falta. En su descripción dice que quiere pasar su lógica **al estilo de nuestra app** (la «0.1.0 de cabecera azul con el botón redondo»).
 
 ### MT-52 · Añadir jornadas desde Inicio y viajes pasados desde Viajes · M · deps: MT-47, MT-51 · *(propuesta de Cristina)*
-- [ ] Quitar el botón «Añadir jornada» de Historial (y el hueco que deja abajo) y ponerlo en **Inicio**, debajo de la jornada: «Añadir una jornada pasada». Abre la misma pantalla de ahora (`RutaJornada(0)`).
-- [ ] En **Viajes**, botón «Añadir viaje pasado» junto a «Viajes anteriores». Ahora solo se puede iniciar uno nuevo; los viajes de antes de usar la app no se pueden pasar.
+- [x] Quitar el botón «Añadir jornada» de Historial (y el hueco que deja abajo) y ponerlo en **Inicio**, debajo de la jornada: «Añadir una jornada pasada». Abre la misma pantalla de ahora (`RutaJornada(0)`).
+- [x] En **Viajes**, botón «Añadir viaje pasado» junto a «Viajes anteriores». Ahora solo se puede iniciar uno nuevo; los viajes de antes de usar la app no se pueden pasar.
   - Pantalla: la de editar viaje con `RutaViaje(0)`: nombre (propuesto «Viaje del …»), inicio, fin (obligatorio) y observaciones; sin la lista de jornadas ni «Borrar».
   - Caso de uso `AnadirViaje`: errores nuevos `FALTA_EL_FIN` y `SOLAPA_CON_OTRO_VIAJE` (el en curso cuenta hasta ahora). Al guardarlo, las jornadas **sin viaje** que empiezan entre su inicio y su fin entran en él (como hace `AnadirJornada` al revés).
   - Tests en `CasosDeUsoViajeTest`; textos ES y UK.
+- Al añadir un viaje pasado se propone de lunes a viernes de la semana anterior al viaje más antiguo (así no pisa a ninguno), y el nombre sigue a la fecha de inicio hasta que se escribe otro. Probado en el emulador con la copia real del conductor: el viaje del 2 al 10 nov recoge sus 8 jornadas sin viaje (4.498 km).
 
 ### MT-53 · Conducción durante la jornada y antes de medianoche del domingo · M · deps: MT-51 · (con la antigua MT-50) · *(petición del conductor)*
 - [x] Con la jornada en curso, poder apuntar «Conducción de hoy hasta ahora» (lo que marca el tacógrafo). Así los contadores de «Lo que te queda» son exactos y no sale la nota «sin contar lo de hoy».
@@ -437,7 +438,7 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - [ ] Cuentan los viajes que **empiezan y terminan dentro** del periodo. Días = de la fecha de salida a la de vuelta, las dos incluidas. Km = suma de las jornadas del viaje.
 - [ ] Gastos de su bolsillo (descripción, importe y fecha), que se suman. Total = nómina + dieta y/o km + gastos, con el desglose y la lista de viajes.
 - [ ] Datos nuevos en la base de datos (migración) y en la copia de seguridad (que siga leyendo las antiguas).
-  - Duda: ¿un viaje que cruza el día de corte no cuenta en ningún periodo? En su app es así. Preguntárselo.
+  - Un viaje que cruza el día de corte no cuenta en ningún periodo: así lo hace su app (lo confirma su descripción de la b20). Día de corte por defecto: el 20.
 
 ### MT-59 · Ajuste de semanas · M · deps: MT-30 · *(petición del conductor)*
 - [ ] Para quien empieza a usar la app a mitad de semana: horas de conducción que ya llevaba esta semana y la anterior, ampliaciones a 10 h, reducidos y fin del último descanso semanal.
@@ -453,6 +454,8 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Conexión por Bluetooth al tacógrafo VDO (idea del conductor). Investigar antes: no se sabe si admite otro cliente además de VDO Driver.
 - Copia de seguridad como texto para pegar en Telegram o en notas (la tiene su app).
 - Widget de la jornada en curso.
+- Pasar de una pestaña a otra deslizando el dedo (la tiene su app, b20).
+- En Viajes, el descanso entre un viaje y el siguiente (la tiene su app, b20).
 - Art. 9 (ferri/tren) y art. 12 (excepciones) completos.
 - Multi-manning (30 h).
 - Gráficas mensuales.

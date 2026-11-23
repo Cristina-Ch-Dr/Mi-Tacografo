@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -67,6 +68,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onAjustes: () -> Unit = {},
     onInforme: (LocalDate) -> Unit = {},
+    onAnadirJornada: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,6 +82,7 @@ fun HomeScreen(
         permisos = { EstadoPermisosAvisos(soloSiFalta = true) },
         semana = semana,
         onInforme = onInforme,
+        onAnadirJornada = onAnadirJornada,
         formulario = {
             // Un formulario nuevo para cada jornada: al iniciar o finalizar, cambia la clave y se vacía.
             val jornada = estado.jornada
@@ -159,6 +162,7 @@ fun HomeContent(
     permisos: @Composable () -> Unit = {},
     semana: ResumenSemanaUi? = null,
     onInforme: (LocalDate) -> Unit = {},
+    onAnadirJornada: () -> Unit = {},
     formulario: @Composable () -> Unit = {},
 ) {
     Column(
@@ -190,6 +194,11 @@ fun HomeContent(
             JornadaEnCursoCard(jornada, state.pausa)
             BotonPausa(enPausa = state.pausa != null, onIniciar = onIniciarPausa, onTerminar = onTerminarPausa)
             TarjetaFormulario(stringResource(R.string.accion_finalizar_jornada), formulario)
+        }
+        // Para pasar lo que está en el tacógrafo o en la libreta pero no en la app (MT-47, MT-52).
+        OutlinedButton(onClick = onAnadirJornada, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Icon(Icons.Filled.Add, contentDescription = null)
+            Text(stringResource(R.string.accion_anadir_jornada_pasada), modifier = Modifier.padding(start = 8.dp))
         }
         semana?.let {
             LoQueQueda(
