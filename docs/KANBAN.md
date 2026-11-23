@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E7 | MT-33, MT-33B, MT-50 | — | MT-49 | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-48, MT-51 · MT-33B sin reglas · **v0.3.0 publicada** |
+| E5 – E8 | MT-33, MT-33B, MT-50 | — | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -328,6 +328,8 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 > 🏁 **Release v0.3.0** ✅ (13 nov 2026): motor del Reglamento 561/2006 con «No verificado», chips en Historial e Inicio, informe de la semana, descanso entre jornadas calculado solo, Historial por semanas y añadir jornadas pasadas. Probada actualizando en un emulador API 33 desde la v0.2.0 de la Release (las dos firmadas con la misma clave): sin cambios de base de datos, siguen las 10 jornadas y la jornada en curso.
 
+> 🏁 **Release v0.4.0** ✅ (22 nov 2026): pestañas como la app del conductor (Inicio · Viajes · Descanso · Historial), Inicio con avisos, iniciar y finalizar en la misma pantalla y «Lo que te queda»; descansos entre jornadas en la pestaña Descanso; totales en Historial; texto claro en «Descanso semanal» del informe (MT-49). Probada actualizando en un emulador API 33 desde la v0.3.0 de la Release (las dos firmadas con la misma clave): sin cambios de base de datos, siguen las 15 jornadas y la jornada en curso.
+
 ---
 
 ## E5 · Resumen, estadísticas y exportación (CSV + PDF) → **v1.0**
@@ -359,8 +361,10 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E6 · Idiomas → **v1.0**
 
-### MT-34 · Idiomas · M · (antes MT-34 y MT-35)
-- [ ] `locales_config.xml`, `setApplicationLocales` y opción en Ajustes.
+### MT-34 · Idiomas · M · (antes MT-34 y MT-35) · *(pedido por Cristina el 22 nov 2026)*
+- [ ] En Ajustes, «Idioma de la app»: Español · Українська · Igual que el móvil. Se cambia al momento, sin tocar el idioma del móvil ni reiniciar la app, y se guarda aunque se cierre.
+  - `locales_config.xml` y `AppCompatDelegate.setApplicationLocales` (en Android 13 también sale en Ajustes del sistema → Apps → Idioma).
+  - Las fechas, los números y los países siguen el idioma elegido (ya usan `idiomaApp()`). El PDF, también.
 - [ ] `values-uk/strings.xml` completo. **Revisión por el conductor**, que es hablante nativo.
 - [ ] Lint `MissingTranslation` como error en la CI.
 
@@ -389,9 +393,60 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ---
 
+## E8 · Lo que piden el conductor y Cristina (23 nov 2026) → **sin versión**
+
+Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Casi todo sale de su app de ejemplo (versión b20), que ha crecido: es lo que tiene y aquí falta. En su descripción dice que quiere pasar su lógica **al estilo de nuestra app** (la «0.1.0 de cabecera azul con el botón redondo»).
+
+### MT-52 · Añadir jornadas desde Inicio y viajes pasados desde Viajes · M · deps: MT-47, MT-51 · *(propuesta de Cristina)*
+- [ ] Quitar el botón «Añadir jornada» de Historial (y el hueco que deja abajo) y ponerlo en **Inicio**, debajo de la jornada: «Añadir una jornada pasada». Abre la misma pantalla de ahora (`RutaJornada(0)`).
+- [ ] En **Viajes**, botón «Añadir viaje pasado» junto a «Viajes anteriores». Ahora solo se puede iniciar uno nuevo; los viajes de antes de usar la app no se pueden pasar.
+  - Pantalla: la de editar viaje con `RutaViaje(0)`: nombre (propuesto «Viaje del …»), inicio, fin (obligatorio) y observaciones; sin la lista de jornadas ni «Borrar».
+  - Caso de uso `AnadirViaje`: errores nuevos `FALTA_EL_FIN` y `SOLAPA_CON_OTRO_VIAJE` (el en curso cuenta hasta ahora). Al guardarlo, las jornadas **sin viaje** que empiezan entre su inicio y su fin entran en él (como hace `AnadirJornada` al revés).
+  - Tests en `CasosDeUsoViajeTest`; textos ES y UK.
+
+### MT-53 · Conducción durante la jornada · S · deps: MT-51 · *(petición del conductor)*
+- [ ] Con la jornada en curso, poder apuntar «Conducción de hoy hasta ahora» (lo que marca el tacógrafo). Así los contadores de «Lo que te queda» son exactos y no sale la nota «sin contar lo de hoy».
+- [ ] Al finalizar, el campo sale relleno con lo último apuntado.
+
+### MT-54 · Botón «Pausa de 3 horas» · S · deps: MT-22 · *(petición del conductor)*
+- [ ] En la pestaña Descanso, un botón para el fraccionado 3 + 9: «La pausa terminó a las…» y la app apunta las 3 h anteriores. Más rápido que «Añadir» con inicio y fin.
+
+### MT-55 · Comunidad autónoma en España · S · deps: MT-41 · *(petición del conductor)*
+- [ ] Si el país es España, elegir también la comunidad autónoma (las abreviaturas del tacógrafo: AN, AR, AST, C, CAN, CAT, CL, CM, CV, EXT, G, IB, LR, M, MU, NA, PV…), al iniciar y al finalizar. El tacógrafo se la pide al meter el país.
+- [ ] Se rellena con la del final de la jornada anterior, como el país.
+
+### MT-56 · Detalles de su app · S · *(petición del conductor)*
+- [ ] Historial: las jornadas separadas por **cabeceras de viaje** («Viaje 3 nov → 9 nov · 2.560 km» / «Fuera de viaje»).
+- [ ] Aviso del descanso semanal también **6 h antes** del plazo (ahora: 24 h antes y pasado el plazo).
+- [ ] Km de hoy y del viaje en Inicio (pendiente de MT-51).
+- [ ] Descanso semanal que cruza dos semanas: elegir a qué semana cuenta (art. 8.9). Revisar qué hace ahora el motor.
+
+### MT-57 · Cuándo salir y despertador · M · deps: MT-13 · *(petición del conductor)*
+- [ ] Al finalizar la jornada, tarjeta en Inicio: con descanso de **9 h** → salida a las X y despertar a las Y; lo mismo con **11 h**.
+- [ ] Cuánto antes despertar: 30 / 45 / 60 / 90 / 120 min o a elegir.
+- [ ] Botón ⏰ para poner el despertador. **Suena de verdad con la app cerrada** (en la suya solo con la app abierta): alarma exacta y pantalla completa, como un despertador. Tono elegido del móvil.
+
+### MT-58 · Salario · L · *(petición del conductor)*
+- [ ] Pestaña o pantalla «Salario». Periodo «del día N al N» (él elige el día de inicio, de 1 a 28) y flechas para ir al anterior y al siguiente.
+- [ ] Modo de cobro: **por km**, **dieta por día** o **dieta + km**. Con: nómina base (€), € por km y € de dieta por día.
+- [ ] Cuentan los viajes que **empiezan y terminan dentro** del periodo. Días = de la fecha de salida a la de vuelta, las dos incluidas. Km = suma de las jornadas del viaje.
+- [ ] Gastos de su bolsillo (descripción, importe y fecha), que se suman. Total = nómina + dieta y/o km + gastos, con el desglose y la lista de viajes.
+- [ ] Datos nuevos en la base de datos (migración) y en la copia de seguridad (que siga leyendo las antiguas).
+  - Duda: ¿un viaje que cruza el día de corte no cuenta en ningún periodo? En su app es así. Preguntárselo.
+
+### MT-59 · Ajuste de semanas · M · deps: MT-30 · *(petición del conductor)*
+- [ ] Para quien empieza a usar la app a mitad de semana: horas de conducción que ya llevaba esta semana y la anterior, ampliaciones a 10 h, reducidos y fin del último descanso semanal.
+- [ ] Botón «?» que lo explica: se rellena una vez antes de la primera salida; luego solo lo que falte, porque lo de las jornadas ya lo cuenta la app.
+- [ ] El motor de reglas lo usa como dato conocido (menos «No verificado» al empezar).
+
+---
+
 ## Backlog futuro (sin planificar)
 
-- Lectura de ficheros `.DDD` de la tarjeta del conductor.
+- Lectura de ficheros `.DDD` de la tarjeta del conductor y comparar con lo apuntado. *El conductor ya probó a leerlos: registro de actividades en TLV, FID 0504, por días y en UTC. Hace falta un archivo reciente que coincida con lo apuntado.*
+- Rellenar país y comunidad autónoma con la ubicación al finalizar (idea del conductor). Ojo: `Geocoder` suele necesitar internet y la app no tiene ese permiso a propósito; habría que usar una tabla de fronteras sin conexión.
+- Conexión por Bluetooth al tacógrafo VDO (idea del conductor). Investigar antes: no se sabe si admite otro cliente además de VDO Driver.
+- Copia de seguridad como texto para pegar en Telegram o en notas (la tiene su app).
 - Widget de la jornada en curso.
 - Art. 9 (ferri/tren) y art. 12 (excepciones) completos.
 - Multi-manning (30 h).
