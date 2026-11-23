@@ -45,6 +45,9 @@ data class JornadaEntity(
     @ColumnInfo(name = "pais_fin") val paisFin: String?,
     @ColumnInfo(name = "ciudad_fin") val ciudadFin: String?,
     @ColumnInfo(name = "conduccion_min") val conduccionMin: Int?,
+    // Desde la versión 3 (MT-53): las dos opcionales, así las filas antiguas quedan con NULL.
+    @ColumnInfo(name = "conduccion_apuntada_epoch_ms") val conduccionApuntadaEpochMs: Long? = null,
+    @ColumnInfo(name = "conduccion_antes_medianoche_min") val conduccionAntesMedianocheMin: Int? = null,
     @ColumnInfo(name = "viaje_id") val viajeId: Long?,
     @ColumnInfo(name = "observaciones") val observaciones: String?,
 )

@@ -60,9 +60,10 @@ class CasosDeUsoJornadaTest {
 
     private fun iniciar(repo: FakeJornadaRepository) = IniciarJornada(repo, FakeViajeRepository(), gestor(repo), reloj)
 
-    private fun finalizar(repo: FakeJornadaRepository) = FinalizarJornada(repo, gestor(repo), reloj)
+    private fun finalizar(repo: FakeJornadaRepository) =
+        FinalizarJornada(repo, gestor(repo), FakeSettingsRepository(), reloj)
 
-    private fun editar(repo: FakeJornadaRepository) = EditarJornada(repo, gestor(repo), reloj)
+    private fun editar(repo: FakeJornadaRepository) = EditarJornada(repo, gestor(repo), FakeSettingsRepository(), reloj)
 
     private fun abiertaHoy(id: Long = 2) =
         Jornada(id = id, inicio = hora(2, 6), zonaInicio = madrid, kmInicio = 100_480)
@@ -237,7 +238,7 @@ class CasosDeUsoJornadaTest {
         private fun anadir(
             repo: FakeJornadaRepository,
             viajes: FakeViajeRepository = FakeViajeRepository(),
-        ) = AnadirJornada(repo, viajes, reloj)
+        ) = AnadirJornada(repo, viajes, FakeSettingsRepository(), reloj)
 
         @Test
         fun `guarda una jornada pasada ya terminada sin programar avisos`() =
@@ -439,6 +440,95 @@ class CasosDeUsoJornadaTest {
                 assertEquals(hora(2, 6), actual().first()?.inicio)
                 finalizar(repo)(DatosFin(hora(2, 16), madrid, 100_900))
                 assertNull(actual().first())
+            }
+    }
+
+    @Nested
+    inner class ConduccionDuranteLaJornada {
+        private fun apuntar(repo: FakeJornadaRepository) = ApuntarConduccion(repo, reloj)
+
+        @Test
+        fun `apunta la conduccion de hasta ahora con la hora`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+
+                val resultado = apuntar(repo)(Duration.ofHours(7))
+
+                val apuntada = (resultado as ResultadoJornada.Ok).valor
+                assertEquals(Duration.ofHours(7), repo.obtenerPorId(2)?.conduccionTacografo)
+                assertEquals(reloj.instant(), apuntada.conduccionApuntadaEn)
+                assertTrue(apuntada.abierta)
+            }
+
+        @Test
+        fun `no deja apuntar mas de lo que lleva la jornada ni sin jornada`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+                // Empezó a las 06:00 y son las 20:00: como mucho 14 h.
+                assertEquals(
+                    ResultadoJornada.Invalida(ErrorJornada.CONDUCCION_MAYOR_QUE_JORNADA),
+                    apuntar(repo)(Duration.ofHours(15)),
+                )
+                assertEquals(
+                    ResultadoJornada.Invalida(ErrorJornada.SIN_JORNADA_ABIERTA),
+                    apuntar(FakeJornadaRepository(listOf(ayer)))(Duration.ofHours(1)),
+                )
+            }
+
+        @Test
+        fun `al finalizar ya no es de hasta ahora`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+                apuntar(repo)(Duration.ofHours(7))
+
+                val resultado =
+                    finalizar(repo)(
+                        DatosFin(hora(2, 19), madrid, kmFin = 101_000, conduccionTacografo = Duration.ofHours(8)),
+                    )
+
+                val finalizada = (resultado as ResultadoJornada.Ok).valor
+                assertEquals(Duration.ofHours(8), finalizada.conduccionTacografo)
+                assertNull(finalizada.conduccionApuntadaEn)
+            }
+
+        @Test
+        fun `al finalizar una jornada que cruza el domingo guarda la conduccion antes de medianoche`() =
+            runTest {
+                // Del domingo 1 a las 20:00 al lunes 2 a las 06:00.
+                val domingo = Jornada(id = 2, inicio = hora(1, 20), zonaInicio = madrid, kmInicio = 100_480)
+                val repo = FakeJornadaRepository(listOf(domingo))
+
+                val resultado =
+                    finalizar(repo)(
+                        DatosFin(
+                            hora(2, 6),
+                            madrid,
+                            kmFin = 101_000,
+                            conduccionTacografo = Duration.ofHours(6),
+                            conduccionAntesMedianoche = Duration.ofHours(3),
+                        ),
+                    )
+
+                assertEquals(Duration.ofHours(3), (resultado as ResultadoJornada.Ok).valor.conduccionAntesMedianoche)
+            }
+
+        @Test
+        fun `si no cruza el domingo, la conduccion antes de medianoche no se guarda`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+
+                val resultado =
+                    finalizar(repo)(
+                        DatosFin(
+                            hora(2, 17),
+                            madrid,
+                            kmFin = 101_000,
+                            conduccionTacografo = Duration.ofHours(8),
+                            conduccionAntesMedianoche = Duration.ofHours(3),
+                        ),
+                    )
+
+                assertNull((resultado as ResultadoJornada.Ok).valor.conduccionAntesMedianoche)
             }
     }
 }

@@ -24,6 +24,8 @@ internal fun JornadaEntity.aDominio(): Jornada =
         paisFin = paisFin,
         ciudadFin = ciudadFin,
         conduccionTacografo = conduccionMin?.let { Duration.ofMinutes(it.toLong()) },
+        conduccionApuntadaEn = conduccionApuntadaEpochMs?.let(Instant::ofEpochMilli),
+        conduccionAntesMedianoche = conduccionAntesMedianocheMin?.let { Duration.ofMinutes(it.toLong()) },
         viajeId = viajeId,
         observaciones = observaciones,
     )
@@ -42,6 +44,8 @@ internal fun Jornada.aEntity(): JornadaEntity =
         paisFin = paisFin,
         ciudadFin = ciudadFin,
         conduccionMin = conduccionTacografo?.toMinutes()?.toInt(),
+        conduccionApuntadaEpochMs = conduccionApuntadaEn?.toEpochMilli(),
+        conduccionAntesMedianocheMin = conduccionAntesMedianoche?.toMinutes()?.toInt(),
         viajeId = viajeId,
         observaciones = observaciones,
     )

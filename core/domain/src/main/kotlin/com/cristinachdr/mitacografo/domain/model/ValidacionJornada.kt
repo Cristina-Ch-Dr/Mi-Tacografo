@@ -2,6 +2,7 @@ package com.cristinachdr.mitacografo.domain.model
 
 import java.time.Duration
 import java.time.Instant
+import java.time.ZoneId
 
 /** Motivos por los que no se puede guardar una jornada. La UI traduce cada uno a un mensaje. */
 enum class ErrorJornada {
@@ -18,6 +19,12 @@ enum class ErrorJornada {
     CONDUCCION_MAYOR_QUE_JORNADA,
     SOLAPA_CON_OTRA_JORNADA,
     FALTA_EL_FIN,
+
+    /** Hay conducción antes de medianoche del domingo, pero no la total. */
+    ANTES_MEDIANOCHE_SIN_TOTAL,
+
+    /** La de antes de medianoche no cabe: es mayor que la total o que las horas a un lado de la medianoche. */
+    ANTES_MEDIANOCHE_NO_CUADRA,
 }
 
 /**
@@ -32,12 +39,14 @@ val MARGEN_HORA_FUTURA: Duration = Duration.ofMinutes(5)
  * La usan los casos de uso antes de guardar y la UI para avisar mientras se escribe.
  *
  * @param finAnterior fin de la jornada anterior, para que no se solapen.
+ * @param zonaReferencia la de Ajustes: en ella se mira la medianoche del domingo (como el motor de reglas).
  * @return los errores encontrados; vacío si la jornada es válida.
  */
 fun validarJornada(
     jornada: Jornada,
     ahora: Instant,
     finAnterior: Instant? = null,
+    zonaReferencia: ZoneId? = null,
 ): Set<ErrorJornada> =
     buildSet {
         val limiteFuturo = ahora.plus(MARGEN_HORA_FUTURA)
@@ -58,11 +67,35 @@ fun validarJornada(
 
         if (conduccion != null) {
             if (conduccion.isNegative) add(ErrorJornada.CONDUCCION_NEGATIVA)
-            if (fin != null && fin.isAfter(jornada.inicio) && conduccion > Duration.between(jornada.inicio, fin)) {
+            // En curso (MT-53): no puede pasar de lo que llevaba la jornada al apuntarla.
+            val hasta = fin ?: jornada.conduccionApuntadaEn
+            if (hasta != null && hasta.isAfter(jornada.inicio) &&
+                conduccion > Duration.between(jornada.inicio, hasta)
+            ) {
                 add(ErrorJornada.CONDUCCION_MAYOR_QUE_JORNADA)
             }
         }
+
+        addAll(validarAntesMedianoche(jornada, zonaReferencia))
     }
+
+/** La conducción antes de medianoche del domingo (MT-50): con total, y que quepa a cada lado de la medianoche. */
+private fun validarAntesMedianoche(
+    jornada: Jornada,
+    zonaReferencia: ZoneId?,
+): Set<ErrorJornada> {
+    val antes = jornada.conduccionAntesMedianoche ?: return emptySet()
+    val total = jornada.conduccionTacografo ?: return setOf(ErrorJornada.ANTES_MEDIANOCHE_SIN_TOTAL)
+    val fin = jornada.fin ?: return emptySet()
+    val cruce = jornada.cruceDeSemana(zonaReferencia) ?: return emptySet()
+    val despues = total - antes
+    val cuadra =
+        !antes.isNegative &&
+            !despues.isNegative &&
+            antes <= Duration.between(jornada.inicio, cruce) &&
+            despues <= Duration.between(cruce, fin)
+    return if (cuadra) emptySet() else setOf(ErrorJornada.ANTES_MEDIANOCHE_NO_CUADRA)
+}
 
 /** Resultado de una operación sobre jornadas: o sale bien, o devuelve por qué no. */
 sealed interface ResultadoJornada<out T> {

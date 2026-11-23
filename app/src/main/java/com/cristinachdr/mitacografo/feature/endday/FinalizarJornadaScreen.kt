@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +31,7 @@ import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
+import com.cristinachdr.mitacografo.ui.components.CampoAntesMedianoche
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
@@ -48,6 +51,9 @@ data class AccionesFinalizar(
     val onKm: (String) -> Unit = {},
     val onConduccionHoras: (String) -> Unit = {},
     val onConduccionMinutos: (String) -> Unit = {},
+    val onApuntarConduccion: () -> Unit = {},
+    val onAntesHoras: (String) -> Unit = {},
+    val onAntesMinutos: (String) -> Unit = {},
     val onPais: (String) -> Unit = {},
     val onCiudad: (String) -> Unit = {},
     val onObservaciones: (String) -> Unit = {},
@@ -130,6 +136,17 @@ fun FinalizarJornadaContent(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        ApuntarConduccionAhora(estado, acciones.onApuntarConduccion)
+        estado.medianoche?.let { medianoche ->
+            CampoAntesMedianoche(
+                medianoche = medianoche,
+                horas = estado.antesHoras,
+                minutos = estado.antesMinutos,
+                onHoras = acciones.onAntesHoras,
+                onMinutos = acciones.onAntesMinutos,
+                errorMinutos = estado.errorMinutosAntes,
+            )
+        }
 
         ResumenEnVivo(kmRecorridos = estado.kmRecorridos, duracion = estado.duracion)
 
@@ -156,6 +173,34 @@ fun FinalizarJornadaContent(
             onClick = acciones.onFinalizar,
             enabled = estado.puedeGuardar,
             icon = Icons.Filled.Done,
+        )
+    }
+}
+
+/**
+ * «Apuntar la conducción de ahora» (MT-53): con la jornada en curso, guarda lo que marca el tacógrafo
+ * sin finalizarla. Así «Lo que te queda» cuenta con ello. Debajo, cuándo se apuntó por última vez.
+ */
+@Composable
+private fun ApuntarConduccionAhora(
+    estado: FinalizarJornadaUiState,
+    onApuntar: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        OutlinedButton(
+            onClick = onApuntar,
+            enabled = estado.puedeApuntar,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+        ) {
+            Text(stringResource(R.string.accion_apuntar_conduccion))
+        }
+        Text(
+            estado.conduccionApuntadaEn?.let {
+                stringResource(R.string.conduccion_apuntada_a_las, it.format(FormatoHora))
+            } ?: stringResource(R.string.apuntar_conduccion_ayuda),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

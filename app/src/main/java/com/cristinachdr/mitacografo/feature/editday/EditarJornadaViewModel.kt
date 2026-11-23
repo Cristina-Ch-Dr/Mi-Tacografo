@@ -7,8 +7,10 @@ import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
+import com.cristinachdr.mitacografo.domain.model.cruceDeSemana
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
+import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.usecase.AnadirJornada
 import com.cristinachdr.mitacografo.domain.usecase.BorrarJornada
 import com.cristinachdr.mitacografo.domain.usecase.EditarJornada
@@ -28,6 +30,8 @@ import java.time.Clock
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 data class EditarJornadaUiState(
@@ -46,6 +50,13 @@ data class EditarJornadaUiState(
     val ciudadFin: String = "",
     val conduccionHoras: String = "",
     val conduccionMinutos: String = "",
+    /** La zona de Ajustes: en ella se mira la medianoche del domingo, como el motor de reglas. */
+    val zonaReferencia: ZoneId? = null,
+    /** El lunes a las 00:00 que cruza la jornada (MT-50); `null` si no cruza ninguno. */
+    val medianoche: ZonedDateTime? = null,
+    val antesHoras: String = "",
+    val antesMinutos: String = "",
+    val errorMinutosAntes: ErrorCampo? = null,
     val observaciones: String = "",
     val errorKmInicio: ErrorCampo? = null,
     val errorKmFin: ErrorCampo? = null,
@@ -71,6 +82,7 @@ data class EditarJornadaUiState(
                 errorKmInicio == null &&
                 errorKmFin == null &&
                 errorMinutos == null &&
+                errorMinutosAntes == null &&
                 errores.isEmpty()
 }
 
@@ -90,6 +102,7 @@ class EditarJornadaViewModel
         private val anadirJornada: AnadirJornada,
         private val borrarJornada: BorrarJornada,
         private val obtenerPreferenciasPaises: ObtenerPreferenciasPaises,
+        private val settings: SettingsRepository,
         private val clock: Clock,
     ) : ViewModel() {
         /** El id viene de la ruta `RutaJornada(id)`; 0 = nueva. */
@@ -102,11 +115,14 @@ class EditarJornadaViewModel
             viewModelScope.launch {
                 val jornada = if (id == Jornada.SIN_ID) propuestaNueva() else repository.obtenerPorId(id)
                 val paises = obtenerPreferenciasPaises()
+                val zonaReferencia = settings.observar().first().zonaReferencia
                 _uiState.update {
                     if (jornada == null) {
                         it.copy(cargando = false)
                     } else {
-                        desde(jornada).copy(paises = paises, nueva = id == Jornada.SIN_ID).validado()
+                        desde(jornada)
+                            .copy(paises = paises, nueva = id == Jornada.SIN_ID, zonaReferencia = zonaReferencia)
+                            .validado()
                     }
                 }
             }
@@ -131,6 +147,10 @@ class EditarJornadaViewModel
         fun onConduccionHoras(valor: String) = actualizar { copy(conduccionHoras = valor.take(2)) }
 
         fun onConduccionMinutos(valor: String) = actualizar { copy(conduccionMinutos = valor.take(2)) }
+
+        fun onAntesHoras(valor: String) = actualizar { copy(antesHoras = valor.take(2)) }
+
+        fun onAntesMinutos(valor: String) = actualizar { copy(antesMinutos = valor.take(2)) }
 
         fun onObservaciones(valor: String) = actualizar { copy(observaciones = valor) }
 
@@ -212,6 +232,7 @@ class EditarJornadaViewModel
 
         private fun desde(jornada: Jornada): EditarJornadaUiState {
             val (horas, minutos) = casillasConduccion(jornada.conduccionTacografo)
+            val (antesHoras, antesMinutos) = casillasConduccion(jornada.conduccionAntesMedianoche)
             return EditarJornadaUiState(
                 original = jornada,
                 inicio = jornada.inicio.atZone(jornada.zonaInicio).toLocalDateTime(),
@@ -224,6 +245,8 @@ class EditarJornadaViewModel
                 ciudadFin = jornada.ciudadFin.orEmpty(),
                 conduccionHoras = horas,
                 conduccionMinutos = minutos,
+                antesHoras = antesHoras,
+                antesMinutos = antesMinutos,
                 observaciones = jornada.observaciones.orEmpty(),
                 cargando = false,
             )
@@ -238,13 +261,29 @@ class EditarJornadaViewModel
             val errorKmInicio = errorKm(kmInicio)
             val errorKmFin = if (terminada) errorKm(kmFin) else null
             val errorMinutos = errorMinutos(conduccionMinutos)
+            // Primero se mira si cruza el domingo: de eso depende que cuente la conducción antes de medianoche.
+            val medianoche =
+                borrador()?.cruceDeSemana(zonaReferencia)?.atZone(zonaReferencia ?: original?.zonaInicio)
+            val conMedianoche = copy(medianoche = medianoche)
+            val errorMinutosAntes = errorMinutos(antesMinutos).takeIf { medianoche != null }
             val borrador =
-                borrador().takeIf { errorKmInicio == null && errorKmFin == null && errorMinutos == null }
-            return copy(
+                conMedianoche.borrador().takeIf {
+                    errorKmInicio == null && errorKmFin == null && errorMinutos == null && errorMinutosAntes == null
+                }
+            return conMedianoche.copy(
                 errorKmInicio = errorKmInicio,
                 errorKmFin = errorKmFin,
                 errorMinutos = errorMinutos,
-                errores = borrador?.let { validarJornada(it, clock.instant()) }.orEmpty(),
+                errorMinutosAntes = errorMinutosAntes,
+                errores =
+                    borrador
+                        ?.let {
+                            validarJornada(
+                                it,
+                                clock.instant(),
+                                zonaReferencia = zonaReferencia,
+                            )
+                        }.orEmpty(),
                 kmRecorridos = borrador?.kmRecorridos,
                 duracion = borrador?.duracion?.takeUnless { it.isNegative },
             )
@@ -286,5 +325,6 @@ internal fun EditarJornadaUiState.borrador(): Jornada? {
         paisFin = paisFin,
         ciudadFin = ciudadFin,
         conduccionTacografo = leerConduccion(conduccionHoras, conduccionMinutos),
+        conduccionAntesMedianoche = if (medianoche == null) null else leerConduccion(antesHoras, antesMinutos),
     )
 }

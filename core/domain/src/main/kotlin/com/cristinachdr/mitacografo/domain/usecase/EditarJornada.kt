@@ -3,8 +3,10 @@ package com.cristinachdr.mitacografo.domain.usecase
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
+import com.cristinachdr.mitacografo.domain.model.sinConduccionSobrante
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
+import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import kotlinx.coroutines.flow.first
 import java.time.Clock
 import java.time.Instant
@@ -21,6 +23,7 @@ class EditarJornada
     constructor(
         private val repository: JornadaRepository,
         private val avisos: GestorAvisos,
+        private val settings: SettingsRepository,
         private val clock: Clock,
     ) {
         suspend operator fun invoke(jornada: Jornada): ResultadoJornada<Jornada> {
@@ -34,16 +37,18 @@ class EditarJornada
                 }
             }
 
+            val zonaReferencia = settings.observar().first().zonaReferencia
             val limpia =
-                jornada.copy(
-                    paisInicio = jornada.paisInicio.comoPais(),
-                    ciudadInicio = jornada.ciudadInicio.limpio(),
-                    paisFin = jornada.paisFin.comoPais(),
-                    ciudadFin = jornada.ciudadFin.limpio(),
-                    observaciones = jornada.observaciones.limpio(),
-                )
+                jornada
+                    .copy(
+                        paisInicio = jornada.paisInicio.comoPais(),
+                        ciudadInicio = jornada.ciudadInicio.limpio(),
+                        paisFin = jornada.paisFin.comoPais(),
+                        ciudadFin = jornada.ciudadFin.limpio(),
+                        observaciones = jornada.observaciones.limpio(),
+                    ).sinConduccionSobrante(zonaReferencia)
             val ahora = clock.instant()
-            val errores = validarJornada(limpia, ahora).toMutableSet()
+            val errores = validarJornada(limpia, ahora, zonaReferencia = zonaReferencia).toMutableSet()
             val otras = repository.observarTodas().first().filter { it.id != limpia.id }
             if (otras.any { it.solapaCon(limpia, ahora) }) errores += ErrorJornada.SOLAPA_CON_OTRA_JORNADA
             if (errores.isNotEmpty()) return ResultadoJornada.Invalida(errores)

@@ -9,6 +9,7 @@ import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.usecase.ApuntarConduccion
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
@@ -50,10 +51,17 @@ class FinalizarJornadaViewModelTest {
         repo: FakeJornadaRepository,
         descansos: FakeDescansoRepository = FakeDescansoRepository(),
     ) = FinalizarJornadaViewModel(
-        FinalizarJornada(repo, GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj), reloj),
+        FinalizarJornada(
+            repo,
+            GestorAvisos(repo, FakeSettingsRepository(), FakeAlarmScheduler(), reloj),
+            FakeSettingsRepository(),
+            reloj,
+        ),
         ObtenerJornadaActual(repo),
         ObtenerPreferenciasPaises(ObtenerPaisesRecientes(repo), FakeSettingsRepository()),
         TerminarPausa(descansos, reloj),
+        ApuntarConduccion(repo, reloj),
+        FakeSettingsRepository(),
         reloj,
     )
 
@@ -160,5 +168,71 @@ class FinalizarJornadaViewModelTest {
             vm.onFinalizar()
 
             assertEquals(ahora.atZone(madrid).toInstant(), descansos.guardados.single().fin)
+        }
+
+    @Test
+    fun `apunta la conduccion de ahora sin finalizar la jornada`() =
+        runTest {
+            val repo = FakeJornadaRepository(listOf(abierta))
+            val vm = viewModel(repo)
+            vm.onConduccionHoras("6")
+            vm.onConduccionMinutos("10")
+
+            vm.onApuntarConduccion()
+
+            val enCurso = repo.obtenerAbierta()!!
+            assertEquals(Duration.ofHours(6).plusMinutes(10), enCurso.conduccionTacografo)
+            assertEquals(reloj.instant(), enCurso.conduccionApuntadaEn)
+            assertEquals(
+                ahora,
+                vm.uiState.value.conduccionApuntadaEn
+                    ?.toLocalDateTime(),
+            )
+            assertFalse(vm.uiState.value.guardado)
+        }
+
+    @Test
+    fun `la conduccion apuntada durante la jornada sale ya escrita al finalizar`() {
+        val apuntada =
+            abierta.copy(
+                conduccionTacografo = Duration.ofHours(6).plusMinutes(10),
+                conduccionApuntadaEn = reloj.instant().minusSeconds(3_600),
+            )
+        val estado = viewModel(FakeJornadaRepository(listOf(apuntada))).uiState.value
+
+        assertEquals("6", estado.conduccionHoras)
+        assertEquals("10", estado.conduccionMinutos)
+    }
+
+    @Test
+    fun `sin cruzar el domingo no pide la conduccion antes de medianoche`() {
+        assertNull(viewModel(FakeJornadaRepository(listOf(abierta))).uiState.value.medianoche)
+    }
+
+    @Test
+    fun `si la jornada cruza el domingo pide la conduccion antes de medianoche y la guarda`() =
+        runTest {
+            // Empezó el domingo 1 a las 20:00 y termina el lunes 2 a las 17:00 (la hora del reloj).
+            val domingo = abierta.copy(inicio = LocalDateTime.of(2026, 11, 1, 20, 0).atZone(madrid).toInstant())
+            val repo = FakeJornadaRepository(listOf(domingo))
+            val vm = viewModel(repo)
+
+            assertEquals(
+                LocalDateTime.of(2026, 11, 2, 0, 0),
+                vm.uiState.value.medianoche
+                    ?.toLocalDateTime(),
+            )
+
+            vm.onKm("245872")
+            vm.onConduccionHoras("9")
+            vm.onAntesHoras("5")
+            // Solo hubo 4 h antes de medianoche.
+            assertEquals(setOf(ErrorJornada.ANTES_MEDIANOCHE_NO_CUADRA), vm.uiState.value.errores)
+
+            vm.onAntesHoras("3")
+            vm.onAntesMinutos("52")
+            vm.onFinalizar()
+
+            assertEquals(Duration.ofHours(3).plusMinutes(52), repo.obtenerPorId(1)!!.conduccionAntesMedianoche)
         }
 }

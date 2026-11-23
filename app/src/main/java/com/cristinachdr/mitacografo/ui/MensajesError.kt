@@ -34,6 +34,8 @@ val ErrorJornada.mensaje: Int
             ErrorJornada.CONDUCCION_MAYOR_QUE_JORNADA -> R.string.error_conduccion_mayor
             ErrorJornada.SOLAPA_CON_OTRA_JORNADA -> R.string.error_solapa
             ErrorJornada.FALTA_EL_FIN -> R.string.error_falta_fin
+            ErrorJornada.ANTES_MEDIANOCHE_SIN_TOTAL -> R.string.error_antes_medianoche_sin_total
+            ErrorJornada.ANTES_MEDIANOCHE_NO_CUADRA -> R.string.error_antes_medianoche_no_cuadra
         }
 
 @get:StringRes

@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-33, MT-33B, MT-50 | — | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-52, MT-54, MT-55, MT-56, MT-33, MT-33B | MT-53 (con MT-50), hecha en `feature/MT-53-conduccion-jornada` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -239,11 +239,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Si los dos reducidos no fueron fuera de casa, lo dice en rojo (`Detalle.reducidosEnCasa`).
 - [x] Textos en español y ucraniano, y tests (T17 y T17b comprueban el detalle). Probado en el emulador API 33 con dos reducidos seguidos en España.
 
-### MT-50 · Conducción antes de medianoche del domingo · M · deps: MT-30 · *(idea de la libreta del conductor)*
-- [ ] El 04/10 trabajó la noche del domingo al lunes y repartió a mano la conducción entre las dos semanas. La app solo tiene el total, así que la conducción de esas semanas sale como un intervalo y a veces «No verificado» (`JORNADA_CRUZA_SEMANA`).
-- [ ] Si una jornada cruza la medianoche del domingo, un campo opcional «Conducción antes de medianoche» al finalizarla y al corregirla o añadirla.
-- [ ] Con el dato, el reparto por semanas es exacto (T20). Migración de la base de datos (columna nueva, opcional) y copia de seguridad que siga leyendo las antiguas.
-- [ ] Textos en español y ucraniano, y tests.
+### MT-50 · Conducción antes de medianoche del domingo → **se hace dentro de MT-53** (E8)
 
 ### MT-18 · Viajes · L · (antes MT-18 y MT-19)
 - [x] `Viaje` (nombre, inicio y fin con zona, observaciones), puerto `ViajeRepository`, entidad, DAO y adaptador de Room.
@@ -341,21 +337,21 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 - [x] Dominio puro `resumirPeriodo` (TDD, test T25): solo cuenta lo que empieza en el periodo, en la zona de referencia si hay.
 - [ ] Fecha límite de las deudas y km por viaje: con el motor de reglas (E4) y con Viajes (E2).
 
-### MT-33 · Exportar CSV · M
-- [ ] `jornadas.csv`, `viajes.csv` y `descansos.csv` (UTF-8 BOM, `;`, coma decimal). Compartir con `Intent.ACTION_SEND`.
+### MT-33 · Exportar: CSV, periodo y botón «Exportar» · L · deps: MT-52 · (con parte de la antigua MT-33B)
+> Va después de E8: nadie la ha pedido aún y, con MT-52, el PDF y el CSV de un viaje ya incluyen los viajes de antes de usar la app.
+- [ ] `jornadas.csv`, `viajes.csv` y `descansos.csv` (UTF-8 BOM, `;`, coma decimal). Compartir con `Intent.ACTION_SEND_MULTIPLE`.
 - [ ] Test del formato (que se abra bien en Excel).
+- [ ] Selección de periodo, la misma para CSV y PDF: semana, bisemana, mes, viaje o fechas libres.
+- [ ] Botón «Exportar → CSV / PDF» en Resumen y en el detalle de un viaje (el PDF de un viaje que faltaba en MT-18).
+- **Criterio:** el conductor genera el PDF de un viaje y lo envía por WhatsApp en ≤ 4 toques.
 
-### MT-33B · Exportar PDF · XL · deps: MT-30 · (antes MT-33B y MT-33C)
+### MT-33B · Informe de reglas en el PDF · L · deps: MT-30, MT-33
 > **Primera parte hecha sin reglas** (con MT-32): «Compartir PDF» y «Guardar PDF» en Resumen. Cabecera, resumen, tablas de jornadas y descansos con su clase, cabecera repetida al cambiar de página, «Página X de Y» y aviso legal. Probado en API 33 en español y ucraniano (el cirílico sale bien).
 > - `Informe` (dominio) + `GeneradorPdf` (puerto en `app`, porque los textos traducidos están en `app`) con `PdfDocument`. Se comparte con `FileProvider` (`cache/informes/`) y se guarda con `CreateDocument`.
-> - Falta: informe de reglas por semana, rango mes / viaje / fechas libres, y el test instrumentado T26.
-- [ ] Puerto `ReportRenderer` e `InformeModel` puro: cabecera, resumen, tablas de jornadas y descansos, informe de reglas por semana y deudas. Test T25.
-- [ ] Selección de rango: semana, bisemana, mes, viaje o fechas libres.
-- [ ] `PdfReportRenderer` con `PdfDocument`: A4, tablas con paginación y cabecera repetida, «Página X de Y», pie con el aviso legal, y comprobar que el ucraniano (cirílico) se ve bien.
-- [ ] Guardar (`CreateDocument`) o compartir (`FileProvider` + `ACTION_SEND`).
-- [ ] Botón «Exportar → CSV / PDF» en Resumen y en el detalle de un viaje.
+> - El periodo y el botón «Exportar» pasan a MT-33.
+- [ ] `InformeModel` puro con el informe de reglas por semana y las deudas. Test T25.
+- [ ] El PDF lo pinta: una tabla por semana con cada regla y su estado.
 - [ ] Test instrumentado T26 (`PdfRenderer` cuenta las páginas).
-- **Criterio:** el conductor genera el PDF de un viaje y lo envía por WhatsApp en ≤ 4 toques.
 
 ---
 
@@ -395,7 +391,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E8 · Lo que piden el conductor y Cristina (23 nov 2026) → **sin versión**
 
-Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Casi todo sale de su app de ejemplo (versión b20), que ha crecido: es lo que tiene y aquí falta. En su descripción dice que quiere pasar su lógica **al estilo de nuestra app** (la «0.1.0 de cabecera azul con el botón redondo»).
+Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Van **antes que MT-33 y MT-33B** (decidido el 23 nov 2026). Casi todo sale de su app de ejemplo (versión b20), que ha crecido: es lo que tiene y aquí falta. En su descripción dice que quiere pasar su lógica **al estilo de nuestra app** (la «0.1.0 de cabecera azul con el botón redondo»).
 
 ### MT-52 · Añadir jornadas desde Inicio y viajes pasados desde Viajes · M · deps: MT-47, MT-51 · *(propuesta de Cristina)*
 - [ ] Quitar el botón «Añadir jornada» de Historial (y el hueco que deja abajo) y ponerlo en **Inicio**, debajo de la jornada: «Añadir una jornada pasada». Abre la misma pantalla de ahora (`RutaJornada(0)`).
@@ -404,9 +400,18 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Ca
   - Caso de uso `AnadirViaje`: errores nuevos `FALTA_EL_FIN` y `SOLAPA_CON_OTRO_VIAJE` (el en curso cuenta hasta ahora). Al guardarlo, las jornadas **sin viaje** que empiezan entre su inicio y su fin entran en él (como hace `AnadirJornada` al revés).
   - Tests en `CasosDeUsoViajeTest`; textos ES y UK.
 
-### MT-53 · Conducción durante la jornada · S · deps: MT-51 · *(petición del conductor)*
-- [ ] Con la jornada en curso, poder apuntar «Conducción de hoy hasta ahora» (lo que marca el tacógrafo). Así los contadores de «Lo que te queda» son exactos y no sale la nota «sin contar lo de hoy».
-- [ ] Al finalizar, el campo sale relleno con lo último apuntado.
+### MT-53 · Conducción durante la jornada y antes de medianoche del domingo · M · deps: MT-51 · (con la antigua MT-50) · *(petición del conductor)*
+- [x] Con la jornada en curso, poder apuntar «Conducción de hoy hasta ahora» (lo que marca el tacógrafo). Así los contadores de «Lo que te queda» son exactos y no sale la nota «sin contar lo de hoy».
+- [x] Al finalizar, el campo sale relleno con lo último apuntado.
+- [x] *(antes MT-50, idea de la libreta)* El 04/10 trabajó la noche del domingo al lunes y repartió a mano la conducción entre las dos semanas. La app solo tiene el total, así que la conducción de esas semanas sale como un intervalo y a veces «No verificado» (`JORNADA_CRUZA_SEMANA`).
+  - Si una jornada cruza la medianoche del domingo, un campo opcional «Conducción antes de medianoche» al finalizarla y al corregirla o añadirla.
+  - Con el dato, el reparto por semanas es exacto (T20).
+- [x] Migración de la base de datos (columnas nuevas, opcionales) y copia de seguridad que siga leyendo las antiguas.
+- [x] Textos en español y ucraniano, y tests.
+- En Inicio, «Apuntar la conducción de ahora» debajo de las casillas de conducción de «Finalizar jornada»: guarda la conducción y la hora (`ApuntarConduccion`, `conduccionApuntadaEn`). El motor cuenta como poco esa y como mucho esa más lo pasado desde entonces; la nota de los contadores dice «Con la conducción apuntada a las …».
+- El campo de antes de medianoche sale al finalizar, al corregir y al añadir, solo si la jornada cruza el lunes a las 00:00 en la zona de referencia (`cruceDeSemana`). Si no cuadra con la total o con las horas a cada lado, error y no deja guardar; el motor, si aun así no cuadra, vuelve al intervalo.
+- Base de datos 2 → 3 (`AutoMigration`, dos columnas opcionales), probada en `MigracionesTest` y en el emulador API 33 instalando encima de develop con una jornada en curso. Copia de seguridad: dos campos opcionales, las antiguas se siguen leyendo.
+- En la app de ejemplo del conductor, el reparto («Conducción en el primer día natural») vale para cualquier medianoche; aquí solo hace falta la del domingo, porque la conducción diaria se cuenta por jornada.
 
 ### MT-54 · Botón «Pausa de 3 horas» · S · deps: MT-22 · *(petición del conductor)*
 - [ ] En la pestaña Descanso, un botón para el fraccionado 3 + 9: «La pausa terminó a las…» y la app apunta las 3 h anteriores. Más rápido que «Añadir» con inicio y fin.

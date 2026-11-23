@@ -106,4 +106,54 @@ class ValidacionJornadaTest {
 
         assertEquals(setOf(ErrorJornada.KM_FIN_MENOR_QUE_INICIO, ErrorJornada.FIN_NO_POSTERIOR_AL_INICIO), errores(mal))
     }
+
+    /** Del domingo 1 a las 20:00 al lunes 2 a las 06:00, con 6 h de conducción: cruza la semana (MT-50). */
+    private val cruza =
+        valida.copy(
+            inicio = LocalDateTime.of(2026, 11, 1, 20, 0).atZone(madrid).toInstant(),
+            fin = hora(6, 0),
+            conduccionTacografo = Duration.ofHours(6),
+        )
+
+    @Test
+    fun `la jornada que cruza el domingo sabe cuando es la medianoche`() {
+        assertEquals(hora(0, 0), cruza.cruceDeSemana(null))
+        assertEquals(null, valida.cruceDeSemana(null))
+        // Con la zona de referencia en Kyiv, la medianoche es la de allí (las 23:00 del domingo en Madrid).
+        assertEquals(
+            LocalDateTime.of(2026, 11, 2, 0, 0).atZone(ZoneId.of("Europe/Kyiv")).toInstant(),
+            cruza.cruceDeSemana(ZoneId.of("Europe/Kyiv")),
+        )
+    }
+
+    @Test
+    fun `la conduccion antes de medianoche tiene que cuadrar`() {
+        val antes = { h: Long -> cruza.copy(conduccionAntesMedianoche = Duration.ofHours(h)) }
+        assertEquals(emptySet<ErrorJornada>(), errores(antes(3)))
+        // Solo hay 4 h antes de medianoche, y 6 h después.
+        assertEquals(setOf(ErrorJornada.ANTES_MEDIANOCHE_NO_CUADRA), errores(antes(5)))
+        assertEquals(setOf(ErrorJornada.ANTES_MEDIANOCHE_NO_CUADRA), errores(antes(7)))
+        assertEquals(
+            setOf(ErrorJornada.ANTES_MEDIANOCHE_SIN_TOTAL),
+            errores(antes(3).copy(conduccionTacografo = null)),
+        )
+    }
+
+    @Test
+    fun `sin cruzar la semana, la conduccion antes de medianoche se quita al guardar`() {
+        val sobrante = valida.copy(conduccionAntesMedianoche = Duration.ofHours(1), conduccionApuntadaEn = ahora)
+        val limpia = sobrante.sinConduccionSobrante(null)
+        assertEquals(null, limpia.conduccionAntesMedianoche)
+        assertEquals(null, limpia.conduccionApuntadaEn) // terminada: ya no es «hasta ahora»
+    }
+
+    @Test
+    fun `en curso, la conduccion apuntada no puede pasar de lo que llevaba la jornada`() {
+        val enCurso = valida.copy(fin = null, kmFin = null, conduccionApuntadaEn = hora(10, 0))
+        assertEquals(
+            setOf(ErrorJornada.CONDUCCION_MAYOR_QUE_JORNADA),
+            errores(enCurso.copy(conduccionTacografo = Duration.ofHours(5))),
+        )
+        assertEquals(emptySet<ErrorJornada>(), errores(enCurso.copy(conduccionTacografo = Duration.ofHours(3))))
+    }
 }

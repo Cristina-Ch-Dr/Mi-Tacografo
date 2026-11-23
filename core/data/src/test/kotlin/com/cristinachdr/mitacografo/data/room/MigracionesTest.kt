@@ -2,6 +2,7 @@ package com.cristinachdr.mitacografo.data.room
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -16,6 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 
@@ -30,10 +32,13 @@ import java.time.ZoneId
 class MigracionesTest {
     // La ruta completa, no solo el nombre: con Robolectric, MigrationTestHelper compara el nombre
     // con la ruta del archivo y, si no coinciden, no abre la base de datos.
-    private val nombre: String =
+    private val nombre: String = ruta("migracion-test.db")
+
+    /** Cada test con su archivo: con el mismo, el segundo no puede abrirlo. */
+    private fun ruta(archivo: String): String =
         ApplicationProvider
             .getApplicationContext<Context>()
-            .getDatabasePath("migracion-test.db")
+            .getDatabasePath(archivo)
             .absolutePath
 
     @get:Rule
@@ -90,6 +95,52 @@ class MigracionesTest {
                 jornadas.guardar(jornadas.obtenerPorId(1)!!.copy(viajeId = id))
                 viajes.borrar(id)
                 assertNull(jornadas.obtenerPorId(1)?.viajeId) // ON DELETE SET NULL: la jornada sigue ahí, sin viaje
+            } finally {
+                database.close()
+            }
+        }
+
+    @Test
+    fun `de la version 2 a la 3 se conservan las jornadas y se pueden guardar los datos de conduccion nuevos`() =
+        runTest {
+            val nombre = ruta("migracion-2-a-3.db")
+            helper.createDatabase(nombre, 2).use { db ->
+                db.execSQL(
+                    "INSERT INTO jornada (id, inicio_epoch_ms, zona_inicio, km_inicio, fin_epoch_ms, zona_fin, " +
+                        "km_fin, conduccion_min) VALUES (1, 1000, 'Europe/Madrid', 250000, 40000000, " +
+                        "'Europe/Madrid', 250480, 480)",
+                )
+                db.execSQL(
+                    "INSERT INTO jornada (id, inicio_epoch_ms, zona_inicio, km_inicio) " +
+                        "VALUES (2, 90000000, 'Europe/Kyiv', 250480)",
+                )
+            }
+
+            helper.runMigrationsAndValidate(nombre, 3, true).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java, nombre)
+                    .allowMainThreadQueries()
+                    // Sin WAL: con Robolectric en Windows, Room no puede abrir en WAL la base de datos que
+                    // MigrationTestHelper acaba de dejar en la última versión (SQLITE_CANTOPEN).
+                    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+                    .build()
+            try {
+                val jornadas = RoomJornadaRepository(database.jornadaDao())
+                val terminada = jornadas.obtenerPorId(1)!!
+                assertEquals(Duration.ofHours(8), terminada.conduccionTacografo)
+                assertNull(terminada.conduccionAntesMedianoche)
+
+                val abierta = jornadas.obtenerAbierta()!!
+                assertNull(abierta.conduccionApuntadaEn)
+                jornadas.guardar(
+                    abierta.copy(
+                        conduccionTacografo = Duration.ofMinutes(200),
+                        conduccionApuntadaEn = Instant.ofEpochMilli(100_000_000),
+                    ),
+                )
+                assertEquals(Instant.ofEpochMilli(100_000_000), jornadas.obtenerAbierta()?.conduccionApuntadaEn)
             } finally {
                 database.close()
             }
