@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-54, MT-55, MT-56, MT-57, MT-58, MT-59, MT-33, MT-33B | MT-52, hecha en `feature/MT-52-anadir-pasados` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-55, MT-56, MT-57, MT-58, MT-59, MT-33, MT-33B | MT-54, hecha en `feature/MT-54-pausa-3-horas` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -415,7 +415,9 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - En la app de ejemplo del conductor, el reparto («Conducción en el primer día natural») vale para cualquier medianoche; aquí solo hace falta la del domingo, porque la conducción diaria se cuenta por jornada.
 
 ### MT-54 · Botón «Pausa de 3 horas» · S · deps: MT-22 · *(petición del conductor)*
-- [ ] En la pestaña Descanso, un botón para el fraccionado 3 + 9: «La pausa terminó a las…» y la app apunta las 3 h anteriores. Más rápido que «Añadir» con inicio y fin.
+- [x] En la pestaña Descanso, un botón para el fraccionado 3 + 9: «La pausa terminó a las…» y la app apunta las 3 h anteriores. Más rápido que «Añadir» con inicio y fin.
+- Botón «Pausa de 3 horas» arriba de la lista; abre un diálogo con la hora de fin (propone la de ahora) y «Se apunta un descanso de 11:00 a 14:00». Caso de uso `ApuntarPausaTresHoras`: guarda un DESCANSO (no una pausa) de 3 h, que el clasificador ya toma como 1.ª parte del fraccionado; el país es el de la jornada en curso o el del final de la última. Si pisa otro descanso o termina en el futuro, lo dice y no se cierra.
+- Probado en el emulador con la copia real del conductor (23 nov, de 11:00 a 14:00: «1.ª parte de un fraccionado»).
 
 ### MT-55 · Comunidad autónoma en España · S · deps: MT-41 · *(petición del conductor)*
 - [ ] Si el país es España, elegir también la comunidad autónoma (las abreviaturas del tacógrafo: AN, AR, AST, C, CAN, CAT, CL, CM, CV, EXT, G, IB, LR, M, MU, NA, PV…), al iniciar y al finalizar. El tacógrafo se la pide al meter el país.

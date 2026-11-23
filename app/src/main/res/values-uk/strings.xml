@@ -410,4 +410,10 @@
     <string name="viaje_titulo_nuevo">Додати минулий рейс</string>
     <string name="viaje_pasado_ayuda">Для рейсів до початку користування програмою. Робочі дні без рейсу, які починаються між виїздом і поверненням, увійдуть у нього.</string>
     <string name="error_viaje_solapa">Перетинається з іншим рейсом: змініть дати.</string>
+    <!-- MT-54: pausa de 3 horas -->
+    <string name="accion_pausa_3_horas">Перерва 3 години</string>
+    <string name="pausa_3_horas_subtitulo">1-ша частина розділеного відпочинку 3 + 9</string>
+    <string name="pausa_3_horas_fin">Перерва закінчилась о</string>
+    <string name="pausa_3_horas_se_apunta">Буде записано відпочинок з %1$s до %2$s.</string>
+    <string name="accion_apuntar">Записати</string>
 </resources>
