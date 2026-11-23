@@ -248,4 +248,56 @@ class CasosDeUsoDescansoTest {
             assertEquals("FR", entreJornadas.descanso.pais)
             assertEquals(ClaseDescanso.DIARIO_NORMAL, entreJornadas.clase)
         }
+
+    @Nested
+    inner class PausaTresHoras {
+        private fun apuntar(
+            jornadas: FakeJornadaRepository,
+            descansos: FakeDescansoRepository,
+        ) = ApuntarPausaTresHoras(jornadas, GuardarDescanso(descansos, reloj))
+
+        @Test
+        fun `apunta las 3 horas anteriores como primera parte de un fraccionado`() =
+            runTest {
+                val descansos = FakeDescansoRepository()
+                val jornadas = FakeJornadaRepository(listOf(ayer, hoyEnCurso))
+
+                val resultado = apuntar(jornadas, descansos)(hora(2, 14, 30), madrid)
+
+                assertTrue(resultado is ResultadoDescanso.Ok)
+                val apuntado = descansos.guardados.single()
+                assertEquals(hora(2, 11, 30), apuntado.inicio)
+                assertEquals(hora(2, 14, 30), apuntado.fin)
+                assertEquals(TipoDescanso.DESCANSO, apuntado.tipo)
+                assertEquals("FR", apuntado.pais) // el de la jornada en curso
+                val clase = ObtenerDescansos(descansos, jornadas)().first().single { !it.descanso.calculado }.clase
+                assertEquals(ClaseDescanso.FRACCIONADO_PRIMERA_PARTE, clase)
+            }
+
+        @Test
+        fun `sin jornada en curso, el pais es el del final de la ultima`() =
+            runTest {
+                val descansos = FakeDescansoRepository()
+
+                apuntar(FakeJornadaRepository(listOf(ayer)), descansos)(hora(2, 12), madrid)
+
+                assertEquals("FR", descansos.guardados.single().pais)
+            }
+
+        @Test
+        fun `no puede pisar otro descanso ni terminar en el futuro`() =
+            runTest {
+                val descansos = FakeDescansoRepository(listOf(descanso(1, hora(2, 12), hora(2, 13))))
+                val jornadas = FakeJornadaRepository(listOf(hoyEnCurso))
+
+                assertEquals(
+                    ResultadoDescanso.Invalido(ErrorDescanso.SOLAPA_CON_OTRO_DESCANSO),
+                    apuntar(jornadas, descansos)(hora(2, 14), madrid),
+                )
+                assertEquals(
+                    ResultadoDescanso.Invalido(ErrorDescanso.FIN_EN_EL_FUTURO),
+                    apuntar(jornadas, descansos)(hora(2, 23), madrid),
+                )
+            }
+    }
 }

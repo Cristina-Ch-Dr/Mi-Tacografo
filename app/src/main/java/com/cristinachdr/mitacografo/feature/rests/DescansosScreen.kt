@@ -9,18 +9,22 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,6 +43,8 @@ import com.cristinachdr.mitacografo.domain.model.DescansoClasificado
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.calculado
 import com.cristinachdr.mitacografo.ui.FormatoHora
+import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
+import com.cristinachdr.mitacografo.ui.components.ListaErroresDescanso
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
 import com.cristinachdr.mitacografo.ui.nombre
@@ -58,8 +64,27 @@ fun DescansosScreen(
     viewModel: DescansosViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
-    DescansosContent(estado = estado, onDescanso = onDescanso, onNuevo = onNuevo)
+    DescansosContent(
+        estado = estado,
+        onDescanso = onDescanso,
+        onNuevo = onNuevo,
+        pausa =
+            AccionesPausaTresHoras(
+                onPedir = viewModel::onPedirPausaTresHoras,
+                onFin = viewModel::onFinPausa,
+                onCancelar = viewModel::onCancelarPausa,
+                onApuntar = viewModel::onApuntarPausa,
+            ),
+    )
 }
+
+/** Las acciones del diálogo «Pausa de 3 horas» (MT-54). */
+data class AccionesPausaTresHoras(
+    val onPedir: () -> Unit = {},
+    val onFin: (LocalDateTime) -> Unit = {},
+    val onCancelar: () -> Unit = {},
+    val onApuntar: () -> Unit = {},
+)
 
 /**
  * La pestaña Descanso (MT-51): por semanas, del más reciente al más antiguo, los descansos entre una jornada
@@ -72,6 +97,7 @@ fun DescansosContent(
     onDescanso: (Long) -> Unit,
     onNuevo: () -> Unit,
     modifier: Modifier = Modifier,
+    pausa: AccionesPausaTresHoras = AccionesPausaTresHoras(),
 ) {
     Box(modifier.fillMaxSize()) {
         LazyColumn(
@@ -88,6 +114,7 @@ fun DescansosContent(
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
+            item(key = "pausa-3-horas") { BotonPausaTresHoras(pausa.onPedir) }
             estado.descansos
                 .groupBy { lunesDe(it.descanso) }
                 .forEach { (lunes, descansos) ->
@@ -118,6 +145,57 @@ fun DescansosContent(
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
         )
     }
+    estado.pausaTresHoras?.let { DialogoPausaTresHoras(it, pausa) }
+}
+
+/**
+ * «Pausa de 3 horas» (MT-54): para la 1.ª parte del fraccionado 3 + 9, más rápido que «Añadir» con inicio y fin.
+ */
+@Composable
+private fun BotonPausaTresHoras(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(onClick = onClick, modifier = modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(R.string.accion_pausa_3_horas), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.pausa_3_horas_subtitulo), style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+/** «La pausa terminó a las…» y la app apunta las 3 h anteriores. */
+@Composable
+private fun DialogoPausaTresHoras(
+    estado: PausaTresHorasUi,
+    acciones: AccionesPausaTresHoras,
+) {
+    AlertDialog(
+        onDismissRequest = acciones.onCancelar,
+        title = { Text(stringResource(R.string.accion_pausa_3_horas)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                CampoFechaHora(stringResource(R.string.pausa_3_horas_fin), estado.fin, acciones.onFin)
+                Text(
+                    stringResource(
+                        R.string.pausa_3_horas_se_apunta,
+                        estado.inicio.format(FormatoHora),
+                        estado.fin.format(FormatoHora),
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                ListaErroresDescanso(estado.errores)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = acciones.onApuntar, enabled = !estado.guardando) {
+                Text(stringResource(R.string.accion_apuntar))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = acciones.onCancelar) { Text(stringResource(R.string.accion_cancelar)) }
+        },
+    )
 }
 
 @Composable

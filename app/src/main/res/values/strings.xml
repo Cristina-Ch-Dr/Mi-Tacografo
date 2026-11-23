@@ -405,4 +405,10 @@
     <string name="viaje_titulo_nuevo">Añadir viaje pasado</string>
     <string name="viaje_pasado_ayuda">Para los viajes de antes de usar la app. Las jornadas sin viaje que empiecen entre la salida y la vuelta entrarán en él.</string>
     <string name="error_viaje_solapa">Se solapa con otro viaje: cambia las fechas.</string>
+    <!-- MT-54: pausa de 3 horas -->
+    <string name="accion_pausa_3_horas">Pausa de 3 horas</string>
+    <string name="pausa_3_horas_subtitulo">1.ª parte del descanso fraccionado 3 + 9</string>
+    <string name="pausa_3_horas_fin">La pausa terminó a las</string>
+    <string name="pausa_3_horas_se_apunta">Se apunta un descanso de %1$s a %2$s.</string>
+    <string name="accion_apuntar">Apuntar</string>
 </resources>

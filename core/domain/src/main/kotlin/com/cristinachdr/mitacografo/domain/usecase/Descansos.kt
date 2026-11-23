@@ -13,6 +13,7 @@ import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import javax.inject.Inject
@@ -122,6 +123,42 @@ class TerminarPausa
                 repository.guardar(enCurso.copy(fin = fin, zonaFin = zona ?: clock.zone))
             }
             return ResultadoDescanso.Ok(Unit)
+        }
+    }
+
+/**
+ * Caso de uso: «Pausa de 3 horas» (MT-54), para el descanso fraccionado 3 + 9.
+ *
+ * El conductor dice cuándo terminó y la app apunta un descanso de las 3 h anteriores. Al ser un descanso
+ * (no una pausa) de 3 h, el clasificador lo toma como 1.ª parte del fraccionado. El país es el de la jornada
+ * en curso o, si no hay, el del final de la última.
+ */
+class ApuntarPausaTresHoras
+    @Inject
+    constructor(
+        private val jornadas: JornadaRepository,
+        private val guardarDescanso: GuardarDescanso,
+    ) {
+        /** @return el id del descanso apuntado. */
+        suspend operator fun invoke(
+            fin: Instant,
+            zona: ZoneId,
+        ): ResultadoDescanso<Long> {
+            val pais = jornadas.obtenerAbierta()?.paisInicio ?: jornadas.obtenerUltimaFinalizada()?.paisFin
+            val descanso =
+                Descanso(
+                    inicio = fin.minus(DURACION),
+                    zonaInicio = zona,
+                    fin = fin,
+                    zonaFin = zona,
+                    tipo = TipoDescanso.DESCANSO,
+                    pais = pais,
+                )
+            return guardarDescanso(descanso)
+        }
+
+        companion object {
+            val DURACION: Duration = Duration.ofHours(3)
         }
     }
 
