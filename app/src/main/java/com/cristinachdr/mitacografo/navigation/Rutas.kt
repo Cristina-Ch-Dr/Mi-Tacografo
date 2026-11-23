@@ -31,9 +31,9 @@ import kotlinx.serialization.Serializable
     val lunes: String,
 )
 
-/** Detalle de un viaje: sus jornadas y km, y corregirlo o borrarlo. */
+/** Detalle de un viaje: sus jornadas y km, y corregirlo o borrarlo; con [id] = 0, añadir uno pasado (MT-52). */
 @Serializable data class RutaViaje(
-    val id: Long,
+    val id: Long = 0,
 )
 
 /** Detalle de una jornada del historial, para corregirla o borrarla; con [id] = 0, añadir una pasada (MT-47). */

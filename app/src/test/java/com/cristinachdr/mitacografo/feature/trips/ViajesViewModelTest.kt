@@ -7,6 +7,7 @@ import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.ErrorViaje
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.Viaje
+import com.cristinachdr.mitacografo.domain.usecase.AnadirViaje
 import com.cristinachdr.mitacografo.domain.usecase.BorrarViaje
 import com.cristinachdr.mitacografo.domain.usecase.FinalizarViaje
 import com.cristinachdr.mitacografo.domain.usecase.GuardarViaje
@@ -124,11 +125,13 @@ class ViajesViewModelTest {
     private fun detalle(
         viajes: FakeViajeRepository,
         jornadas: FakeJornadaRepository,
+        id: Long = 1L,
     ) = EditarViajeViewModel(
-        SavedStateHandle(mapOf("id" to 1L)),
+        SavedStateHandle(mapOf("id" to id)),
         ObtenerViajes(viajes, jornadas),
         viajes,
         GuardarViaje(viajes, reloj),
+        AnadirViaje(viajes, jornadas, reloj),
         BorrarViaje(viajes),
         reloj,
     )
@@ -165,5 +168,56 @@ class ViajesViewModelTest {
         assertTrue(viajes.guardados.isEmpty())
         assertNull(jornadas.guardadas.single().viajeId)
         assertTrue(vm.uiState.value.cerrar)
+    }
+
+    @Test
+    fun `un viaje pasado propone la semana pasada y un nombre que sigue a la fecha de inicio`() {
+        val vm = detalle(FakeViajeRepository(), FakeJornadaRepository(), id = 0L)
+        vm.usarNombrePropuesto { dia -> "Viaje del $dia" }
+
+        val estado = vm.uiState.value
+        assertTrue(estado.nuevo)
+        assertEquals(LocalDateTime.of(2026, 11, 2, 6, 0), estado.inicio)
+        assertEquals(LocalDateTime.of(2026, 11, 6, 18, 0), estado.fin)
+        assertEquals("Viaje del 2026-11-02", estado.nombre)
+
+        vm.onInicio(LocalDateTime.of(2026, 11, 3, 7, 0))
+        assertEquals("Viaje del 2026-11-03", vm.uiState.value.nombre)
+
+        // Una vez escrito a mano, ya no cambia solo.
+        vm.onNombre("Murcia – Lyon")
+        vm.onInicio(LocalDateTime.of(2026, 11, 2, 7, 0))
+        assertEquals("Murcia – Lyon", vm.uiState.value.nombre)
+    }
+
+    @Test
+    fun `al guardar un viaje pasado entran sus jornadas sin viaje`() {
+        val sinViaje = jornada.copy(viajeId = null)
+        val jornadas = FakeJornadaRepository(listOf(sinViaje))
+        val viajes = FakeViajeRepository(emptyList(), jornadas)
+        val vm = detalle(viajes, jornadas, id = 0L)
+        vm.usarNombrePropuesto { dia -> "Viaje del $dia" }
+
+        vm.onGuardar()
+
+        assertTrue(vm.uiState.value.cerrar)
+        val nuevo = viajes.guardados.single()
+        assertEquals("Viaje del 2026-11-02", nuevo.nombre)
+        assertEquals(nuevo.id, jornadas.guardadas.single().viajeId)
+    }
+
+    @Test
+    fun `con viajes, propone la semana anterior al mas antiguo y avisa si se pisan`() {
+        val viajes = FakeViajeRepository(listOf(ida)) // del 2 al 5 de noviembre
+        val vm = detalle(viajes, FakeJornadaRepository(), id = 0L)
+        vm.usarNombrePropuesto { dia -> "Viaje del $dia" }
+
+        assertEquals(LocalDateTime.of(2026, 10, 26, 6, 0), vm.uiState.value.inicio)
+        assertEquals(LocalDateTime.of(2026, 10, 30, 18, 0), vm.uiState.value.fin)
+        assertTrue(vm.uiState.value.puedeGuardar)
+
+        vm.onFin(LocalDateTime.of(2026, 11, 3, 12, 0))
+        assertEquals(setOf(ErrorViaje.SOLAPA_CON_OTRO_VIAJE), vm.uiState.value.errores)
+        assertFalse(vm.uiState.value.puedeGuardar)
     }
 }

@@ -5,11 +5,13 @@ import com.cristinachdr.mitacografo.domain.model.ResultadoViaje
 import com.cristinachdr.mitacografo.domain.model.ResumenViaje
 import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.model.resumirViajes
+import com.cristinachdr.mitacografo.domain.model.solapaCon
 import com.cristinachdr.mitacografo.domain.model.validarViaje
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.ViajeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.Clock
 import javax.inject.Inject
@@ -85,6 +87,44 @@ class GuardarViaje
             val errores = validarViaje(limpio, otros, clock.instant())
             if (errores.isNotEmpty()) return ResultadoViaje.Invalido(errores)
             return ResultadoViaje.Ok(viajes.guardar(limpio))
+        }
+    }
+
+/**
+ * Caso de uso: añadir a mano un viaje ya terminado (MT-52), de antes de usar la app.
+ *
+ * Tiene que tener fin y no pisar a otro viaje. Al guardarlo, las jornadas **sin viaje** que empiezan entre
+ * su inicio y su fin entran en él (lo mismo que hace `AnadirJornada` con una jornada que cae en un viaje).
+ */
+class AnadirViaje
+    @Inject
+    constructor(
+        private val viajes: ViajeRepository,
+        private val jornadas: JornadaRepository,
+        private val clock: Clock,
+    ) {
+        /** @return el id del viaje creado. */
+        suspend operator fun invoke(viaje: Viaje): ResultadoViaje<Long> {
+            val fin = viaje.fin ?: return ResultadoViaje.Invalido(ErrorViaje.FALTA_EL_FIN)
+            val ahora = clock.instant()
+            val limpio =
+                viaje.copy(
+                    id = Viaje.SIN_ID,
+                    nombre = viaje.nombre.trim(),
+                    observaciones = viaje.observaciones.limpio(),
+                )
+            val otros = viajes.obtenerTodos()
+            val errores = validarViaje(limpio, otros, ahora).toMutableSet()
+            if (otros.any { it.solapaCon(limpio, ahora) }) errores += ErrorViaje.SOLAPA_CON_OTRO_VIAJE
+            if (errores.isNotEmpty()) return ResultadoViaje.Invalido(errores)
+
+            val id = viajes.guardar(limpio)
+            jornadas
+                .observarTodas()
+                .first()
+                .filter { it.viajeId == null && limpio.inicio <= it.inicio && it.inicio < fin }
+                .forEach { jornadas.guardar(it.copy(viajeId = id)) }
+            return ResultadoViaje.Ok(id)
         }
     }
 

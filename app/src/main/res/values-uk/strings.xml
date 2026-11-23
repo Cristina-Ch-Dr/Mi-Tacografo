@@ -144,7 +144,7 @@
     <string name="pantalla_pendiente">Незабаром</string>
 
     <!-- Історія -->
-    <string name="historial_vacio">Ще немає робочих днів. Коли завершите перший, він з’явиться тут. Попередні можна внести кнопкою «Додати робочий день».</string>
+    <string name="historial_vacio">Робочих днів ще немає. Коли завершите перший, він зʼявиться тут. Ті, що вже були, можна додати на Головній кнопкою «Додати минулий робочий день».</string>
     <string name="historial_total_semana">%1$s км · %2$s водіння</string>
     <string name="historial_total_semana_incompleta">%1$s км · %2$s водіння (не все записано)</string>
     <string name="historial_dia">%1$s · %2$s</string>
@@ -403,4 +403,11 @@
     <string name="antes_medianoche_ayuda">Робочий день переходить через північ (%1$s), коли змінюється тиждень. Якщо вказати, що показував тахограф о 24:00, керування точно розподілиться між двома тижнями.</string>
     <string name="error_antes_medianoche_sin_total">Щоб розподілити керування між двома тижнями, вкажіть також загальне.</string>
     <string name="error_antes_medianoche_no_cuadra">Керування до півночі не сходиться: воно не може бути більшим за загальне чи за години роботи з кожного боку від півночі.</string>
+    <!-- MT-52: añadir jornadas desde Inicio y viajes pasados -->
+    <string name="accion_anadir_jornada_pasada">Додати минулий робочий день</string>
+    <string name="accion_anadir_viaje_pasado">Додати минулий</string>
+    <string name="accion_anadir_viaje">Додати рейс</string>
+    <string name="viaje_titulo_nuevo">Додати минулий рейс</string>
+    <string name="viaje_pasado_ayuda">Для рейсів до початку користування програмою. Робочі дні без рейсу, які починаються між виїздом і поверненням, увійдуть у нього.</string>
+    <string name="error_viaje_solapa">Перетинається з іншим рейсом: змініть дати.</string>
 </resources>

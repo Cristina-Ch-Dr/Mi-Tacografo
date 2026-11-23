@@ -104,7 +104,8 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             }
 
             destinoActual?.hasRoute(RutaViaje::class) == true -> {
-                R.string.viaje_titulo
+                val nuevo = entradaActual?.toRoute<RutaViaje>()?.id == 0L
+                if (nuevo) R.string.viaje_titulo_nuevo else R.string.viaje_titulo
             }
 
             destinoActual?.hasRoute(RutaInforme::class) == true -> {
@@ -198,6 +199,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             composable<RutaInicio> {
                 HomeScreen(
                     onAjustes = { navController.navigate(RutaAjustes) { launchSingleTop = true } },
+                    onAnadirJornada = { navController.navigate(RutaJornada()) },
                     onInforme = { navController.navigate(RutaInforme(it.toString())) },
                 )
             }
@@ -205,12 +207,16 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 HistoryScreen(
                     onJornada = { navController.navigate(RutaJornada(it)) },
                     onSemana = { navController.navigate(RutaInforme(it.toString())) },
-                    onNueva = { navController.navigate(RutaJornada()) },
                     onResumen = { navController.navigate(RutaResumen) { launchSingleTop = true } },
                 )
             }
             composable<RutaInforme> { InformeSemanaScreen() }
-            composable<RutaViajes> { TripsScreen(onViaje = { navController.navigate(RutaViaje(it)) }) }
+            composable<RutaViajes> {
+                TripsScreen(
+                    onViaje = { navController.navigate(RutaViaje(it)) },
+                    onNuevo = { navController.navigate(RutaViaje()) },
+                )
+            }
             composable<RutaViaje> {
                 EditarViajeScreen(
                     onJornada = { navController.navigate(RutaJornada(it)) },

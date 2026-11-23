@@ -63,6 +63,8 @@ val ErrorViaje.mensaje: Int
             ErrorViaje.INICIO_EN_EL_FUTURO -> R.string.error_inicio_futuro
             ErrorViaje.FIN_NO_POSTERIOR_AL_INICIO -> R.string.error_fin_no_posterior
             ErrorViaje.FIN_EN_EL_FUTURO -> R.string.error_fin_futuro
+            ErrorViaje.FALTA_EL_FIN -> R.string.error_falta_fin
+            ErrorViaje.SOLAPA_CON_OTRO_VIAJE -> R.string.error_viaje_solapa
         }
 
 /** Nombre de cada clase de descanso para el chip de la lista. El semanal reducido lleva la deuda (`%1$s`). */

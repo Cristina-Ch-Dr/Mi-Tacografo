@@ -61,30 +61,20 @@ fun HistoryScreen(
     onJornada: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onSemana: (LocalDate) -> Unit = {},
-    onNueva: () -> Unit = {},
     onResumen: () -> Unit = {},
     viewModel: HistorialViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
-    Box(modifier.fillMaxSize()) {
-        HistorialContent(
-            estado = estado,
-            onJornada = onJornada,
-            onSemana = onSemana,
-            onResumen = onResumen,
-            onAnterior = viewModel::onAnterior,
-            onSiguiente = viewModel::onSiguiente,
-        )
-        // Para pasar las jornadas que están en el tacógrafo o en la libreta pero no en la app (MT-47).
-        if (!estado.cargando) {
-            ExtendedFloatingActionButton(
-                onClick = onNueva,
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.accion_anadir_jornada)) },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            )
-        }
-    }
+    // Las jornadas pasadas se añaden desde Inicio (MT-52).
+    HistorialContent(
+        estado = estado,
+        onJornada = onJornada,
+        modifier = modifier,
+        onSemana = onSemana,
+        onResumen = onResumen,
+        onAnterior = viewModel::onAnterior,
+        onSiguiente = viewModel::onSiguiente,
+    )
 }
 
 /**
@@ -115,8 +105,7 @@ fun HistorialContent(
         SelectorSemana(semana, estado, onAnterior, onSiguiente)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            // Abajo, hueco para que el botón «Añadir jornada» no tape la última.
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item(key = "semana-${semana.lunes}") {

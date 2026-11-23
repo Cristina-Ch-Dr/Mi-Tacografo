@@ -37,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.ResumenViaje
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
@@ -57,6 +58,14 @@ fun EditarViajeScreen(
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
     val alCerrar by rememberUpdatedState(onCerrar)
     LaunchedEffect(estado.cerrar) { if (estado.cerrar) alCerrar() }
+    // Un viaje pasado nuevo se llama, de entrada, como su fecha de inicio (MT-52).
+    val formato = formatoFecha()
+    val propuesto = stringResource(R.string.viaje_nombre_propuesto, "%s")
+    LaunchedEffect(propuesto, formato) {
+        viewModel.usarNombrePropuesto { dia ->
+            propuesto.format(dia.format(formato))
+        }
+    }
 
     EditarViajeContent(
         estado = estado,
@@ -106,28 +115,19 @@ fun EditarViajeContent(
             Text(stringResource(R.string.error_viaje_no_existe), style = MaterialTheme.typography.headlineSmall)
             return@Column
         }
-        val resumen = estado.resumen ?: return@Column
         val inicio = estado.inicio ?: return@Column
-
-        TarjetaViaje(resumen, onClick = {}, destacada = resumen.viaje.enCurso)
-        if (!resumen.conduccion.isZero) {
+        val resumen = estado.resumen
+        if (estado.nuevo) {
             Text(
-                stringResource(R.string.resumen_conduccion) + ": " + textoDuracion(resumen.conduccion),
+                stringResource(R.string.viaje_pasado_ayuda),
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        } else if (resumen != null) {
+            DetalleViaje(resumen, acciones.onJornada)
+            HorizontalDivider()
         }
 
-        Text(
-            stringResource(R.string.viaje_jornadas),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        if (resumen.jornadas.isEmpty()) {
-            Text(stringResource(R.string.viaje_sin_jornadas), style = MaterialTheme.typography.bodyLarge)
-        }
-        resumen.jornadas.forEach { jornada -> FilaJornadaViaje(jornada, onClick = { acciones.onJornada(jornada.id) }) }
-
-        HorizontalDivider()
         CampoTexto(estado.nombre, acciones.onNombre, stringResource(R.string.viaje_nombre))
         CampoFechaHora(stringResource(R.string.campo_hora_inicio), inicio, acciones.onInicio)
         estado.fin?.let { CampoFechaHora(stringResource(R.string.campo_hora_fin), it, acciones.onFin) }
@@ -139,11 +139,12 @@ fun EditarViajeContent(
         )
         ListaErroresViaje(estado.errores)
         BigButton(
-            text = stringResource(R.string.accion_guardar_cambios),
+            text = stringResource(if (estado.nuevo) R.string.accion_anadir_viaje else R.string.accion_guardar_cambios),
             onClick = acciones.onGuardar,
             enabled = estado.puedeGuardar,
             icon = Icons.Filled.Done,
         )
+        if (estado.nuevo) return@Column
         OutlinedButton(
             onClick = acciones.onPedirBorrar,
             enabled = !estado.guardando,
@@ -169,6 +170,33 @@ fun EditarViajeContent(
                 TextButton(onClick = acciones.onCancelarBorrar) { Text(stringResource(R.string.accion_cancelar)) }
             },
         )
+    }
+}
+
+/** El viaje con sus km y conducción, y la lista de sus jornadas (que se abren para corregirlas). */
+@Composable
+private fun DetalleViaje(
+    resumen: ResumenViaje,
+    onJornada: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        TarjetaViaje(resumen, onClick = {}, destacada = resumen.viaje.enCurso)
+        if (!resumen.conduccion.isZero) {
+            Text(
+                stringResource(R.string.resumen_conduccion) + ": " + textoDuracion(resumen.conduccion),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+        Text(
+            stringResource(R.string.viaje_jornadas),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        if (resumen.jornadas.isEmpty()) {
+            Text(stringResource(R.string.viaje_sin_jornadas), style = MaterialTheme.typography.bodyLarge)
+        }
+        resumen.jornadas.forEach { jornada -> FilaJornadaViaje(jornada, onClick = { onJornada(jornada.id) }) }
     }
 }
 
