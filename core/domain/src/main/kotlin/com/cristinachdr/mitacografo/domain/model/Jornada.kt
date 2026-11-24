@@ -24,12 +24,15 @@ data class Jornada(
     /** País en formato ISO 3166-1 alfa-2, por ejemplo "ES" o "UA". */
     val paisInicio: String? = null,
     val ciudadInicio: String? = null,
+    /** Comunidad autónoma, solo si el país es España (MT-55): el código del tacógrafo, como "AN". */
+    val regionInicio: String? = null,
     /** `null` mientras la jornada sigue abierta. */
     val fin: Instant? = null,
     val zonaFin: ZoneId? = null,
     val kmFin: Int? = null,
     val paisFin: String? = null,
     val ciudadFin: String? = null,
+    val regionFin: String? = null,
     /**
      * Conducción que marca el tacógrafo al final. `null` = no se ha apuntado.
      *

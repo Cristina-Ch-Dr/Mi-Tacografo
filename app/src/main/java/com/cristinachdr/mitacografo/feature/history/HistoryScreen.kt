@@ -42,6 +42,7 @@ import com.cristinachdr.mitacografo.domain.model.DescansoPrevio
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.SemanaJornadas
 import com.cristinachdr.mitacografo.domain.model.agruparPorSemana
+import com.cristinachdr.mitacografo.domain.model.lugar
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
@@ -297,7 +298,12 @@ private fun FilaJornada(
             }
             // Conducción y descanso juntos (MT-46): lo que descansó desde la jornada anterior.
             descansoPrevio?.let { TextoDescansoPrevio(it) }
-            val paises = listOfNotNull(jornada.paisInicio, jornada.paisFin).distinct().joinToString(" → ")
+            val paises =
+                listOfNotNull(
+                    lugar(jornada.paisInicio, jornada.regionInicio),
+                    lugar(jornada.paisFin, jornada.regionFin),
+                ).distinct()
+                    .joinToString(" → ")
             if (paises.isNotEmpty()) {
                 Text(
                     paises,

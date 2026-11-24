@@ -411,4 +411,7 @@
     <string name="pausa_3_horas_fin">La pausa terminó a las</string>
     <string name="pausa_3_horas_se_apunta">Se apunta un descanso de %1$s a %2$s.</string>
     <string name="accion_apuntar">Apuntar</string>
+    <!-- MT-55: comunidad autónoma en España -->
+    <string name="campo_region">Comunidad autónoma</string>
+    <string name="region_ninguna">Sin indicar</string>
 </resources>

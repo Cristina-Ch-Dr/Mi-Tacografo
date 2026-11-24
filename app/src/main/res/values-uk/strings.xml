@@ -416,4 +416,7 @@
     <string name="pausa_3_horas_fin">Перерва закінчилась о</string>
     <string name="pausa_3_horas_se_apunta">Буде записано відпочинок з %1$s до %2$s.</string>
     <string name="accion_apuntar">Записати</string>
+    <!-- MT-55: comunidad autónoma en España -->
+    <string name="campo_region">Автономна спільнота (Іспанія)</string>
+    <string name="region_ninguna">Не вказано</string>
 </resources>

@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-55, MT-56, MT-57, MT-58, MT-59, MT-33, MT-33B | MT-54, hecha en `feature/MT-54-pausa-3-horas` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-56, MT-57, MT-58, MT-59, MT-33, MT-33B | MT-55, hecha en `feature/MT-55-comunidad-autonoma` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -420,8 +420,11 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Probado en el emulador con la copia real del conductor (23 nov, de 11:00 a 14:00: «1.ª parte de un fraccionado»).
 
 ### MT-55 · Comunidad autónoma en España · S · deps: MT-41 · *(petición del conductor)*
-- [ ] Si el país es España, elegir también la comunidad autónoma (las abreviaturas del tacógrafo: AN, AR, AST, C, CAN, CAT, CL, CM, CV, EXT, G, IB, LR, M, MU, NA, PV…), al iniciar y al finalizar. El tacógrafo se la pide al meter el país.
-- [ ] Se rellena con la del final de la jornada anterior, como el país.
+- [x] Si el país es España, elegir también la comunidad autónoma (las abreviaturas del tacógrafo: AN, AR, AST, C, CAN, CAT, CL, CM, CV, EXT, G, IB, LR, M, MU, NA, PV…), al iniciar y al finalizar. El tacógrafo se la pide al meter el país.
+- [x] Se rellena con la del final de la jornada anterior, como el país.
+- Códigos de la tabla oficial del JRC (Reglamento 1360/2002 y 2016/799, apéndice I): Canarias es **IC**, y en los tacógrafos inteligentes también Ceuta (CE) y Melilla (ME). La app HTML del conductor usa otros (CB, EX, GA, CN…), que no son los del tacógrafo.
+- `regionInicio` y `regionFin` en la jornada (base de datos 3 → 4, copia de seguridad con campos opcionales). Solo se guardan si el país es España y el código existe; al cambiar a otro país, se quita. También al corregir y al añadir jornadas, y en Historial y el PDF sale «ES (NA) → FR».
+- Probado en el emulador con la copia real del conductor. En ella apuntaba la comunidad en «Ciudad» (13 de 17 veces en España): en España, si la ciudad es solo un código del tacógrafo, pasa a la comunidad, en la migración 3 → 4 (`ComunidadDesdeCiudad`) y al restaurar copias antiguas (`conComunidadDeCiudad`).
 
 ### MT-56 · Detalles de su app · S · *(petición del conductor)*
 - [ ] Historial: las jornadas separadas por **cabeceras de viaje** («Viaje 3 nov → 9 nov · 2.560 km» / «Fuera de viaje»).

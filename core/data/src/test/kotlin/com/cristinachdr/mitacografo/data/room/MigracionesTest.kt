@@ -145,4 +145,51 @@ class MigracionesTest {
                 database.close()
             }
         }
+
+    @Test
+    fun `de la version 3 a la 4 se conservan las jornadas y se puede guardar la comunidad`() =
+        runTest {
+            val nombre = ruta("migracion-3-a-4.db")
+            helper.createDatabase(nombre, 3).use { db ->
+                db.execSQL(
+                    "INSERT INTO jornada (id, inicio_epoch_ms, zona_inicio, km_inicio, pais_inicio, fin_epoch_ms, " +
+                        "zona_fin, km_fin, pais_fin, conduccion_min, conduccion_antes_medianoche_min) VALUES " +
+                        "(1, 1000, 'Europe/Madrid', 250000, 'ES', 40000000, 'Europe/Madrid', 250480, 'ES', 480, 120)",
+                )
+                // Como en la copia del conductor: la comunidad apuntada en «Ciudad».
+                db.execSQL(
+                    "INSERT INTO jornada (id, inicio_epoch_ms, zona_inicio, km_inicio, pais_inicio, ciudad_inicio, " +
+                        "fin_epoch_ms, zona_fin, km_fin, pais_fin, ciudad_fin) VALUES (2, 50000000, 'Europe/Madrid', " +
+                        "250480, 'ES', ' na ', 60000000, 'Europe/Paris', 250900, 'FR', 'CAT')",
+                )
+            }
+
+            helper.runMigrationsAndValidate(nombre, 4, true).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java, nombre)
+                    .allowMainThreadQueries()
+                    // Sin WAL, por lo mismo que en la migración de 2 a 3.
+                    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+                    .build()
+            try {
+                val jornadas = RoomJornadaRepository(database.jornadaDao())
+                val jornada = jornadas.obtenerPorId(1)!!
+                assertEquals(Duration.ofMinutes(120), jornada.conduccionAntesMedianoche)
+                assertNull(jornada.regionInicio)
+
+                jornadas.guardar(jornada.copy(regionInicio = "AN", regionFin = "M"))
+                assertEquals("M", jornadas.obtenerPorId(1)?.regionFin)
+
+                // En España pasa de «Ciudad» a su columna; en Francia («CAT» como ciudad) no se toca.
+                val antigua = jornadas.obtenerPorId(2)!!
+                assertEquals("NA", antigua.regionInicio)
+                assertNull(antigua.ciudadInicio)
+                assertNull(antigua.regionFin)
+                assertEquals("CAT", antigua.ciudadFin)
+            } finally {
+                database.close()
+            }
+        }
 }

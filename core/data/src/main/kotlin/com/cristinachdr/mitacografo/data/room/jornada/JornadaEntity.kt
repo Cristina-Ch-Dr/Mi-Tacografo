@@ -48,6 +48,9 @@ data class JornadaEntity(
     // Desde la versión 3 (MT-53): las dos opcionales, así las filas antiguas quedan con NULL.
     @ColumnInfo(name = "conduccion_apuntada_epoch_ms") val conduccionApuntadaEpochMs: Long? = null,
     @ColumnInfo(name = "conduccion_antes_medianoche_min") val conduccionAntesMedianocheMin: Int? = null,
+    // Desde la versión 4 (MT-55): la comunidad autónoma (código del tacógrafo), solo en España.
+    @ColumnInfo(name = "region_inicio") val regionInicio: String? = null,
+    @ColumnInfo(name = "region_fin") val regionFin: String? = null,
     @ColumnInfo(name = "viaje_id") val viajeId: Long?,
     @ColumnInfo(name = "observaciones") val observaciones: String?,
 )

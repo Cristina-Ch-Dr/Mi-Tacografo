@@ -38,6 +38,7 @@ import com.cristinachdr.mitacografo.ui.components.BigButton
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
+import com.cristinachdr.mitacografo.ui.components.CampoRegion
 import com.cristinachdr.mitacografo.ui.components.CampoTexto
 import com.cristinachdr.mitacografo.ui.components.ListaErrores
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
@@ -58,6 +59,7 @@ fun IniciarJornadaContent(
     onIniciar: () -> Unit,
     modifier: Modifier = Modifier,
     enPantallaPropia: Boolean = true,
+    onRegion: (String) -> Unit = {},
 ) {
     // Dentro de Inicio (MT-51) el formulario no se desplaza solo: lo hace la pantalla entera.
     Column(
@@ -96,6 +98,7 @@ fun IniciarJornadaContent(
             etiqueta = stringResource(R.string.campo_pais),
             preferencias = estado.paises,
         )
+        CampoRegion(pais = estado.pais, valor = estado.region, onCambio = onRegion)
         CampoTexto(valor = estado.ciudad, onCambio = onCiudad, etiqueta = stringResource(R.string.campo_ciudad))
         CampoTexto(
             valor = estado.observaciones,

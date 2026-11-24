@@ -15,6 +15,7 @@ import com.cristinachdr.mitacografo.domain.usecase.AnadirJornada
 import com.cristinachdr.mitacografo.domain.usecase.BorrarJornada
 import com.cristinachdr.mitacografo.domain.usecase.EditarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
+import com.cristinachdr.mitacografo.feature.startday.regionPara
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import com.cristinachdr.mitacografo.ui.casillasConduccion
 import com.cristinachdr.mitacografo.ui.errorMinutos
@@ -42,11 +43,14 @@ data class EditarJornadaUiState(
     val inicio: LocalDateTime? = null,
     val kmInicio: String = "",
     val paisInicio: String = "",
+    /** Comunidad autónoma, si el país es España (MT-55). */
+    val regionInicio: String = "",
     val ciudadInicio: String = "",
     /** Solo si la jornada está terminada: una jornada en curso se termina desde Inicio. */
     val fin: LocalDateTime? = null,
     val kmFin: String = "",
     val paisFin: String = "",
+    val regionFin: String = "",
     val ciudadFin: String = "",
     val conduccionHoras: String = "",
     val conduccionMinutos: String = "",
@@ -132,7 +136,12 @@ class EditarJornadaViewModel
 
         fun onKmInicio(valor: String) = actualizar { copy(kmInicio = valor) }
 
-        fun onPaisInicio(valor: String) = actualizar { copy(paisInicio = valor) }
+        fun onPaisInicio(valor: String) =
+            actualizar {
+                copy(paisInicio = valor, regionInicio = regionPara(valor, regionInicio))
+            }
+
+        fun onRegionInicio(valor: String) = actualizar { copy(regionInicio = valor) }
 
         fun onCiudadInicio(valor: String) = actualizar { copy(ciudadInicio = valor) }
 
@@ -140,7 +149,9 @@ class EditarJornadaViewModel
 
         fun onKmFin(valor: String) = actualizar { copy(kmFin = valor) }
 
-        fun onPaisFin(valor: String) = actualizar { copy(paisFin = valor) }
+        fun onPaisFin(valor: String) = actualizar { copy(paisFin = valor, regionFin = regionPara(valor, regionFin)) }
+
+        fun onRegionFin(valor: String) = actualizar { copy(regionFin = valor) }
 
         fun onCiudadFin(valor: String) = actualizar { copy(ciudadFin = valor) }
 
@@ -238,10 +249,12 @@ class EditarJornadaViewModel
                 inicio = jornada.inicio.atZone(jornada.zonaInicio).toLocalDateTime(),
                 kmInicio = if (jornada.id == Jornada.SIN_ID) "" else jornada.kmInicio.toString(),
                 paisInicio = jornada.paisInicio.orEmpty(),
+                regionInicio = jornada.regionInicio.orEmpty(),
                 ciudadInicio = jornada.ciudadInicio.orEmpty(),
                 fin = jornada.fin?.atZone(jornada.zonaFin ?: jornada.zonaInicio)?.toLocalDateTime(),
                 kmFin = jornada.kmFin?.toString().orEmpty(),
                 paisFin = jornada.paisFin.orEmpty(),
+                regionFin = jornada.regionFin.orEmpty(),
                 ciudadFin = jornada.ciudadFin.orEmpty(),
                 conduccionHoras = horas,
                 conduccionMinutos = minutos,
@@ -314,6 +327,7 @@ internal fun EditarJornadaUiState.borrador(): Jornada? {
             inicio = inicio.atZone(original.zonaInicio).toInstant(),
             kmInicio = kmInicio,
             paisInicio = paisInicio,
+            regionInicio = regionInicio,
             ciudadInicio = ciudadInicio,
             observaciones = observaciones,
         )
@@ -323,6 +337,7 @@ internal fun EditarJornadaUiState.borrador(): Jornada? {
         fin = fin?.atZone(zonaFin)?.toInstant(),
         kmFin = kmFin.toIntOrNull() ?: return null,
         paisFin = paisFin,
+        regionFin = regionFin,
         ciudadFin = ciudadFin,
         conduccionTacografo = leerConduccion(conduccionHoras, conduccionMinutos),
         conduccionAntesMedianoche = if (medianoche == null) null else leerConduccion(antesHoras, antesMinutos),

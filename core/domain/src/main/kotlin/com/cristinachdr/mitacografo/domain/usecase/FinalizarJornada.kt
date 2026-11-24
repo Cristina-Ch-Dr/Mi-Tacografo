@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.domain.usecase
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
+import com.cristinachdr.mitacografo.domain.model.comoRegion
 import com.cristinachdr.mitacografo.domain.model.sinConduccionSobrante
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
@@ -20,6 +21,8 @@ data class DatosFin(
     val zona: ZoneId,
     val kmFin: Int,
     val pais: String? = null,
+    /** Comunidad autónoma, si el país es España (MT-55). */
+    val region: String? = null,
     val ciudad: String? = null,
     /** Lo que marca el tacógrafo. `null` si no lo apunta (las reglas dirán «No verificado»). */
     val conduccionTacografo: Duration? = null,
@@ -56,6 +59,7 @@ class FinalizarJornada
                         zonaFin = datos.zona,
                         kmFin = datos.kmFin,
                         paisFin = datos.pais.comoPais(),
+                        regionFin = datos.region.comoRegion(datos.pais.comoPais()),
                         ciudadFin = datos.ciudad.limpio(),
                         conduccionTacografo = datos.conduccionTacografo,
                         conduccionAntesMedianoche = datos.conduccionAntesMedianoche,
