@@ -414,4 +414,11 @@
     <!-- MT-55: comunidad autónoma en España -->
     <string name="campo_region">Comunidad autónoma</string>
     <string name="region_ninguna">Sin indicar</string>
+    <!-- MT-56: detalles de su app -->
+    <string name="historial_cabecera_viaje">%1$s · %2$s → %3$s · %4$s km</string>
+    <string name="historial_viaje_en_curso">en curso</string>
+    <string name="historial_fuera_de_viaje">Fuera de viaje</string>
+    <string name="aviso_semanal_muy_pronto">Quedan menos de 6 h: el descanso semanal tiene que empezar antes del %1$s.</string>
+    <string name="inicio_km_hoy">Hoy: %1$s km</string>
+    <string name="inicio_km_viaje">Viaje: %1$s km</string>
 </resources>

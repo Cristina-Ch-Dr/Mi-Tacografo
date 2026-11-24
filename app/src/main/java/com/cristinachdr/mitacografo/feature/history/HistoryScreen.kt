@@ -40,9 +40,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.DescansoPrevio
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.ResumenViaje
 import com.cristinachdr.mitacografo.domain.model.SemanaJornadas
+import com.cristinachdr.mitacografo.domain.model.TramoViaje
 import com.cristinachdr.mitacografo.domain.model.agruparPorSemana
 import com.cristinachdr.mitacografo.domain.model.lugar
+import com.cristinachdr.mitacografo.domain.model.porViaje
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
 import com.cristinachdr.mitacografo.ui.formatoFecha
@@ -112,16 +115,56 @@ fun HistorialContent(
             item(key = "semana-${semana.lunes}") {
                 CabeceraSemana(semana, estado.estadoSemana[semana.lunes], onInforme = { onSemana(semana.lunes) })
             }
-            items(semana.jornadas, key = { it.id }) { jornada ->
-                FilaJornada(
-                    jornada = jornada,
-                    estado = estado.estadoJornada[jornada.id],
-                    descansoPrevio = estado.descansoPrevio[jornada.id],
-                    onClick = { onJornada(jornada.id) },
-                )
+            // Con viajes, las jornadas van bajo la cabecera de su viaje, como en la app del conductor (MT-56).
+            val tramos = semana.porViaje().ifEmpty { listOf(TramoViaje(null, semana.jornadas)) }
+            val conCabeceras = tramos.any { it.viajeId != null }
+            tramos.forEach { tramo ->
+                if (conCabeceras) {
+                    item(key = "viaje-${tramo.viajeId}-${tramo.jornadas.first().id}") {
+                        CabeceraViaje(tramo.viajeId?.let { estado.viajes[it] })
+                    }
+                }
+                items(tramo.jornadas, key = { it.id }) { jornada ->
+                    FilaJornada(
+                        jornada = jornada,
+                        estado = estado.estadoJornada[jornada.id],
+                        descansoPrevio = estado.descansoPrevio[jornada.id],
+                        onClick = { onJornada(jornada.id) },
+                    )
+                }
             }
         }
     }
+}
+
+/** «Viaje del 13 nov · 13 nov → 19 nov · 4.707 km», o «Fuera de viaje» (MT-56). */
+@Composable
+private fun CabeceraViaje(
+    viaje: ResumenViaje?,
+    modifier: Modifier = Modifier,
+) {
+    val texto =
+        if (viaje == null) {
+            stringResource(R.string.historial_fuera_de_viaje)
+        } else {
+            val inicio =
+                viaje.viaje.inicio
+                    .atZone(viaje.viaje.zonaInicio)
+                    .format(formatoFecha())
+            val fin =
+                viaje.viaje.fin
+                    ?.atZone(viaje.viaje.zonaFin ?: viaje.viaje.zonaInicio)
+                    ?.format(formatoFecha())
+                    ?: stringResource(R.string.historial_viaje_en_curso)
+            stringResource(R.string.historial_cabecera_viaje, viaje.viaje.nombre, inicio, fin, textoKm(viaje.km))
+        }
+    Text(
+        texto,
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.secondary,
+        modifier = modifier.padding(top = 8.dp),
+    )
 }
 
 /**

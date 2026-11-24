@@ -191,9 +191,11 @@ fun HomeContent(
         val jornada = state.jornada
         if (jornada == null) {
             SinJornadaCard(state.descanso)
+            KmHoyYViaje(state)
             TarjetaFormulario(stringResource(R.string.accion_iniciar_jornada), formulario)
         } else {
             JornadaEnCursoCard(jornada, state.pausa)
+            KmHoyYViaje(state)
             BotonPausa(enPausa = state.pausa != null, onIniciar = onIniciarPausa, onTerminar = onTerminarPausa)
             TarjetaFormulario(stringResource(R.string.accion_finalizar_jornada), formulario)
         }
@@ -211,6 +213,27 @@ fun HomeContent(
             )
         }
     }
+}
+
+/** «Hoy: 530 km · Viaje: 1.940 km» (MT-56). No sale si aún no hay nada que contar. */
+@Composable
+private fun KmHoyYViaje(
+    state: HomeUiState,
+    modifier: Modifier = Modifier,
+) {
+    val viaje = state.viajeEnCurso
+    if (state.kmHoy == 0 && viaje == null) return
+    val partes =
+        listOfNotNull(
+            stringResource(R.string.inicio_km_hoy, textoKm(state.kmHoy)),
+            viaje?.let { stringResource(R.string.inicio_km_viaje, textoKm(it.km)) },
+        )
+    Text(
+        partes.joinToString(" · "),
+        style = MaterialTheme.typography.titleMedium,
+        textAlign = TextAlign.Center,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 /** Sin jornada en curso: desde cuándo descansa (el tiempo desde la última jornada ya es descanso, MT-46). */
@@ -292,6 +315,10 @@ private fun TarjetaAviso(
 
             is AvisoInicio.SemanalPronto -> {
                 stringResource(R.string.aviso_semanal_pronto, textoDiaHora(aviso.plazo))
+            }
+
+            is AvisoInicio.SemanalMuyPronto -> {
+                stringResource(R.string.aviso_semanal_muy_pronto, textoDiaHora(aviso.plazo))
             }
 
             is AvisoInicio.SemanalVencido -> {

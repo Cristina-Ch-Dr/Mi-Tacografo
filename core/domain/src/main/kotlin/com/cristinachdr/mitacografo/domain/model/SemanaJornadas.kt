@@ -47,3 +47,27 @@ fun agruparPorSemana(
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         }.map { (lunes, deLaSemana) -> SemanaJornadas(lunes, deLaSemana) }
         .sortedByDescending { it.lunes }
+
+/** Jornadas seguidas del mismo viaje (o fuera de viaje, con [viajeId] `null`), para las cabeceras del Historial. */
+data class TramoViaje(
+    val viajeId: Long?,
+    val jornadas: List<Jornada>,
+)
+
+/**
+ * Las jornadas de la semana partidas en tramos de un mismo viaje (MT-56), en el mismo orden.
+ * Si ninguna va en un viaje, no hay tramos: no hace falta ninguna cabecera.
+ */
+fun SemanaJornadas.porViaje(): List<TramoViaje> {
+    if (jornadas.all { it.viajeId == null }) return emptyList()
+    val tramos = mutableListOf<TramoViaje>()
+    jornadas.forEach { jornada ->
+        val ultimo = tramos.lastOrNull()
+        if (ultimo != null && ultimo.viajeId == jornada.viajeId) {
+            tramos[tramos.lastIndex] = ultimo.copy(jornadas = ultimo.jornadas + jornada)
+        } else {
+            tramos += TramoViaje(jornada.viajeId, listOf(jornada))
+        }
+    }
+    return tramos
+}

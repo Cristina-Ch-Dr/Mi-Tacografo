@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.ResumenViaje
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
 import com.cristinachdr.mitacografo.domain.model.descansoActual
 import com.cristinachdr.mitacografo.domain.model.plazoSiguienteSemanal
+import com.cristinachdr.mitacografo.domain.model.resumirViajes
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
@@ -54,6 +56,10 @@ data class HomeUiState(
     val descanso: PausaUi? = null,
     /** La hora de este estado: cambia cada minuto (para los avisos de arriba y la hora de los formularios). */
     val ahora: Instant = Instant.EPOCH,
+    /** Km de las jornadas terminadas que empezaron hoy (MT-56). */
+    val kmHoy: Int = 0,
+    /** El viaje en curso con sus km, si hay uno (MT-56). */
+    val viajeEnCurso: ResumenViaje? = null,
 )
 
 data class PausaUi(
@@ -163,16 +169,21 @@ class HomeViewModel
         val uiState: StateFlow<HomeUiState> =
             combine(
                 combine(obtenerJornadaActual(), jornadas.observarTodas()) { actual, todas ->
-                    actual to descansoActual(todas)?.let { fin -> fin to todas.maxBy { it.inicio } }
+                    Triple(actual, descansoActual(todas)?.let { fin -> fin to todas.maxBy { it.inicio } }, todas)
                 },
                 settings.observar(),
                 descansos.observarEnCurso(),
                 viajes.observarTodos(),
                 cadaMinuto(),
-            ) { (jornada, ultima), ajustes, pausa, todosLosViajes, ahora ->
+            ) { (jornada, ultima, todas), ajustes, pausa, todosLosViajes, ahora ->
                 val viaje = jornada?.viajeId?.let { id -> todosLosViajes.find { it.id == id }?.nombre }
                 crearEstado(jornada, ajustes.avisos, pausa, ahora, viaje)
                     .copy(
+                        kmHoy = kmDeHoy(todas, ahora),
+                        viajeEnCurso =
+                            todosLosViajes
+                                .find { it.enCurso }
+                                ?.let { enCurso -> resumirViajes(listOf(enCurso), todas).single() },
                         faltanPaises = ajustes.paisEmpresa == null || ajustes.paisResidencia == null,
                         descanso =
                             ultima?.let { (fin, j) ->
@@ -196,6 +207,15 @@ class HomeViewModel
 
         fun onTerminarPausa() {
             viewModelScope.launch { terminarPausa() }
+        }
+
+        /** Km de las jornadas terminadas que empezaron hoy (en la zona del móvil), como en su app. */
+        private fun kmDeHoy(
+            todas: List<Jornada>,
+            ahora: Instant,
+        ): Int {
+            val hoy = ahora.atZone(clock.zone).toLocalDate()
+            return todas.filter { it.inicio.atZone(clock.zone).toLocalDate() == hoy }.sumOf { it.kmRecorridos ?: 0 }
         }
 
         /** Emite la hora actual ahora y luego al empezar cada minuto. */

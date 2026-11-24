@@ -9,6 +9,7 @@ import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
+import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
@@ -49,6 +50,7 @@ class HomeViewModelTest {
         vararg jornadas: Jornada,
         descansos: FakeDescansoRepository = FakeDescansoRepository(),
         ajustes: Ajustes = Ajustes(),
+        viajes: List<Viaje> = emptyList(),
     ): HomeViewModel {
         val repo = FakeJornadaRepository(jornadas.toList())
         val settings = FakeSettingsRepository(ajustes)
@@ -56,7 +58,7 @@ class HomeViewModelTest {
             ObtenerJornadaActual(repo),
             settings,
             descansos,
-            FakeViajeRepository(),
+            FakeViajeRepository(viajes),
             repo,
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
             TerminarPausa(descansos, reloj),
@@ -215,6 +217,48 @@ class HomeViewModelTest {
                 Duration.ofHours(12),
                 vm.uiState.value.descanso
                     ?.transcurrido,
+            )
+        }
+
+    @Test
+    fun `km de hoy y del viaje en curso`() =
+        runTest {
+            val reloj = Clock.fixed(hora(20), madrid)
+            val viaje = Viaje(id = 7, nombre = "Ida", inicio = hora(1), zonaInicio = madrid)
+
+            fun terminada(
+                id: Long,
+                desde: Int,
+                hasta: Int,
+                km: Int,
+                dia: Instant = hora(desde),
+            ) = Jornada(
+                id = id,
+                inicio = dia,
+                zonaInicio = madrid,
+                kmInicio = 1_000,
+                fin = dia.plusSeconds((hasta - desde) * 3600L),
+                zonaFin = madrid,
+                kmFin = 1_000 + km,
+                viajeId = 7,
+            )
+            // Ayer (otro día) 400 km y hoy dos jornadas de 300 y 200: hoy 500, el viaje 900.
+            val ayer = terminada(1, 6, 16, 400, dia = hora(6).minusSeconds(24 * 3600))
+            val vm =
+                viewModel(
+                    reloj,
+                    ayer,
+                    terminada(2, 6, 11, 300),
+                    terminada(3, 13, 18, 200),
+                    viajes = listOf(viaje),
+                )
+            observar(vm)
+
+            assertEquals(500, vm.uiState.value.kmHoy)
+            assertEquals(
+                900,
+                vm.uiState.value.viajeEnCurso
+                    ?.km,
             )
         }
 }

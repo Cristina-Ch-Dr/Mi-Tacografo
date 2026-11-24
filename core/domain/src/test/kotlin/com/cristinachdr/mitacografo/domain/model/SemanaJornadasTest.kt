@@ -83,4 +83,32 @@ class SemanaJornadasTest {
             agruparPorSemana(listOf(domingoNoche), zonaReferencia = kyiv).single().lunes,
         )
     }
+
+    @Test
+    fun `las jornadas se parten por viaje en el mismo orden, y sin viajes no hay tramos`() {
+        val semana =
+            SemanaJornadas(
+                LocalDate.of(2026, 11, 2),
+                listOf(
+                    jornada(4, 6).copy(viajeId = 2),
+                    jornada(3, 5).copy(viajeId = 2),
+                    jornada(2, 4),
+                    jornada(1, 3).copy(viajeId = 1),
+                ),
+            )
+
+        assertEquals(listOf(2L, null, 1L), semana.porViaje().map { it.viajeId })
+        assertEquals(
+            listOf(4L, 3L),
+            semana
+                .porViaje()
+                .first()
+                .jornadas
+                .map { it.id },
+        )
+        assertEquals(
+            emptyList<TramoViaje>(),
+            SemanaJornadas(LocalDate.of(2026, 11, 2), listOf(jornada(1, 3))).porViaje(),
+        )
+    }
 }
