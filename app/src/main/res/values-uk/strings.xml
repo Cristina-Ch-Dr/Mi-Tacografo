@@ -419,4 +419,11 @@
     <!-- MT-55: comunidad autónoma en España -->
     <string name="campo_region">Автономна спільнота (Іспанія)</string>
     <string name="region_ninguna">Не вказано</string>
+    <!-- MT-56: detalles de su app -->
+    <string name="historial_cabecera_viaje">%1$s · %2$s → %3$s · %4$s км</string>
+    <string name="historial_viaje_en_curso">триває</string>
+    <string name="historial_fuera_de_viaje">Поза рейсом</string>
+    <string name="aviso_semanal_muy_pronto">Лишилось менше 6 год: тижневий відпочинок має початися до %1$s.</string>
+    <string name="inicio_km_hoy">Сьогодні: %1$s км</string>
+    <string name="inicio_km_viaje">Рейс: %1$s км</string>
 </resources>

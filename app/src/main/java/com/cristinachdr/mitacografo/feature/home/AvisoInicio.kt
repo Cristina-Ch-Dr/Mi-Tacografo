@@ -25,6 +25,13 @@ sealed interface AvisoInicio {
         override val grave = false
     }
 
+    /** Quedan 6 h o menos (MT-56): como en su app, un segundo aviso más serio. */
+    data class SemanalMuyPronto(
+        val plazo: ZonedDateTime,
+    ) : AvisoInicio {
+        override val grave = false
+    }
+
     data class SemanalVencido(
         val plazo: ZonedDateTime,
     ) : AvisoInicio {
@@ -35,6 +42,7 @@ sealed interface AvisoInicio {
 private val TRECE_HORAS: Duration = Duration.ofHours(13)
 private val QUINCE_HORAS: Duration = Duration.ofHours(15)
 private val UN_DIA: Duration = Duration.ofHours(24)
+private val SEIS_HORAS: Duration = Duration.ofHours(6)
 
 /**
  * Los avisos de arriba de Inicio.
@@ -59,6 +67,7 @@ fun avisosInicio(
         val falta = Duration.between(estado.ahora, plazoSemanal.toInstant())
         when {
             falta.isNegative || falta.isZero -> avisos += AvisoInicio.SemanalVencido(plazoSemanal)
+            falta <= SEIS_HORAS -> avisos += AvisoInicio.SemanalMuyPronto(plazoSemanal)
             falta <= UN_DIA -> avisos += AvisoInicio.SemanalPronto(plazoSemanal)
         }
     }

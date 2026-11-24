@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-56, MT-57, MT-58, MT-59, MT-33, MT-33B | MT-55, hecha en `feature/MT-55-comunidad-autonoma` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-57, MT-58, MT-59, MT-33, MT-33B | MT-56, hecha en `feature/MT-56-detalles-su-app` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -427,10 +427,15 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Probado en el emulador con la copia real del conductor. En ella apuntaba la comunidad en «Ciudad» (13 de 17 veces en España): en España, si la ciudad es solo un código del tacógrafo, pasa a la comunidad, en la migración 3 → 4 (`ComunidadDesdeCiudad`) y al restaurar copias antiguas (`conComunidadDeCiudad`).
 
 ### MT-56 · Detalles de su app · S · *(petición del conductor)*
-- [ ] Historial: las jornadas separadas por **cabeceras de viaje** («Viaje 3 nov → 9 nov · 2.560 km» / «Fuera de viaje»).
-- [ ] Aviso del descanso semanal también **6 h antes** del plazo (ahora: 24 h antes y pasado el plazo).
-- [ ] Km de hoy y del viaje en Inicio (pendiente de MT-51).
-- [ ] Descanso semanal que cruza dos semanas: elegir a qué semana cuenta (art. 8.9). Revisar qué hace ahora el motor.
+- [x] Historial: las jornadas separadas por **cabeceras de viaje** («Viaje 3 nov → 9 nov · 2.560 km» / «Fuera de viaje»).
+- [x] Aviso del descanso semanal también **6 h antes** del plazo (ahora: 24 h antes y pasado el plazo).
+- [x] Km de hoy y del viaje en Inicio (pendiente de MT-51).
+- [x] Descanso semanal que cruza dos semanas: elegir a qué semana cuenta (art. 8.9). Revisar qué hace ahora el motor.
+  - Revisado: el motor ya aplica el art. 8.9 solo (D-2 en `ReglasDescansoSemanal`): cuenta en la semana en la que empieza y, si esa semana ya tiene uno, en la siguiente. Elegirlo a mano obligaría a guardar la elección de cada descanso, también de los calculados entre jornadas. **Decidido (24 nov 2026): se queda automático.**
+- Cabeceras: `SemanaJornadas.porViaje()` parte la semana en tramos de un mismo viaje; si ninguna jornada va en un viaje, no hay cabeceras. «Viaje del 13 nov 2026 · 13 nov 2026 → 19 nov 2026 · 4.707 km» / «Fuera de viaje».
+- Aviso del semanal en Inicio: a 24 h, a 6 h («Quedan menos de 6 h…») y pasado el plazo. Son avisos en la pantalla, no notificaciones.
+- En Inicio, debajo de la jornada: «Hoy: 530 km · Viaje: 1.940 km» (km de las jornadas terminadas que empezaron hoy y del viaje en curso).
+- Probado en el emulador con la copia real del conductor.
 
 ### MT-57 · Cuándo salir y despertador · M · deps: MT-13 · *(petición del conductor)*
 - [ ] Al finalizar la jornada, tarjeta en Inicio: con descanso de **9 h** → salida a las X y despertar a las Y; lo mismo con **11 h**.

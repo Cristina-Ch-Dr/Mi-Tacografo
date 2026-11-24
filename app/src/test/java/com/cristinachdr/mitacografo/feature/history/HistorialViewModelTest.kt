@@ -4,10 +4,12 @@ import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansosPrevios
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerHistorial
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerViajes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -48,6 +50,7 @@ class HistorialViewModelTest {
             ObtenerHistorial(repo, settings),
             ObtenerInformeReglas(repo, FakeDescansoRepository(), settings, reloj),
             ObtenerDescansosPrevios(repo, FakeDescansoRepository()),
+            ObtenerViajes(FakeViajeRepository(), repo),
         )
     }
 

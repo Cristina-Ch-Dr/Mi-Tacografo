@@ -3,10 +3,12 @@ package com.cristinachdr.mitacografo.feature.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.DescansoPrevio
+import com.cristinachdr.mitacografo.domain.model.ResumenViaje
 import com.cristinachdr.mitacografo.domain.model.SemanaJornadas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansosPrevios
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerHistorial
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
+import com.cristinachdr.mitacografo.domain.usecase.ObtenerViajes
 import com.cristinachdr.mitacografo.ui.reglas.EstadoRegla
 import com.cristinachdr.mitacografo.ui.reglas.peor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +32,8 @@ data class HistorialUiState(
     val descansoPrevio: Map<Long, DescansoPrevio> = emptyMap(),
     /** La semana que se ve (su lunes); `null` = la más reciente. */
     val elegida: LocalDate? = null,
+    /** Los viajes con sus km (por id), para las cabeceras de viaje (MT-56). */
+    val viajes: Map<Long, ResumenViaje> = emptyMap(),
 ) {
     val vacio: Boolean get() = !cargando && semanas.isEmpty()
 
@@ -63,6 +67,7 @@ class HistorialViewModel
         obtenerHistorial: ObtenerHistorial,
         obtenerInformeReglas: ObtenerInformeReglas,
         obtenerDescansosPrevios: ObtenerDescansosPrevios,
+        obtenerViajes: ObtenerViajes,
     ) : ViewModel() {
         private val elegida = MutableStateFlow<LocalDate?>(null)
 
@@ -73,13 +78,15 @@ class HistorialViewModel
                 obtenerInformeReglas(),
                 obtenerDescansosPrevios(),
                 elegida,
-            ) { semanas, informe, previos, lunes ->
+                obtenerViajes(),
+            ) { semanas, informe, previos, lunes, viajes ->
                 val jornadas = informe.semanas.flatMap { it.jornadas }
                 HistorialUiState(
                     semanas = semanas,
                     cargando = false,
                     descansoPrevio = previos,
                     elegida = lunes,
+                    viajes = viajes.associateBy { it.viaje.id },
                     estadoJornada =
                         jornadas
                             .mapNotNull { j ->

@@ -49,6 +49,9 @@ class AvisoInicioTest {
 
         assertEquals(listOf(AvisoInicio.SemanalPronto(pronto)), avisosInicio(conJornada(8), pronto))
         assertEquals(listOf(AvisoInicio.SemanalVencido(pasado)), avisosInicio(conJornada(8), pasado))
+        // Con 6 h o menos, el aviso más serio (MT-56).
+        val muyPronto = ahora.plusHours(5)
+        assertEquals(listOf(AvisoInicio.SemanalMuyPronto(muyPronto)), avisosInicio(conJornada(8), muyPronto))
     }
 
     @Test
