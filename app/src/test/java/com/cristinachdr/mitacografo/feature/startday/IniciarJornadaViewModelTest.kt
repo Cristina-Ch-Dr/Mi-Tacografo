@@ -143,4 +143,21 @@ class IniciarJornadaViewModelTest {
 
             assertTrue(descansos.guardados.isEmpty())
         }
+
+    @Test
+    fun `propone la comunidad del final de la anterior y se quita al cambiar a otro pais`() =
+        runTest {
+            val repo = FakeJornadaRepository(listOf(ayer.copy(paisFin = "ES", regionFin = "AN")))
+            val vm = viewModel(repo)
+            assertEquals("AN", vm.uiState.value.region)
+
+            vm.onPais("FR")
+            assertEquals("", vm.uiState.value.region)
+
+            vm.onPais("ES")
+            vm.onRegion("CAT")
+            vm.onIniciar()
+
+            assertEquals("CAT", repo.obtenerAbierta()?.regionInicio)
+        }
 }

@@ -10,6 +10,7 @@ import com.cristinachdr.mitacografo.domain.model.ErrorCopia
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.Viaje
+import com.cristinachdr.mitacografo.domain.model.conComunidadDeCiudad
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -97,10 +98,13 @@ private fun Jornada.aDto() =
         conduccionMinutos = conduccionTacografo?.toMinutes(),
         conduccionApuntadaEn = conduccionApuntadaEn?.toString(),
         conduccionAntesMedianocheMinutos = conduccionAntesMedianoche?.toMinutes(),
+        regionInicio = regionInicio,
+        regionFin = regionFin,
         viajeId = viajeId,
         observaciones = observaciones,
     )
 
+// Las copias de antes de MT-55 traen la comunidad en «Ciudad»: se pasa a su campo.
 private fun JornadaDto.aDominio() =
     Jornada(
         id = id,
@@ -117,9 +121,11 @@ private fun JornadaDto.aDominio() =
         conduccionTacografo = conduccionMinutos?.let(Duration::ofMinutes),
         conduccionApuntadaEn = conduccionApuntadaEn?.let(Instant::parse),
         conduccionAntesMedianoche = conduccionAntesMedianocheMinutos?.let(Duration::ofMinutes),
+        regionInicio = regionInicio,
+        regionFin = regionFin,
         viajeId = viajeId,
         observaciones = observaciones,
-    )
+    ).conComunidadDeCiudad()
 
 private fun Descanso.aDto() =
     DescansoDto(

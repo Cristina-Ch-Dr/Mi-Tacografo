@@ -35,6 +35,7 @@ import com.cristinachdr.mitacografo.ui.components.CampoAntesMedianoche
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
+import com.cristinachdr.mitacografo.ui.components.CampoRegion
 import com.cristinachdr.mitacografo.ui.components.CampoTexto
 import com.cristinachdr.mitacografo.ui.components.ListaErrores
 import com.cristinachdr.mitacografo.ui.formatoFecha
@@ -55,6 +56,7 @@ data class AccionesFinalizar(
     val onAntesHoras: (String) -> Unit = {},
     val onAntesMinutos: (String) -> Unit = {},
     val onPais: (String) -> Unit = {},
+    val onRegion: (String) -> Unit = {},
     val onCiudad: (String) -> Unit = {},
     val onObservaciones: (String) -> Unit = {},
     val onFinalizar: () -> Unit = {},
@@ -156,6 +158,7 @@ fun FinalizarJornadaContent(
             etiqueta = stringResource(R.string.campo_pais),
             preferencias = estado.paises,
         )
+        CampoRegion(pais = estado.pais, valor = estado.region, onCambio = acciones.onRegion)
         CampoTexto(
             valor = estado.ciudad,
             onCambio = acciones.onCiudad,

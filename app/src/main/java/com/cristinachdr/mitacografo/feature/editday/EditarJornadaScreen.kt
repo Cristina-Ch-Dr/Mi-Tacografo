@@ -38,6 +38,7 @@ import com.cristinachdr.mitacografo.ui.components.CampoAntesMedianoche
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
 import com.cristinachdr.mitacografo.ui.components.CampoPais
+import com.cristinachdr.mitacografo.ui.components.CampoRegion
 import com.cristinachdr.mitacografo.ui.components.CampoTexto
 import com.cristinachdr.mitacografo.ui.components.ListaErrores
 import com.cristinachdr.mitacografo.ui.textoDuracion
@@ -63,10 +64,12 @@ fun EditarJornadaScreen(
                 onInicio = viewModel::onInicio,
                 onKmInicio = viewModel::onKmInicio,
                 onPaisInicio = viewModel::onPaisInicio,
+                onRegionInicio = viewModel::onRegionInicio,
                 onCiudadInicio = viewModel::onCiudadInicio,
                 onFin = viewModel::onFin,
                 onKmFin = viewModel::onKmFin,
                 onPaisFin = viewModel::onPaisFin,
+                onRegionFin = viewModel::onRegionFin,
                 onCiudadFin = viewModel::onCiudadFin,
                 onConduccionHoras = viewModel::onConduccionHoras,
                 onConduccionMinutos = viewModel::onConduccionMinutos,
@@ -85,10 +88,12 @@ data class AccionesEditar(
     val onInicio: (LocalDateTime) -> Unit = {},
     val onKmInicio: (String) -> Unit = {},
     val onPaisInicio: (String) -> Unit = {},
+    val onRegionInicio: (String) -> Unit = {},
     val onCiudadInicio: (String) -> Unit = {},
     val onFin: (LocalDateTime) -> Unit = {},
     val onKmFin: (String) -> Unit = {},
     val onPaisFin: (String) -> Unit = {},
+    val onRegionFin: (String) -> Unit = {},
     val onCiudadFin: (String) -> Unit = {},
     val onConduccionHoras: (String) -> Unit = {},
     val onConduccionMinutos: (String) -> Unit = {},
@@ -143,6 +148,7 @@ fun EditarJornadaContent(
             etiqueta = stringResource(R.string.campo_pais),
             preferencias = estado.paises,
         )
+        CampoRegion(pais = estado.paisInicio, valor = estado.regionInicio, onCambio = acciones.onRegionInicio)
         CampoTexto(estado.ciudadInicio, acciones.onCiudadInicio, stringResource(R.string.campo_ciudad))
 
         val fin = estado.fin
@@ -162,6 +168,7 @@ fun EditarJornadaContent(
                 etiqueta = stringResource(R.string.campo_pais),
                 preferencias = estado.paises,
             )
+            CampoRegion(pais = estado.paisFin, valor = estado.regionFin, onCambio = acciones.onRegionFin)
             CampoTexto(estado.ciudadFin, acciones.onCiudadFin, stringResource(R.string.campo_ciudad))
 
             Text(stringResource(R.string.campo_conduccion), style = MaterialTheme.typography.titleMedium)

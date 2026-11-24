@@ -12,6 +12,7 @@ import android.text.TextPaint
 import androidx.core.graphics.withTranslation
 import com.cristinachdr.mitacografo.R
 import com.cristinachdr.mitacografo.domain.model.ClaseDescanso
+import com.cristinachdr.mitacografo.domain.model.lugar
 import com.cristinachdr.mitacografo.domain.usecase.Informe
 import com.cristinachdr.mitacografo.ui.nombre
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -270,7 +271,10 @@ private class Maquetador(
                     j.kmFin?.let(t::km) ?: "—",
                     j.kmRecorridos?.let(t::km) ?: "—",
                     j.conduccionTacografo?.let(t::duracion) ?: "—",
-                    listOfNotNull(j.paisInicio, j.paisFin).distinct().joinToString(" → ").ifEmpty { "—" },
+                    listOfNotNull(lugar(j.paisInicio, j.regionInicio), lugar(j.paisFin, j.regionFin))
+                        .distinct()
+                        .joinToString(" → ")
+                        .ifEmpty { "—" },
                 )
             }
         tabla(columnas, filas)

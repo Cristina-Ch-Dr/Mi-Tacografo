@@ -15,6 +15,7 @@ import com.cristinachdr.mitacografo.domain.usecase.FinalizarJornada
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerPreferenciasPaises
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
+import com.cristinachdr.mitacografo.feature.startday.regionPara
 import com.cristinachdr.mitacografo.ui.ErrorCampo
 import com.cristinachdr.mitacografo.ui.casillasConduccion
 import com.cristinachdr.mitacografo.ui.errorMinutos
@@ -43,6 +44,8 @@ data class FinalizarJornadaUiState(
     val conduccionHoras: String = "",
     val conduccionMinutos: String = "",
     val pais: String = "",
+    /** Comunidad autónoma, si el país es España (MT-55). */
+    val region: String = "",
     /** Qué países salen primero en el selector (recientes y lo elegido en Ajustes). */
     val paises: PreferenciasPaises = PreferenciasPaises(),
     val ciudad: String = "",
@@ -120,6 +123,7 @@ class FinalizarJornadaViewModel
                         conduccionApuntadaEn = abierta?.conduccionApuntadaEn?.atZone(clock.zone),
                         // Normalmente se termina en el mismo país en el que se empezó.
                         pais = abierta?.paisInicio.orEmpty(),
+                        region = abierta?.regionInicio.orEmpty(),
                         paises = paises,
                         observaciones = abierta?.observaciones.orEmpty(),
                         cargando = false,
@@ -181,7 +185,9 @@ class FinalizarJornadaViewModel
             }
         }
 
-        fun onPais(valor: String) = actualizar { copy(pais = valor) }
+        fun onPais(valor: String) = actualizar { copy(pais = valor, region = regionPara(valor, region)) }
+
+        fun onRegion(valor: String) = actualizar { copy(region = valor) }
 
         fun onCiudad(valor: String) = actualizar { copy(ciudad = valor) }
 
@@ -200,6 +206,7 @@ class FinalizarJornadaViewModel
                         zona = estado.zona,
                         kmFin = km,
                         pais = estado.pais,
+                        region = estado.region,
                         ciudad = estado.ciudad,
                         conduccionTacografo = estado.conduccion(),
                         conduccionAntesMedianoche = estado.antesMedianoche(),

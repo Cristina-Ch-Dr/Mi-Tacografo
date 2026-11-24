@@ -531,4 +531,67 @@ class CasosDeUsoJornadaTest {
                 assertNull((resultado as ResultadoJornada.Ok).valor.conduccionAntesMedianoche)
             }
     }
+
+    @Nested
+    inner class ComunidadAutonoma {
+        @Test
+        fun `al iniciar en Espana guarda la comunidad, y en otro pais no`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer))
+
+                val id =
+                    (
+                        iniciar(
+                            repo,
+                        )(DatosInicio(hora(2, 6), madrid, 100_480, pais = "es", region = " an ")) as ResultadoJornada.Ok
+                    ).valor
+                assertEquals("AN", repo.obtenerPorId(id)?.regionInicio)
+
+                val otro = FakeJornadaRepository(listOf(ayer))
+                val id2 =
+                    (
+                        iniciar(
+                            otro,
+                        )(DatosInicio(hora(2, 6), madrid, 100_480, pais = "FR", region = "AN")) as ResultadoJornada.Ok
+                    ).valor
+                assertNull(otro.obtenerPorId(id2)?.regionInicio)
+            }
+
+        @Test
+        fun `un codigo que no es del tacografo no se guarda`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer))
+
+                val id =
+                    (
+                        iniciar(
+                            repo,
+                        )(DatosInicio(hora(2, 6), madrid, 100_480, pais = "ES", region = "XX")) as ResultadoJornada.Ok
+                    ).valor
+
+                assertNull(repo.obtenerPorId(id)?.regionInicio)
+            }
+
+        @Test
+        fun `al finalizar guarda la comunidad del final, y la siguiente la propone`() =
+            runTest {
+                val repo = FakeJornadaRepository(listOf(ayer, abiertaHoy()))
+
+                finalizar(repo)(DatosFin(hora(2, 17), madrid, kmFin = 101_000, pais = "ES", region = "CAT"))
+
+                assertEquals("CAT", repo.obtenerPorId(2)?.regionFin)
+                assertEquals("CAT", ProponerDatosInicio(repo)().region)
+            }
+
+        @Test
+        fun `al corregir y cambiar el pais a otro, la comunidad se quita`() =
+            runTest {
+                val enEspana = ayer.copy(paisFin = "ES", regionFin = "M")
+                val repo = FakeJornadaRepository(listOf(enEspana))
+
+                editar(repo)(enEspana.copy(paisFin = "FR"))
+
+                assertNull(repo.obtenerPorId(1)?.regionFin)
+            }
+    }
 }

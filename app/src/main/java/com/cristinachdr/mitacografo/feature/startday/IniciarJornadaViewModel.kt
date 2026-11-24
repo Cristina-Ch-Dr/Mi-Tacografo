@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.PAIS_CON_REGIONES
 import com.cristinachdr.mitacografo.domain.model.PreferenciasPaises
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
 import com.cristinachdr.mitacografo.domain.model.validarJornada
@@ -33,6 +34,8 @@ data class IniciarJornadaUiState(
     val zona: ZoneId,
     val km: String = "",
     val pais: String = "",
+    /** Comunidad autónoma, si el país es España (MT-55). */
+    val region: String = "",
     /** Qué países salen primero en el selector (recientes y lo elegido en Ajustes). */
     val paises: PreferenciasPaises = PreferenciasPaises(),
     val ciudad: String = "",
@@ -89,6 +92,7 @@ class IniciarJornadaViewModel
                     copy(
                         km = propuesta.kmInicio?.toString().orEmpty(),
                         pais = propuesta.pais.orEmpty(),
+                        region = propuesta.region.orEmpty(),
                         paises = paises,
                         ciudad = propuesta.ciudad.orEmpty(),
                         propuestaDescanso = descanso,
@@ -118,7 +122,9 @@ class IniciarJornadaViewModel
 
         fun onKm(valor: String) = actualizar { copy(km = valor) }
 
-        fun onPais(valor: String) = actualizar { copy(pais = valor) }
+        fun onPais(valor: String) = actualizar { copy(pais = valor, region = regionPara(valor, region)) }
+
+        fun onRegion(valor: String) = actualizar { copy(region = valor) }
 
         fun onCiudad(valor: String) = actualizar { copy(ciudad = valor) }
 
@@ -137,6 +143,7 @@ class IniciarJornadaViewModel
                         zona = estado.zona,
                         kmInicio = km,
                         pais = estado.pais,
+                        region = estado.region,
                         ciudad = estado.ciudad,
                         observaciones = estado.observaciones,
                     )
@@ -173,3 +180,9 @@ class IniciarJornadaViewModel
             return copy(errorKm = errorKm, errores = errores)
         }
     }
+
+/** Al cambiar de país, la comunidad solo se queda si sigue siendo España (MT-55). */
+internal fun regionPara(
+    pais: String,
+    region: String,
+): String = if (pais == PAIS_CON_REGIONES) region else ""

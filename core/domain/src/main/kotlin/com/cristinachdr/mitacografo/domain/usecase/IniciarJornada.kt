@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.domain.usecase
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
+import com.cristinachdr.mitacografo.domain.model.comoRegion
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.ViajeRepository
@@ -17,6 +18,8 @@ data class DatosInicio(
     val zona: ZoneId,
     val kmInicio: Int,
     val pais: String? = null,
+    /** Comunidad autónoma, si el país es España (MT-55). */
+    val region: String? = null,
     val ciudad: String? = null,
     val observaciones: String? = null,
 )
@@ -40,12 +43,14 @@ class IniciarJornada
         suspend operator fun invoke(datos: DatosInicio): ResultadoJornada<Long> {
             if (repository.obtenerAbierta() != null) return ResultadoJornada.Invalida(ErrorJornada.JORNADA_YA_ABIERTA)
 
+            val pais = datos.pais.comoPais()
             val jornada =
                 Jornada(
                     inicio = datos.inicio,
                     zonaInicio = datos.zona,
                     kmInicio = datos.kmInicio,
-                    paisInicio = datos.pais.comoPais(),
+                    paisInicio = pais,
+                    regionInicio = datos.region.comoRegion(pais),
                     ciudadInicio = datos.ciudad.limpio(),
                     observaciones = datos.observaciones.limpio(),
                     viajeId = viajes.obtenerEnCurso()?.id,

@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.domain.usecase
 import com.cristinachdr.mitacografo.domain.model.ErrorJornada
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResultadoJornada
+import com.cristinachdr.mitacografo.domain.model.comoRegion
 import com.cristinachdr.mitacografo.domain.model.sinConduccionSobrante
 import com.cristinachdr.mitacografo.domain.model.validarJornada
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
@@ -39,8 +40,10 @@ class AnadirJornada
                     .copy(
                         id = Jornada.SIN_ID,
                         paisInicio = jornada.paisInicio.comoPais(),
+                        regionInicio = jornada.regionInicio.comoRegion(jornada.paisInicio.comoPais()),
                         ciudadInicio = jornada.ciudadInicio.limpio(),
                         paisFin = jornada.paisFin.comoPais(),
+                        regionFin = jornada.regionFin.comoRegion(jornada.paisFin.comoPais()),
                         ciudadFin = jornada.ciudadFin.limpio(),
                         observaciones = jornada.observaciones.limpio(),
                     ).sinConduccionSobrante(zonaReferencia)

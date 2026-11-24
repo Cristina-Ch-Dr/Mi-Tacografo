@@ -43,6 +43,7 @@ class JsonBackupTest {
                         kmInicio = 245_310,
                         paisInicio = "ES",
                         ciudadInicio = "Ciudad A",
+                        regionInicio = "AN",
                         fin = hora(2, 18, kyiv),
                         zonaFin = kyiv,
                         kmFin = 245_872,
@@ -130,6 +131,29 @@ class JsonBackupTest {
     }
 
     @Test
+    fun `en una copia antigua, la comunidad apuntada en Ciudad pasa a su campo`() {
+        val texto =
+            """
+            {
+              "app": "mi-tacografo",
+              "version": 1,
+              "creada": "2026-11-23T19:00:00Z",
+              "jornadas": [
+                { "id": 1, "inicio": "2026-11-22T08:43:00Z", "zonaInicio": "Europe/Madrid", "kmInicio": 100,
+                  "paisInicio": "ES", "ciudadInicio": "NA", "fin": "2026-11-22T19:07:00Z",
+                  "zonaFin": "Europe/Paris", "kmFin": 819, "paisFin": "FR", "ciudadFin": "Lyon" }
+              ]
+            }
+            """.trimIndent()
+
+        val jornada = backup.decodificar(texto).jornadas.single()
+
+        assertEquals("NA", jornada.regionInicio)
+        assertNull(jornada.ciudadInicio)
+        assertEquals("Lyon", jornada.ciudadFin)
+    }
+
+    @Test
     fun `una copia de la version 1 escrita a mano se sigue leyendo`() {
         // Si un cambio rompe este test, las copias que ya tiene el conductor dejarían de valer.
         val texto =
@@ -154,6 +178,7 @@ class JsonBackupTest {
         // Las de antes de MT-53 no traen la conducción «hasta ahora» ni la de antes de medianoche.
         assertNull(leida.jornadas.single().conduccionApuntadaEn)
         assertNull(leida.jornadas.single().conduccionAntesMedianoche)
+        assertNull(leida.jornadas.single().regionInicio) // y las de antes de MT-55, sin comunidad
         assertEquals(Ajustes(paisEmpresa = "ES"), leida.ajustes)
         // Las copias de antes de MT-20 no traen descansos.
         assertEquals(emptyList<Descanso>(), leida.descansos)

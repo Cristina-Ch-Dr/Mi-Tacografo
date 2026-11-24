@@ -7,11 +7,12 @@ import javax.inject.Inject
 data class PropuestaInicio(
     val kmInicio: Int? = null,
     val pais: String? = null,
+    val region: String? = null,
     val ciudad: String? = null,
 )
 
 /**
- * Caso de uso: proponer el km de inicio (el último km final), el país y la ciudad.
+ * Caso de uso: proponer el km de inicio (el último km final), el país, la comunidad (MT-55) y la ciudad.
  *
  * Así, en el caso normal, iniciar la jornada son 2 toques.
  */
@@ -25,6 +26,7 @@ class ProponerDatosInicio
             return PropuestaInicio(
                 kmInicio = anterior.kmFin,
                 pais = anterior.paisFin,
+                region = anterior.regionFin,
                 ciudad = anterior.ciudadFin,
             )
         }
