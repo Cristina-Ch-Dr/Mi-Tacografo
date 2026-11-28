@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.cristinachdr.mitacografo.domain.usecase.GestorAvisos
+import com.cristinachdr.mitacografo.domain.usecase.ReprogramarDespertador
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,8 @@ import javax.inject.Inject
 class BootReceiver : BroadcastReceiver() {
     @Inject lateinit var gestorAvisos: GestorAvisos
 
+    @Inject lateinit var reprogramarDespertador: ReprogramarDespertador
+
     override fun onReceive(
         context: Context,
         intent: Intent,
@@ -31,6 +34,8 @@ class BootReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 gestorAvisos.reprogramarJornadaAbierta()
+                // Y el despertador (MT-57), si se había puesto para más tarde.
+                reprogramarDespertador()
             } finally {
                 pendiente.finish()
             }

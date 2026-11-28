@@ -426,4 +426,26 @@
     <string name="aviso_semanal_muy_pronto">Лишилось менше 6 год: тижневий відпочинок має початися до %1$s.</string>
     <string name="inicio_km_hoy">Сьогодні: %1$s км</string>
     <string name="inicio_km_viaje">Рейс: %1$s км</string>
+    <!-- MT-57: cuándo salir y despertador -->
+    <string name="formato_minutos">%1$d хв</string>
+    <string name="accion_quitar">Прибрати</string>
+    <string name="accion_apagar">Вимкнути</string>
+    <string name="accion_poner_despertador">⏰ Поставити</string>
+    <string name="accion_elegir_tono">Вибрати мелодію</string>
+    <string name="cuando_salir_titulo">Коли виїжджати</string>
+    <string name="cuando_salir_descanso">З відпочинком %1$d год</string>
+    <string name="cuando_salir_salida">Виїзд: %1$s</string>
+    <string name="cuando_salir_despertar">Підйом: %1$s</string>
+    <string name="cuando_salir_antelacion">Будити до виїзду за</string>
+    <string name="cuando_salir_otra">Інше…</string>
+    <string name="despertador_puesto">⏰ Будильник: %1$s</string>
+    <string name="despertador_sin_exactas">Без дозволу на точні будильники він може задзвонити на кілька хвилин пізніше.</string>
+    <string name="despertador_sin_pantalla_completa">Без дозволу на повноекранні сповіщення будильник дзвонить, але не з’являється поверх блокування.</string>
+    <string name="despertador_titulo">Час вставати</string>
+    <string name="despertador_texto">Натисніть «Вимкнути», щоб зупинити будильник.</string>
+    <string name="canal_despertador_nombre">Будильник</string>
+    <string name="ajustes_seccion_despertador">Будильник</string>
+    <string name="ajustes_despertador_ayuda">Той, що в «Коли виїжджати» на Головній. Дзвонить на гучності будильника, навіть якщо телефон у беззвучному режимі, доки його не вимкнете.</string>
+    <string name="despertador_tono_actual">Мелодія: %1$s</string>
+    <string name="despertador_tono_alarma">будильника телефону</string>
 </resources>

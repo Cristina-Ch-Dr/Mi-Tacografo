@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_MAXIMA
+import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Continente
@@ -11,6 +13,7 @@ import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Duration
+import java.time.Instant
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -38,6 +41,9 @@ internal class DataStoreSettingsRepository
                 preferencias.guardar(Claves.ZONA_REFERENCIA, nuevos.zonaReferencia?.id)
                 preferencias.guardar(Claves.PAISES_HABITUALES, nuevos.paisesHabituales.sorted().joinToString(","))
                 preferencias.guardar(Claves.CONTINENTES, nuevos.continentes.sorted().joinToString(",") { it.name })
+                preferencias.guardar(Claves.ANTELACION_DESPERTADOR, nuevos.antelacionDespertador.toMinutes().toString())
+                preferencias.guardar(Claves.TONO_DESPERTADOR, nuevos.tonoDespertador)
+                preferencias.guardar(Claves.DESPERTADOR, nuevos.despertador?.toEpochMilli()?.toString())
             }
         }
 
@@ -49,6 +55,9 @@ internal class DataStoreSettingsRepository
             val ZONA_REFERENCIA = stringPreferencesKey("zona_referencia")
             val PAISES_HABITUALES = stringPreferencesKey("paises_habituales")
             val CONTINENTES = stringPreferencesKey("continentes")
+            val ANTELACION_DESPERTADOR = stringPreferencesKey("antelacion_despertador_min")
+            val TONO_DESPERTADOR = stringPreferencesKey("tono_despertador")
+            val DESPERTADOR = stringPreferencesKey("despertador_epoch_ms")
         }
 
         private fun Preferences.aAjustes(): Ajustes =
@@ -64,6 +73,14 @@ internal class DataStoreSettingsRepository
                     lista(this[Claves.CONTINENTES])
                         .mapNotNull { nombre -> Continente.entries.find { it.name == nombre } }
                         .toSet(),
+                antelacionDespertador =
+                    this[Claves.ANTELACION_DESPERTADOR]
+                        ?.toLongOrNull()
+                        ?.let(Duration::ofMinutes)
+                        ?.takeIf { !it.isNegative && it <= ANTELACION_DESPERTADOR_MAXIMA }
+                        ?: ANTELACION_DESPERTADOR_POR_DEFECTO,
+                tonoDespertador = this[Claves.TONO_DESPERTADOR],
+                despertador = this[Claves.DESPERTADOR]?.toLongOrNull()?.let(Instant::ofEpochMilli),
             )
 
         private fun androidx.datastore.preferences.core.MutablePreferences.guardar(

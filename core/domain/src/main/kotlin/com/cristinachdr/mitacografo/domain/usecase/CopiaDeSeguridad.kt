@@ -116,7 +116,10 @@ class RestaurarCopia
             viajes.reemplazarTodos(copia.viajes)
             repository.reemplazarTodas(copia.jornadas)
             descansos.reemplazarTodos(copia.descansos)
-            settings.actualizar { copia.ajustes }
+            // El tono y el despertador son de este móvil: no se cambian por los de la copia (MT-57).
+            settings.actualizar { actuales ->
+                copia.ajustes.copy(tonoDespertador = actuales.tonoDespertador, despertador = actuales.despertador)
+            }
             avisos.reprogramarJornadaAbierta()
         }
     }

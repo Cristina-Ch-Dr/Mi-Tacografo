@@ -53,6 +53,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             ),
         permisos = { EstadoPermisosAvisos(soloSiFalta = false) },
         sonido = { SeccionSonido() },
+        despertador = { SeccionDespertador() },
         copia = { SeccionCopia() },
     )
 }
@@ -87,6 +88,7 @@ fun SettingsContent(
     modifier: Modifier = Modifier,
     permisos: @Composable () -> Unit = {},
     sonido: @Composable () -> Unit = {},
+    despertador: @Composable () -> Unit = {},
     copia: @Composable () -> Unit = {},
 ) {
     Column(
@@ -108,6 +110,10 @@ fun SettingsContent(
             Text(stringResource(R.string.ajustes_prueba_programada), style = MaterialTheme.typography.bodyMedium)
         }
         sonido()
+
+        HorizontalDivider()
+        Seccion(stringResource(R.string.ajustes_seccion_despertador))
+        despertador()
 
         HorizontalDivider()
         Seccion(stringResource(R.string.ajustes_seccion_reglas))

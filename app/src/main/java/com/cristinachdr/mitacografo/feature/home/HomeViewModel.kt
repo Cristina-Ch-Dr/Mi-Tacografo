@@ -2,11 +2,14 @@ package com.cristinachdr.mitacografo.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_MAXIMA
+import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResumenViaje
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
+import com.cristinachdr.mitacografo.domain.model.cuandoSalir
 import com.cristinachdr.mitacografo.domain.model.descansoActual
 import com.cristinachdr.mitacografo.domain.model.plazoSiguienteSemanal
 import com.cristinachdr.mitacografo.domain.model.resumirViajes
@@ -22,6 +25,8 @@ import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
+import com.cristinachdr.mitacografo.domain.usecase.PonerDespertador
+import com.cristinachdr.mitacografo.domain.usecase.QuitarDespertador
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import com.cristinachdr.mitacografo.ui.reglas.EstadoRegla
 import com.cristinachdr.mitacografo.ui.reglas.peor
@@ -60,6 +65,21 @@ data class HomeUiState(
     val kmHoy: Int = 0,
     /** El viaje en curso con sus km, si hay uno (MT-56). */
     val viajeEnCurso: ResumenViaje? = null,
+    /** «Cuándo salir» (MT-57): con 9 h y 11 h de descanso. Vacío si hay jornada o ya pasaron las dos salidas. */
+    val salidas: List<SalidaUi> = emptyList(),
+    /** Cuánto antes de salir suena el despertador. */
+    val antelacion: Duration = ANTELACION_DESPERTADOR_POR_DEFECTO,
+    /** A qué hora está puesto el despertador (en la zona del móvil); `null` = no hay. */
+    val despertador: ZonedDateTime? = null,
+)
+
+/** Una opción de «Cuándo salir», con las horas en la zona del móvil (la del reloj del conductor). */
+data class SalidaUi(
+    val descanso: Duration,
+    val salida: ZonedDateTime,
+    val despertar: ZonedDateTime,
+    /** La hora de despertar ya pasó: no se puede poner el despertador. */
+    val pasada: Boolean,
 )
 
 data class PausaUi(
@@ -119,12 +139,14 @@ class HomeViewModel
     @Inject
     constructor(
         obtenerJornadaActual: ObtenerJornadaActual,
-        settings: SettingsRepository,
         descansos: DescansoRepository,
         viajes: ViajeRepository,
         jornadas: JornadaRepository,
         private val iniciarPausa: IniciarPausa,
         private val terminarPausa: TerminarPausa,
+        private val settings: SettingsRepository,
+        private val ponerDespertador: PonerDespertador,
+        private val quitarDespertador: QuitarDespertador,
         obtenerInformeReglas: ObtenerInformeReglas,
         obtenerDescansos: ObtenerDescansos,
         private val clock: Clock,
@@ -184,6 +206,16 @@ class HomeViewModel
                             todosLosViajes
                                 .find { it.enCurso }
                                 ?.let { enCurso -> resumirViajes(listOf(enCurso), todas).single() },
+                        salidas =
+                            if (jornada ==
+                                null
+                            ) {
+                                salidas(ultima?.first, ajustes.antelacionDespertador, ahora)
+                            } else {
+                                emptyList()
+                            },
+                        antelacion = ajustes.antelacionDespertador,
+                        despertador = ajustes.despertador?.atZone(clock.zone),
                         faltanPaises = ajustes.paisEmpresa == null || ajustes.paisResidencia == null,
                         descanso =
                             ultima?.let { (fin, j) ->
@@ -207,6 +239,40 @@ class HomeViewModel
 
         fun onTerminarPausa() {
             viewModelScope.launch { terminarPausa() }
+        }
+
+        /** ⏰ de «Cuándo salir»: pone el despertador a esa hora. */
+        fun onPonerDespertador(hora: ZonedDateTime) {
+            viewModelScope.launch { ponerDespertador(hora.toInstant()) }
+        }
+
+        fun onQuitarDespertador() {
+            viewModelScope.launch { quitarDespertador() }
+        }
+
+        /** Cuánto antes despertar (30, 45, 60, 90, 120 min o la que escriba). */
+        fun onAntelacion(antelacion: Duration) {
+            if (antelacion.isNegative || antelacion > ANTELACION_DESPERTADOR_MAXIMA) return
+            viewModelScope.launch { settings.actualizar { it.copy(antelacionDespertador = antelacion) } }
+        }
+
+        /** Las salidas posibles mientras quede alguna por llegar (MT-57). */
+        private fun salidas(
+            fin: Instant?,
+            antelacion: Duration,
+            ahora: Instant,
+        ): List<SalidaUi> {
+            fin ?: return emptyList()
+            val posibles = cuandoSalir(fin, antelacion)
+            if (posibles.none { it.salida.isAfter(ahora) }) return emptyList()
+            return posibles.map {
+                SalidaUi(
+                    descanso = it.descanso,
+                    salida = it.salida.atZone(clock.zone),
+                    despertar = it.despertar.atZone(clock.zone),
+                    pasada = !it.despertar.isAfter(ahora),
+                )
+            }
         }
 
         /** Km de las jornadas terminadas que empezaron hoy (en la zona del móvil), como en su app. */

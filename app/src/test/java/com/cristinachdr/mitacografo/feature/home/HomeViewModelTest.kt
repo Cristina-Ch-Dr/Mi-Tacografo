@@ -2,6 +2,7 @@ package com.cristinachdr.mitacografo.feature.home
 
 import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeDespertador
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
@@ -15,6 +16,8 @@ import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerJornadaActual
+import com.cristinachdr.mitacografo.domain.usecase.PonerDespertador
+import com.cristinachdr.mitacografo.domain.usecase.QuitarDespertador
 import com.cristinachdr.mitacografo.domain.usecase.TerminarPausa
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -40,6 +43,8 @@ class HomeViewModelTest {
 
     private val madrid = ZoneId.of("Europe/Madrid")
 
+    private val despertador = FakeDespertador()
+
     private fun hora(
         h: Int,
         m: Int = 0,
@@ -56,12 +61,14 @@ class HomeViewModelTest {
         val settings = FakeSettingsRepository(ajustes)
         return HomeViewModel(
             ObtenerJornadaActual(repo),
-            settings,
             descansos,
             FakeViajeRepository(viajes),
             repo,
             IniciarPausa(descansos, repo, GuardarDescanso(descansos, reloj), reloj),
             TerminarPausa(descansos, reloj),
+            settings,
+            PonerDespertador(settings, despertador, reloj),
+            QuitarDespertador(settings, despertador),
             ObtenerInformeReglas(repo, descansos, settings, reloj),
             ObtenerDescansos(descansos, repo),
             reloj,
@@ -259,6 +266,42 @@ class HomeViewModelTest {
                 900,
                 vm.uiState.value.viajeEnCurso
                     ?.km,
+            )
+        }
+
+    @Test
+    fun `al terminar la jornada propone cuando salir y pone el despertador`() =
+        runTest {
+            // Terminó a las 19:00; son las 20:00. Con 9 h sale a las 04:00 y despierta a las 03:00 (60 min antes).
+            val reloj = Clock.fixed(hora(20), madrid)
+            val terminada =
+                Jornada(
+                    id = 1,
+                    inicio = hora(8),
+                    zonaInicio = madrid,
+                    kmInicio = 0,
+                    fin = hora(19),
+                    zonaFin = madrid,
+                    kmFin = 500,
+                )
+            val vm = viewModel(reloj, terminada)
+            observar(vm)
+
+            val salidas = vm.uiState.value.salidas
+            assertEquals(listOf(9L, 11L), salidas.map { it.descanso.toHours() })
+            assertEquals(hora(19).plusSeconds(8 * 3600), salidas.first().despertar.toInstant())
+
+            vm.onPonerDespertador(salidas.first().despertar)
+            assertEquals(salidas.first().despertar.toInstant(), despertador.puesto)
+            assertEquals(salidas.first().despertar, vm.uiState.value.despertador)
+
+            vm.onAntelacion(Duration.ofMinutes(30))
+            assertEquals(
+                hora(19).plusSeconds(8 * 3600 + 30 * 60),
+                vm.uiState.value.salidas
+                    .first()
+                    .despertar
+                    .toInstant(),
             )
         }
 }

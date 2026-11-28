@@ -1,5 +1,6 @@
 package com.cristinachdr.mitacografo.data.backup
 
+import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Continente
@@ -183,6 +184,7 @@ private fun Ajustes.aDto() =
         zonaReferencia = zonaReferencia?.id,
         paisesHabituales = paisesHabituales.sorted(),
         continentes = continentes.map { it.name }.sorted(),
+        antelacionDespertadorMinutos = antelacionDespertador.toMinutes(),
     )
 
 private fun AjustesDto.aDominio() =
@@ -195,4 +197,6 @@ private fun AjustesDto.aDominio() =
         paisesHabituales = paisesHabituales.toSet(),
         // Un continente que esta versión no conoce se ignora.
         continentes = continentes.mapNotNull { nombre -> Continente.entries.find { it.name == nombre } }.toSet(),
+        antelacionDespertador =
+            antelacionDespertadorMinutos?.let(Duration::ofMinutes) ?: ANTELACION_DESPERTADOR_POR_DEFECTO,
     )

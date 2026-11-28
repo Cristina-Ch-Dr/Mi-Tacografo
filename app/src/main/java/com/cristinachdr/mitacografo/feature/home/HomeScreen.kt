@@ -83,6 +83,12 @@ fun HomeScreen(
         semana = semana,
         onInforme = onInforme,
         onAnadirJornada = onAnadirJornada,
+        despertador =
+            AccionesDespertador(
+                onPoner = viewModel::onPonerDespertador,
+                onQuitar = viewModel::onQuitarDespertador,
+                onAntelacion = viewModel::onAntelacion,
+            ),
         formulario = {
             // Un formulario nuevo para cada jornada: al iniciar o finalizar, cambia la clave y se vacía.
             val jornada = estado.jornada
@@ -165,6 +171,7 @@ fun HomeContent(
     semana: ResumenSemanaUi? = null,
     onInforme: (LocalDate) -> Unit = {},
     onAnadirJornada: () -> Unit = {},
+    despertador: AccionesDespertador = AccionesDespertador(),
     formulario: @Composable () -> Unit = {},
 ) {
     Column(
@@ -192,6 +199,7 @@ fun HomeContent(
         if (jornada == null) {
             SinJornadaCard(state.descanso)
             KmHoyYViaje(state)
+            if (state.salidas.isNotEmpty()) TarjetaCuandoSalir(state, despertador)
             TarjetaFormulario(stringResource(R.string.accion_iniciar_jornada), formulario)
         } else {
             JornadaEnCursoCard(jornada, state.pausa)

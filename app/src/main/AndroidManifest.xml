@@ -8,6 +8,12 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- Volver a programar los avisos al reiniciar el móvil. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Despertador (MT-57): sonar con la app cerrada, encima del bloqueo, con el tono en bucle y vibración. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".MiTacografoApp"
@@ -35,6 +41,26 @@
         <receiver
             android:name=".platform.AlarmReceiver"
             android:exported="false" />
+
+        <!-- Despertador (MT-57) -->
+        <receiver
+            android:name=".platform.DespertadorReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".platform.DespertadorService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <activity
+            android:name=".platform.AlarmaActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.MiTacografo"
+            android:turnScreenOn="true" />
 
         <receiver
             android:name=".platform.BootReceiver"

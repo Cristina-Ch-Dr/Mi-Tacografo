@@ -1,6 +1,7 @@
 package com.cristinachdr.mitacografo.domain.model
 
 import java.time.Duration
+import java.time.Instant
 import java.time.ZoneId
 
 /**
@@ -23,6 +24,12 @@ data class Ajustes(
     val paisesHabituales: Set<String> = emptySet(),
     /** Continentes por los que suele trabajar: sus países salen primero. Vacío = todos. */
     val continentes: Set<Continente> = emptySet(),
+    /** Cuánto antes de la hora de salida suena el despertador (MT-57). */
+    val antelacionDespertador: Duration = ANTELACION_DESPERTADOR_POR_DEFECTO,
+    /** Tono del despertador (una dirección `content://` de Android). `null` = el de alarma del móvil. Es de este móvil. */
+    val tonoDespertador: String? = null,
+    /** A qué hora está puesto el despertador; `null` = no hay. Es de este móvil. */
+    val despertador: Instant? = null,
 )
 
 /**
