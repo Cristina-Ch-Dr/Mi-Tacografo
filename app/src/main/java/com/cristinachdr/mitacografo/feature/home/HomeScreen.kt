@@ -88,6 +88,9 @@ fun HomeScreen(
                 onPoner = viewModel::onPonerDespertador,
                 onQuitar = viewModel::onQuitarDespertador,
                 onAntelacion = viewModel::onAntelacion,
+                onSalida = viewModel::onSalida,
+                onRestaurarSalida = viewModel::onRestaurarSalida,
+                onHoraPropia = viewModel::onHoraPropia,
             ),
         formulario = {
             // Un formulario nuevo para cada jornada: al iniciar o finalizar, cambia la clave y se vacía.

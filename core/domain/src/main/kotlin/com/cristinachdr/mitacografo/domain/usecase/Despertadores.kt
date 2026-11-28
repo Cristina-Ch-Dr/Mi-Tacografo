@@ -1,9 +1,12 @@
 package com.cristinachdr.mitacografo.domain.usecase
 
+import com.cristinachdr.mitacografo.domain.model.SalidasManuales
+import com.cristinachdr.mitacografo.domain.model.cuandoSalir
 import com.cristinachdr.mitacografo.domain.port.Despertador
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import kotlinx.coroutines.flow.first
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 
@@ -59,5 +62,43 @@ class ReprogramarDespertador
             } else {
                 settings.actualizar { it.copy(despertador = null) }
             }
+        }
+    }
+
+/**
+ * Caso de uso: cambiar a mano la hora de salida de una opción de «Cuándo salir» (MT-60), o volver a la
+ * calculada con `null`. Si el despertador estaba puesto para esa opción, se mueve con ella.
+ */
+class CambiarSalida
+    @Inject
+    constructor(
+        private val settings: SettingsRepository,
+        private val despertador: Despertador,
+        private val clock: Clock,
+    ) {
+        suspend operator fun invoke(
+            finJornada: Instant,
+            descanso: Duration,
+            salida: Instant?,
+        ) {
+            if (salida != null && !salida.isAfter(finJornada)) return
+            var reprogramar: Instant? = null
+            settings.actualizar { ajustes ->
+                val antes = cuandoSalir(finJornada, ajustes.antelacionDespertador, ajustes.salidasManuales)
+                val actuales =
+                    ajustes.salidasManuales
+                        ?.takeIf { it.fin == finJornada }
+                        ?.salidas
+                        .orEmpty()
+                val nuevas = if (salida == null) actuales - descanso else actuales + (descanso to salida)
+                val manuales = SalidasManuales(finJornada, nuevas).takeIf { nuevas.isNotEmpty() }
+                val despues = cuandoSalir(finJornada, ajustes.antelacionDespertador, manuales)
+                val anterior = antes.first { it.descanso == descanso }.despertar
+                val nuevo = despues.first { it.descanso == descanso }.despertar
+                val mover = ajustes.despertador == anterior && nuevo.isAfter(clock.instant())
+                if (mover) reprogramar = nuevo
+                ajustes.copy(salidasManuales = manuales, despertador = if (mover) nuevo else ajustes.despertador)
+            }
+            reprogramar?.let { despertador.programar(it) }
         }
     }

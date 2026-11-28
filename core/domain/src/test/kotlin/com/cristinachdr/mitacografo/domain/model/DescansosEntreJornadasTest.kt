@@ -128,4 +128,15 @@ class DescansosEntreJornadasTest {
     }
 
     private fun lunesDe2() = java.time.LocalDate.of(2026, 11, 2)
+
+    @Test
+    fun `el descanso calculado lleva la comunidad del final de la jornada anterior`() {
+        val enEspana = lunes.copy(paisFin = "ES", regionFin = "CAT")
+
+        val calculado = completarDescansos(listOf(martes, enEspana), emptyList()).single()
+
+        assertEquals("ES", calculado.pais)
+        assertEquals("CAT", calculado.region)
+        assertEquals("ES (CAT)", lugar(calculado.pais, calculado.region))
+    }
 }

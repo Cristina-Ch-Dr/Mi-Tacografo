@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.ConfigSalario
 import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.ModoCobro
+import com.cristinachdr.mitacografo.domain.model.SalidasManuales
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -52,6 +53,7 @@ internal class DataStoreSettingsRepository
                 preferencias.guardar(Claves.SALARIO_NOMINA, nuevos.salario.nomina.toPlainString())
                 preferencias.guardar(Claves.SALARIO_POR_KM, nuevos.salario.porKm.toPlainString())
                 preferencias.guardar(Claves.SALARIO_POR_DIA, nuevos.salario.porDia.toPlainString())
+                preferencias.guardar(Claves.SALIDAS_MANUALES, nuevos.salidasManuales?.let(::codificarSalidas))
             }
         }
 
@@ -71,6 +73,7 @@ internal class DataStoreSettingsRepository
             val SALARIO_NOMINA = stringPreferencesKey("salario_nomina")
             val SALARIO_POR_KM = stringPreferencesKey("salario_por_km")
             val SALARIO_POR_DIA = stringPreferencesKey("salario_por_dia")
+            val SALIDAS_MANUALES = stringPreferencesKey("salidas_manuales")
         }
 
         private fun Preferences.aAjustes(): Ajustes =
@@ -104,6 +107,7 @@ internal class DataStoreSettingsRepository
                         porKm = importe(this[Claves.SALARIO_POR_KM]),
                         porDia = importe(this[Claves.SALARIO_POR_DIA]),
                     ),
+                salidasManuales = this[Claves.SALIDAS_MANUALES]?.let(::decodificarSalidas),
             )
 
         private fun androidx.datastore.preferences.core.MutablePreferences.guardar(
@@ -138,3 +142,24 @@ private fun lista(texto: String?): List<String> =
 /** Un importe guardado como texto ("0.045"). Si falta o está estropeado, cero. */
 private fun importe(texto: String?): BigDecimal =
     texto?.toBigDecimalOrNull()?.takeIf { it.signum() >= 0 } ?: BigDecimal.ZERO
+
+/** «fin|540:salida,660:salida» (fin y salidas en ms; descanso en minutos). */
+internal fun codificarSalidas(manuales: SalidasManuales): String =
+    manuales.fin.toEpochMilli().toString() + "|" +
+        manuales.salidas.entries.joinToString(
+            ",",
+        ) { (descanso, salida) -> "${descanso.toMinutes()}:${salida.toEpochMilli()}" }
+
+/** Lo contrario de [codificarSalidas]. Si está estropeado, `null` (se usan las calculadas). */
+internal fun decodificarSalidas(texto: String): SalidasManuales? =
+    runCatching {
+        val (fin, salidas) = texto.split("|")
+        SalidasManuales(
+            fin = Instant.ofEpochMilli(fin.toLong()),
+            salidas =
+                salidas.split(",").filter { it.isNotBlank() }.associate { parte ->
+                    val (minutos, salida) = parte.split(":")
+                    Duration.ofMinutes(minutos.toLong()) to Instant.ofEpochMilli(salida.toLong())
+                },
+        )
+    }.getOrNull()

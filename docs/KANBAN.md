@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-60, MT-59, MT-61, MT-33, MT-33B | MT-58, hecha en `feature/MT-58-salario` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-57 (MT-50 dentro de MT-53) · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-59, MT-61, MT-33, MT-33B | MT-60, hecha en `feature/MT-60-detalles-b30` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-58 (MT-50 dentro de MT-53) · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -459,11 +459,15 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Probado en el emulador con la copia real del conductor: periodo del 20 oct al 19 nov, su viaje del 13 al 19 nov (7 días, 4.707 km), con 60 €/día y 0,045 €/km → 631,82 €.
 
 ### MT-60 · Detalles de su app b30 · S · deps: MT-57, MT-55 · *(de su app, b30, 28 nov 2026)*
-- [ ] «Cuándo salir»: tocar la hora de salida de una opción para cambiarla a mano (p. ej. salir a las 05:00 en vez de a las 04:40); el despertador la sigue. Un ↺ vuelve a la calculada. Si con esa hora el descanso no llega a 9 h, en rojo.
+- [x] «Cuándo salir»: tocar la hora de salida de una opción para cambiarla a mano (p. ej. salir a las 05:00 en vez de a las 04:40); el despertador la sigue. Un ↺ vuelve a la calculada. Si con esa hora el descanso no llega a 9 h, en rojo.
   - Solo vale para la última jornada terminada: al terminar otra, se vuelve a las calculadas (en su app, `dep` y `depFor`).
-- [ ] «Hora propia» para el despertador: ponerlo a cualquier hora, sin salir de una de las dos opciones.
-- [ ] Pestaña Descanso: en cada descanso entre jornadas, dónde fue, con la comunidad si es en España (en su app, «E-CAT»; aquí «ES (CAT)», como en Historial).
+- [x] «Hora propia» para el despertador: ponerlo a cualquier hora, sin salir de una de las dos opciones.
+- [x] Pestaña Descanso: en cada descanso entre jornadas, dónde fue, con la comunidad si es en España (en su app, «E-CAT»; aquí «ES (CAT)», como en Historial).
 - Lo demás nuevo de la b30 ya lo tiene esta app de otra forma: los tonos (aquí, los de alarma del móvil) y guardar el archivo de la copia (aquí, con el selector de Android).
+- Salida a mano: `SalidasManuales` en Ajustes (de este móvil, no va en la copia ni se pisa al restaurar), `cuandoSalir()` las usa solo para su jornada, `salidaALas()` coge la hora más próxima después del fin y `CambiarSalida` mueve el despertador si estaba puesto para esa opción. Con la salida cambiada, el título dice el descanso real («Descanso de 8 h 05 min»), en rojo si no llega a 9 h.
+- «⏰ Despertador a otra hora»: la próxima vez que el reloj marque esa hora (`proximaVezALas()`). El selector de hora ahora es un `DialogoHora` reutilizable.
+- Descansos calculados entre jornadas: llevan la comunidad de la jornada anterior (`Descanso.region`, no se guarda en la base de datos) y salen como «ES (CAT)».
+- Probado en el emulador: con la copia real del conductor salen «ES (NA)» y «ES (CV)» en Descanso; con una copia de prueba, la salida a las 22:00 da «Descanso de 8 h 05 min» en rojo, el despertar pasa a las 21:00 y ↺ vuelve a las 22:54.
 
 ### MT-59 · Ajuste de semanas · M · deps: MT-30 · *(petición del conductor)*
 - [ ] Para quien empieza a usar la app a mitad de semana: horas de conducción que ya llevaba esta semana y la anterior, ampliaciones a 10 h, reducidos y fin del último descanso semanal.

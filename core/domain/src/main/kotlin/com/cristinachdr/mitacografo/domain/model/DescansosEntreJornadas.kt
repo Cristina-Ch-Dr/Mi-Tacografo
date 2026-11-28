@@ -41,6 +41,7 @@ fun completarDescansos(
                     zonaFin = siguiente.zonaInicio,
                     tipo = TipoDescanso.DESCANSO,
                     pais = anterior.paisFin ?: siguiente.paisInicio,
+                    region = if (anterior.paisFin != null) anterior.regionFin else siguiente.regionInicio,
                 )
             }
     return (descansos + calculados).sortedBy { it.inicio }

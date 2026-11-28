@@ -467,4 +467,8 @@
     <string name="salario_campo_nomina">Nómina (base), €</string>
     <string name="salario_campo_por_dia">Dieta, € por día</string>
     <string name="salario_campo_por_km">€ por km</string>
+    <!-- MT-60: detalles de su app b30 -->
+    <string name="cuando_salir_descanso_real">Descanso de %1$s</string>
+    <string name="cuando_salir_toca_salida">Toca la hora de salida para cambiarla; ↺ vuelve a la calculada.</string>
+    <string name="accion_hora_propia">⏰ Despertador a otra hora</string>
 </resources>

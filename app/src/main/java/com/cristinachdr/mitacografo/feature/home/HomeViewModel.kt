@@ -8,11 +8,14 @@ import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.ResumenViaje
+import com.cristinachdr.mitacografo.domain.model.SalidasManuales
 import com.cristinachdr.mitacografo.domain.model.calcularAvisos
 import com.cristinachdr.mitacografo.domain.model.cuandoSalir
 import com.cristinachdr.mitacografo.domain.model.descansoActual
 import com.cristinachdr.mitacografo.domain.model.plazoSiguienteSemanal
+import com.cristinachdr.mitacografo.domain.model.proximaVezALas
 import com.cristinachdr.mitacografo.domain.model.resumirViajes
+import com.cristinachdr.mitacografo.domain.model.salidaALas
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
@@ -21,6 +24,7 @@ import com.cristinachdr.mitacografo.domain.rules.Deuda
 import com.cristinachdr.mitacografo.domain.rules.EstadoDeuda
 import com.cristinachdr.mitacografo.domain.rules.Intervalo
 import com.cristinachdr.mitacografo.domain.rules.ReglaId
+import com.cristinachdr.mitacografo.domain.usecase.CambiarSalida
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerInformeReglas
@@ -44,6 +48,7 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
@@ -71,6 +76,8 @@ data class HomeUiState(
     val antelacion: Duration = ANTELACION_DESPERTADOR_POR_DEFECTO,
     /** A qué hora está puesto el despertador (en la zona del móvil); `null` = no hay. */
     val despertador: ZonedDateTime? = null,
+    /** Fin de la última jornada: de él salen las salidas (y las que se cambian a mano). */
+    val finUltima: Instant? = null,
 )
 
 /** Una opción de «Cuándo salir», con las horas en la zona del móvil (la del reloj del conductor). */
@@ -80,6 +87,12 @@ data class SalidaUi(
     val despertar: ZonedDateTime,
     /** La hora de despertar ya pasó: no se puede poner el despertador. */
     val pasada: Boolean,
+    /** La salida se cambió a mano (MT-60): se puede volver a la calculada. */
+    val manual: Boolean = false,
+    /** Lo que descansa de verdad con esa salida. */
+    val descansoReal: Duration = descanso,
+    /** Con esa salida no llega a 9 h de descanso: en rojo. */
+    val corto: Boolean = false,
 )
 
 data class PausaUi(
@@ -147,6 +160,7 @@ class HomeViewModel
         private val settings: SettingsRepository,
         private val ponerDespertador: PonerDespertador,
         private val quitarDespertador: QuitarDespertador,
+        private val cambiarSalida: CambiarSalida,
         obtenerInformeReglas: ObtenerInformeReglas,
         obtenerDescansos: ObtenerDescansos,
         private val clock: Clock,
@@ -207,13 +221,12 @@ class HomeViewModel
                                 .find { it.enCurso }
                                 ?.let { enCurso -> resumirViajes(listOf(enCurso), todas).single() },
                         salidas =
-                            if (jornada ==
-                                null
-                            ) {
-                                salidas(ultima?.first, ajustes.antelacionDespertador, ahora)
+                            if (jornada == null) {
+                                salidas(ultima?.first, ajustes.antelacionDespertador, ajustes.salidasManuales, ahora)
                             } else {
                                 emptyList()
                             },
+                        finUltima = ultima?.first,
                         antelacion = ajustes.antelacionDespertador,
                         despertador = ajustes.despertador?.atZone(clock.zone),
                         faltanPaises = ajustes.paisEmpresa == null || ajustes.paisResidencia == null,
@@ -256,14 +269,35 @@ class HomeViewModel
             viewModelScope.launch { settings.actualizar { it.copy(antelacionDespertador = antelacion) } }
         }
 
-        /** Las salidas posibles mientras quede alguna por llegar (MT-57). */
+        /** Tocar la hora de salida de una opción: cambiarla a mano (MT-60). */
+        fun onSalida(
+            descanso: Duration,
+            hora: LocalTime,
+        ) {
+            val fin = uiState.value.finUltima ?: return
+            viewModelScope.launch { cambiarSalida(fin, descanso, salidaALas(fin, hora, clock.zone)) }
+        }
+
+        /** ↺: volver a la salida calculada. */
+        fun onRestaurarSalida(descanso: Duration) {
+            val fin = uiState.value.finUltima ?: return
+            viewModelScope.launch { cambiarSalida(fin, descanso, null) }
+        }
+
+        /** «⏰ Hora propia»: el despertador a la próxima vez que el reloj marque esa hora. */
+        fun onHoraPropia(hora: LocalTime) {
+            viewModelScope.launch { ponerDespertador(proximaVezALas(clock.instant(), hora, clock.zone)) }
+        }
+
+        /** Las salidas posibles mientras quede alguna por llegar (MT-57), con las cambiadas a mano (MT-60). */
         private fun salidas(
             fin: Instant?,
             antelacion: Duration,
+            manuales: SalidasManuales?,
             ahora: Instant,
         ): List<SalidaUi> {
             fin ?: return emptyList()
-            val posibles = cuandoSalir(fin, antelacion)
+            val posibles = cuandoSalir(fin, antelacion, manuales)
             if (posibles.none { it.salida.isAfter(ahora) }) return emptyList()
             return posibles.map {
                 SalidaUi(
@@ -271,6 +305,9 @@ class HomeViewModel
                     salida = it.salida.atZone(clock.zone),
                     despertar = it.despertar.atZone(clock.zone),
                     pasada = !it.despertar.isAfter(ahora),
+                    manual = it.manual,
+                    descansoReal = it.descansoReal,
+                    corto = it.descansoCorto,
                 )
             }
         }

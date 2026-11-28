@@ -123,7 +123,11 @@ class RestaurarCopia
             gastos.reemplazarTodos(copia.gastos)
             // El tono y el despertador son de este móvil: no se cambian por los de la copia (MT-57).
             settings.actualizar { actuales ->
-                copia.ajustes.copy(tonoDespertador = actuales.tonoDespertador, despertador = actuales.despertador)
+                copia.ajustes.copy(
+                    tonoDespertador = actuales.tonoDespertador,
+                    despertador = actuales.despertador,
+                    salidasManuales = actuales.salidasManuales,
+                )
             }
             avisos.reprogramarJornadaAbierta()
         }
