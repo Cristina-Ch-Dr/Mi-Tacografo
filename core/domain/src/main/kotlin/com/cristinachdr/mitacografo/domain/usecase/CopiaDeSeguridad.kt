@@ -8,6 +8,7 @@ import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
+import com.cristinachdr.mitacografo.domain.port.GastoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.port.ViajeRepository
@@ -22,6 +23,7 @@ class ExportarCopia
         private val repository: JornadaRepository,
         private val descansos: DescansoRepository,
         private val viajes: ViajeRepository,
+        private val gastos: GastoRepository,
         private val settings: SettingsRepository,
         private val backup: BackupPort,
         private val clock: Clock,
@@ -34,6 +36,7 @@ class ExportarCopia
                     ajustes = settings.observar().first(),
                     descansos = descansos.obtenerTodos(),
                     viajes = viajes.obtenerTodos(),
+                    gastos = gastos.obtenerTodos(),
                 )
             return backup.codificar(copia)
         }
@@ -106,6 +109,7 @@ class RestaurarCopia
         private val repository: JornadaRepository,
         private val descansos: DescansoRepository,
         private val viajes: ViajeRepository,
+        private val gastos: GastoRepository,
         private val settings: SettingsRepository,
         private val avisos: GestorAvisos,
     ) {
@@ -116,6 +120,7 @@ class RestaurarCopia
             viajes.reemplazarTodos(copia.viajes)
             repository.reemplazarTodas(copia.jornadas)
             descansos.reemplazarTodos(copia.descansos)
+            gastos.reemplazarTodos(copia.gastos)
             // El tono y el despertador son de este móvil: no se cambian por los de la copia (MT-57).
             settings.actualizar { actuales ->
                 copia.ajustes.copy(tonoDespertador = actuales.tonoDespertador, despertador = actuales.despertador)

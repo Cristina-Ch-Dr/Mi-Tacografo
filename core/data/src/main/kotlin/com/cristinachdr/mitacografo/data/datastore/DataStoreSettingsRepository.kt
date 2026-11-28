@@ -8,10 +8,13 @@ import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_MAXIMA
 import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.ConfigSalario
 import com.cristinachdr.mitacografo.domain.model.Continente
+import com.cristinachdr.mitacografo.domain.model.ModoCobro
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -44,6 +47,11 @@ internal class DataStoreSettingsRepository
                 preferencias.guardar(Claves.ANTELACION_DESPERTADOR, nuevos.antelacionDespertador.toMinutes().toString())
                 preferencias.guardar(Claves.TONO_DESPERTADOR, nuevos.tonoDespertador)
                 preferencias.guardar(Claves.DESPERTADOR, nuevos.despertador?.toEpochMilli()?.toString())
+                preferencias.guardar(Claves.SALARIO_DIA, nuevos.salario.diaInicio.toString())
+                preferencias.guardar(Claves.SALARIO_MODO, nuevos.salario.modo.name)
+                preferencias.guardar(Claves.SALARIO_NOMINA, nuevos.salario.nomina.toPlainString())
+                preferencias.guardar(Claves.SALARIO_POR_KM, nuevos.salario.porKm.toPlainString())
+                preferencias.guardar(Claves.SALARIO_POR_DIA, nuevos.salario.porDia.toPlainString())
             }
         }
 
@@ -58,6 +66,11 @@ internal class DataStoreSettingsRepository
             val ANTELACION_DESPERTADOR = stringPreferencesKey("antelacion_despertador_min")
             val TONO_DESPERTADOR = stringPreferencesKey("tono_despertador")
             val DESPERTADOR = stringPreferencesKey("despertador_epoch_ms")
+            val SALARIO_DIA = stringPreferencesKey("salario_dia_inicio")
+            val SALARIO_MODO = stringPreferencesKey("salario_modo")
+            val SALARIO_NOMINA = stringPreferencesKey("salario_nomina")
+            val SALARIO_POR_KM = stringPreferencesKey("salario_por_km")
+            val SALARIO_POR_DIA = stringPreferencesKey("salario_por_dia")
         }
 
         private fun Preferences.aAjustes(): Ajustes =
@@ -81,6 +94,16 @@ internal class DataStoreSettingsRepository
                         ?: ANTELACION_DESPERTADOR_POR_DEFECTO,
                 tonoDespertador = this[Claves.TONO_DESPERTADOR],
                 despertador = this[Claves.DESPERTADOR]?.toLongOrNull()?.let(Instant::ofEpochMilli),
+                salario =
+                    ConfigSalario(
+                        diaInicio =
+                            this[Claves.SALARIO_DIA]?.toIntOrNull()?.takeIf { it in ConfigSalario.DIAS_INICIO }
+                                ?: ConfigSalario.DIA_INICIO_POR_DEFECTO,
+                        modo = ModoCobro.entries.find { it.name == this[Claves.SALARIO_MODO] } ?: ModoCobro.DIETA,
+                        nomina = importe(this[Claves.SALARIO_NOMINA]),
+                        porKm = importe(this[Claves.SALARIO_POR_KM]),
+                        porDia = importe(this[Claves.SALARIO_POR_DIA]),
+                    ),
             )
 
         private fun androidx.datastore.preferences.core.MutablePreferences.guardar(
@@ -111,3 +134,7 @@ private fun lista(texto: String?): List<String> =
         .split(",")
         .map { it.trim() }
         .filter { it.isNotEmpty() }
+
+/** Un importe guardado como texto ("0.045"). Si falta o está estropeado, cero. */
+private fun importe(texto: String?): BigDecimal =
+    texto?.toBigDecimalOrNull()?.takeIf { it.signum() >= 0 } ?: BigDecimal.ZERO

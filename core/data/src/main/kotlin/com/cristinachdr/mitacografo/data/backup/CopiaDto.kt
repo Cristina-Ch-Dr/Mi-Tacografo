@@ -19,6 +19,18 @@ internal data class CopiaDto(
     val descansos: List<DescansoDto> = emptyList(),
     // Desde MT-18, igual que `descansos`: las copias antiguas se leen con la lista vacía.
     val viajes: List<ViajeDto> = emptyList(),
+    // Desde MT-58, igual.
+    val gastos: List<GastoDto> = emptyList(),
+)
+
+@Serializable
+internal data class GastoDto(
+    val id: Long,
+    /** "2026-11-22" */
+    val fecha: String,
+    val descripcion: String? = null,
+    /** "12.50", como texto para no perder decimales. */
+    val importe: String,
 )
 
 @Serializable
@@ -80,6 +92,12 @@ internal data class AjustesDto(
     val continentes: List<String> = emptyList(),
     // Desde MT-57. El tono y el despertador puesto son de cada móvil: no van en la copia.
     val antelacionDespertadorMinutos: Long? = null,
+    // Desde MT-58: lo que cobra. Los importes, como texto ("0.045").
+    val salarioDiaInicio: Int? = null,
+    val salarioModo: String? = null,
+    val salarioNomina: String? = null,
+    val salarioPorKm: String? = null,
+    val salarioPorDia: String? = null,
 )
 
 @Serializable

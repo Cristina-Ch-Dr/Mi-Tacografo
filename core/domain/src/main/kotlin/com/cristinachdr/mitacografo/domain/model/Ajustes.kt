@@ -30,6 +30,8 @@ data class Ajustes(
     val tonoDespertador: String? = null,
     /** A qué hora está puesto el despertador; `null` = no hay. Es de este móvil. */
     val despertador: Instant? = null,
+    /** Lo que cobra, para la pantalla Salario (MT-58). */
+    val salario: ConfigSalario = ConfigSalario(),
 )
 
 /**

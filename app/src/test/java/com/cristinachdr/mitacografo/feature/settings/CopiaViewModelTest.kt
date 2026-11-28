@@ -3,6 +3,7 @@ package com.cristinachdr.mitacografo.feature.settings
 import com.cristinachdr.mitacografo.MainDispatcherRule
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeGastoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
@@ -84,9 +85,9 @@ class CopiaViewModelTest {
         val gestor = GestorAvisos(repo, settings, FakeAlarmScheduler(), reloj)
         val descansos = FakeDescansoRepository()
         return CopiaViewModel(
-            ExportarCopia(repo, descansos, FakeViajeRepository(), settings, backup, reloj),
+            ExportarCopia(repo, descansos, FakeViajeRepository(), FakeGastoRepository(), settings, backup, reloj),
             LeerCopia(backup),
-            RestaurarCopia(repo, descansos, FakeViajeRepository(), settings, gestor),
+            RestaurarCopia(repo, descansos, FakeViajeRepository(), FakeGastoRepository(), settings, gestor),
             repo,
             archivos,
             reloj,

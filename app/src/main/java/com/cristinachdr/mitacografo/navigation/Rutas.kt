@@ -16,6 +16,9 @@ import kotlinx.serialization.Serializable
 /** Resumen y PDF: desde MT-51 se abre desde el Historial, ya no es una pestaña. */
 @Serializable data object RutaResumen
 
+/** Salario del periodo, con sus viajes y gastos (MT-58). Se abre desde Viajes. */
+@Serializable data object RutaSalario
+
 @Serializable data object RutaAjustes
 
 /** Lista de pausas y descansos: la pestaña Descanso (MT-51). */

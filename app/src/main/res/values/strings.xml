@@ -443,4 +443,28 @@
     <string name="ajustes_despertador_ayuda">El de «Cuándo salir» en Inicio. Suena con el volumen de alarma, aunque el móvil esté en silencio, hasta que lo apagues.</string>
     <string name="despertador_tono_actual">Tono: %1$s</string>
     <string name="despertador_tono_alarma">el de alarma del móvil</string>
+    <!-- MT-58: salario -->
+    <string name="nav_salario">Salario</string>
+    <string name="accion_salario">€ Salario del periodo</string>
+    <string name="salario_total">Total del periodo</string>
+    <string name="salario_nomina">Nómina</string>
+    <string name="salario_dietas">Dietas: %1$d días × %2$s</string>
+    <string name="salario_km">Kilómetros: %1$s km × %2$s</string>
+    <string name="salario_gastos">Gastos de tu bolsillo</string>
+    <string name="salario_viajes">Viajes que cuentan</string>
+    <string name="salario_sin_viajes">Ningún viaje terminado dentro de este periodo.</string>
+    <string name="salario_regla_viajes">Cuentan los viajes que salen y vuelven dentro del periodo; uno que cruza el día de inicio no cuenta en ninguno. Los días van de la fecha de salida a la de vuelta, las dos incluidas.</string>
+    <string name="salario_viaje">%1$s → %2$s · %3$s km · %4$d días</string>
+    <string name="salario_fecha_gasto">Fecha: %1$s</string>
+    <string name="salario_descripcion_gasto">Qué fue (parking, comida…)</string>
+    <string name="salario_importe">Importe, €</string>
+    <string name="salario_anadir_gasto">Añadir gasto</string>
+    <string name="salario_como_cobras">Cómo cobras</string>
+    <string name="salario_modo_km">Por km</string>
+    <string name="salario_modo_dieta">Dieta</string>
+    <string name="salario_modo_dieta_km">Dieta + km</string>
+    <string name="salario_dia_inicio">Día en que empieza el periodo (1–28)</string>
+    <string name="salario_campo_nomina">Nómina (base), €</string>
+    <string name="salario_campo_por_dia">Dieta, € por día</string>
+    <string name="salario_campo_por_km">€ por km</string>
 </resources>

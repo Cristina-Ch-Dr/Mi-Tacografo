@@ -448,4 +448,28 @@
     <string name="ajustes_despertador_ayuda">Той, що в «Коли виїжджати» на Головній. Дзвонить на гучності будильника, навіть якщо телефон у беззвучному режимі, доки його не вимкнете.</string>
     <string name="despertador_tono_actual">Мелодія: %1$s</string>
     <string name="despertador_tono_alarma">будильника телефону</string>
+    <!-- MT-58: salario -->
+    <string name="nav_salario">Зарплата</string>
+    <string name="accion_salario">€ Зарплата за період</string>
+    <string name="salario_total">Разом за період</string>
+    <string name="salario_nomina">Ставка</string>
+    <string name="salario_dietas">Добові: %1$d дн. × %2$s</string>
+    <string name="salario_km">Кілометри: %1$s км × %2$s</string>
+    <string name="salario_gastos">Витрати з власної кишені</string>
+    <string name="salario_viajes">Рейси, що враховуються</string>
+    <string name="salario_sin_viajes">У цьому періоді немає завершених рейсів.</string>
+    <string name="salario_regla_viajes">Враховуються рейси, що почалися й завершилися в межах періоду; рейс, що перетинає день початку, не враховується в жодному. Дні рахуються від дати виїзду до дати повернення включно.</string>
+    <string name="salario_viaje">%1$s → %2$s · %3$s км · %4$d дн.</string>
+    <string name="salario_fecha_gasto">Дата: %1$s</string>
+    <string name="salario_descripcion_gasto">На що (паркінг, їжа…)</string>
+    <string name="salario_importe">Сума, €</string>
+    <string name="salario_anadir_gasto">Додати витрату</string>
+    <string name="salario_como_cobras">Як вам платять</string>
+    <string name="salario_modo_km">За км</string>
+    <string name="salario_modo_dieta">Добові</string>
+    <string name="salario_modo_dieta_km">Добові + км</string>
+    <string name="salario_dia_inicio">День початку періоду (1–28)</string>
+    <string name="salario_campo_nomina">Ставка (база), €</string>
+    <string name="salario_campo_por_dia">Добові, € за день</string>
+    <string name="salario_campo_por_km">€ за км</string>
 </resources>

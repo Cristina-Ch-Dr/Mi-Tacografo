@@ -3,20 +3,25 @@ package com.cristinachdr.mitacografo.data.backup
 import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.ConfigSalario
 import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
+import com.cristinachdr.mitacografo.domain.model.Gasto
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.ModoCobro
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.Viaje
 import com.cristinachdr.mitacografo.domain.model.conComunidadDeCiudad
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -72,6 +77,7 @@ private fun CopiaSeguridad.aDto() =
         ajustes = ajustes.aDto(),
         descansos = descansos.sortedBy { it.inicio }.map { it.aDto() },
         viajes = viajes.sortedBy { it.inicio }.map { it.aDto() },
+        gastos = gastos.sortedBy { it.fecha }.map { it.aDto() },
     )
 
 private fun CopiaDto.aDominio() =
@@ -81,6 +87,7 @@ private fun CopiaDto.aDominio() =
         ajustes = ajustes.aDominio(),
         descansos = descansos.map { it.aDominio() },
         viajes = viajes.map { it.aDominio() },
+        gastos = gastos.map { it.aDominio() },
     )
 
 private fun Jornada.aDto() =
@@ -185,6 +192,11 @@ private fun Ajustes.aDto() =
         paisesHabituales = paisesHabituales.sorted(),
         continentes = continentes.map { it.name }.sorted(),
         antelacionDespertadorMinutos = antelacionDespertador.toMinutes(),
+        salarioDiaInicio = salario.diaInicio,
+        salarioModo = salario.modo.name,
+        salarioNomina = salario.nomina.toPlainString(),
+        salarioPorKm = salario.porKm.toPlainString(),
+        salarioPorDia = salario.porDia.toPlainString(),
     )
 
 private fun AjustesDto.aDominio() =
@@ -199,4 +211,21 @@ private fun AjustesDto.aDominio() =
         continentes = continentes.mapNotNull { nombre -> Continente.entries.find { it.name == nombre } }.toSet(),
         antelacionDespertador =
             antelacionDespertadorMinutos?.let(Duration::ofMinutes) ?: ANTELACION_DESPERTADOR_POR_DEFECTO,
+        salario =
+            ConfigSalario(
+                diaInicio =
+                    salarioDiaInicio?.takeIf {
+                        it in ConfigSalario.DIAS_INICIO
+                    } ?: ConfigSalario.DIA_INICIO_POR_DEFECTO,
+                modo = ModoCobro.entries.find { it.name == salarioModo } ?: ModoCobro.DIETA,
+                nomina = salarioNomina?.let(::BigDecimal) ?: BigDecimal.ZERO,
+                porKm = salarioPorKm?.let(::BigDecimal) ?: BigDecimal.ZERO,
+                porDia = salarioPorDia?.let(::BigDecimal) ?: BigDecimal.ZERO,
+            ),
     )
+
+private fun Gasto.aDto() =
+    GastoDto(id = id, fecha = fecha.toString(), descripcion = descripcion, importe = importe.toPlainString())
+
+private fun GastoDto.aDominio() =
+    Gasto(id = id, fecha = LocalDate.parse(fecha), descripcion = descripcion, importe = BigDecimal(importe))
