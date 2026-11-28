@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-57, MT-58, MT-59, MT-33, MT-33B | MT-56, hecha en `feature/MT-56-detalles-su-app` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-58, MT-59, MT-33, MT-33B | MT-57, hecha en `feature/MT-57-despertador` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -438,9 +438,13 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Probado en el emulador con la copia real del conductor.
 
 ### MT-57 · Cuándo salir y despertador · M · deps: MT-13 · *(petición del conductor)*
-- [ ] Al finalizar la jornada, tarjeta en Inicio: con descanso de **9 h** → salida a las X y despertar a las Y; lo mismo con **11 h**.
-- [ ] Cuánto antes despertar: 30 / 45 / 60 / 90 / 120 min o a elegir.
-- [ ] Botón ⏰ para poner el despertador. **Suena de verdad con la app cerrada** (en la suya solo con la app abierta): alarma exacta y pantalla completa, como un despertador. Tono elegido del móvil.
+- [x] Al finalizar la jornada, tarjeta en Inicio: con descanso de **9 h** → salida a las X y despertar a las Y; lo mismo con **11 h**.
+- [x] Cuánto antes despertar: 30 / 45 / 60 / 90 / 120 min o a elegir.
+- [x] Botón ⏰ para poner el despertador. **Suena de verdad con la app cerrada** (en la suya solo con la app abierta): alarma exacta y pantalla completa, como un despertador. Tono elegido del móvil.
+- Inicio, al terminar la jornada: tarjeta «Cuándo salir» con 9 h y 11 h (salida y despertar, en la hora del móvil) y «⏰ Poner». Se quita cuando ya han pasado las dos salidas. Antelación con chips (30/45/60/90/120 min) u «Otra…» (hasta 240 min). El despertador puesto sale como «⏰ Despertador: sáb 15:04 · Quitar», con aviso si faltan los permisos de alarmas exactas o de pantalla completa (Android 14+).
+- Dominio: `cuandoSalir()`, puerto `Despertador`, casos de uso `PonerDespertador`, `QuitarDespertador` y `ReprogramarDespertador` (al reiniciar el móvil). En Ajustes: antelación (va en la copia), tono y hora del despertador (son de cada móvil: no van en la copia y no se pisan al restaurar).
+- Android: `setAlarmClock` (sale el ⏰ en la barra) → `DespertadorReceiver` → `DespertadorService` (servicio en primer plano, `mediaPlayback`): tono elegido en bucle con el volumen de **alarma** y vibración, hasta «Apagar» o 10 min. Su notificación abre `AlarmaActivity` encima del bloqueo. Tono en Ajustes → «Despertador», con el selector de tonos de alarma de Android.
+- Probado en el emulador API 33 con la app en segundo plano y el móvil bloqueado: sonó a su hora exacta (15:04:03, volumen de alarma) y se paró con «Apagar».
 
 ### MT-58 · Salario · L · *(petición del conductor)*
 - [ ] Pestaña o pantalla «Salario». Periodo «del día N al N» (él elige el día de inicio, de 1 a 28) y flechas para ir al anterior y al siguiente.

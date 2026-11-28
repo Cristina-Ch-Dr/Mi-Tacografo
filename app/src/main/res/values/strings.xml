@@ -421,4 +421,26 @@
     <string name="aviso_semanal_muy_pronto">Quedan menos de 6 h: el descanso semanal tiene que empezar antes del %1$s.</string>
     <string name="inicio_km_hoy">Hoy: %1$s km</string>
     <string name="inicio_km_viaje">Viaje: %1$s km</string>
+    <!-- MT-57: cuándo salir y despertador -->
+    <string name="formato_minutos">%1$d min</string>
+    <string name="accion_quitar">Quitar</string>
+    <string name="accion_apagar">Apagar</string>
+    <string name="accion_poner_despertador">⏰ Poner</string>
+    <string name="accion_elegir_tono">Elegir el tono</string>
+    <string name="cuando_salir_titulo">Cuándo salir</string>
+    <string name="cuando_salir_descanso">Con %1$d h de descanso</string>
+    <string name="cuando_salir_salida">Salida: %1$s</string>
+    <string name="cuando_salir_despertar">Despertar: %1$s</string>
+    <string name="cuando_salir_antelacion">Despertar antes de salir</string>
+    <string name="cuando_salir_otra">Otra…</string>
+    <string name="despertador_puesto">⏰ Despertador: %1$s</string>
+    <string name="despertador_sin_exactas">Sin el permiso de alarmas exactas, el despertador puede sonar unos minutos tarde.</string>
+    <string name="despertador_sin_pantalla_completa">Sin el permiso de pantalla completa, el despertador suena pero no sale encima del bloqueo.</string>
+    <string name="despertador_titulo">Hora de levantarse</string>
+    <string name="despertador_texto">Toca «Apagar» para parar el despertador.</string>
+    <string name="canal_despertador_nombre">Despertador</string>
+    <string name="ajustes_seccion_despertador">Despertador</string>
+    <string name="ajustes_despertador_ayuda">El de «Cuándo salir» en Inicio. Suena con el volumen de alarma, aunque el móvil esté en silencio, hasta que lo apagues.</string>
+    <string name="despertador_tono_actual">Tono: %1$s</string>
+    <string name="despertador_tono_alarma">el de alarma del móvil</string>
 </resources>

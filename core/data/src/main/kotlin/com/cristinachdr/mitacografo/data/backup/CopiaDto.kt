@@ -78,6 +78,8 @@ internal data class AjustesDto(
     val zonaReferencia: String? = null,
     val paisesHabituales: List<String> = emptyList(),
     val continentes: List<String> = emptyList(),
+    // Desde MT-57. El tono y el despertador puesto son de cada móvil: no van en la copia.
+    val antelacionDespertadorMinutos: Long? = null,
 )
 
 @Serializable

@@ -62,6 +62,9 @@ class DataStoreSettingsRepositoryTest {
                     zonaReferencia = ZoneId.of("Europe/Madrid"),
                     paisesHabituales = setOf("DE", "FR"),
                     continentes = setOf(Continente.EUROPA, Continente.ASIA),
+                    antelacionDespertador = Duration.ofMinutes(45),
+                    tonoDespertador = "content://media/internal/audio/media/12",
+                    despertador = java.time.Instant.ofEpochMilli(1_800_000_000_000),
                 )
 
             repo.actualizar { nuevos }
