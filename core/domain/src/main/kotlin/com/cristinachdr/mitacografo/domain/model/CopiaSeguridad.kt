@@ -15,6 +15,8 @@ data class CopiaSeguridad(
     val descansos: List<Descanso> = emptyList(),
     /** Viajes. Las copias anteriores a MT-18 no los traen: se leen como lista vacía. */
     val viajes: List<Viaje> = emptyList(),
+    /** Gastos de su bolsillo. Las copias anteriores a MT-58 no los traen: se leen como lista vacía. */
+    val gastos: List<Gasto> = emptyList(),
 ) {
     /** La primera y la última jornada de la copia, para el resumen antes de restaurar. */
     val desde: Instant? get() = jornadas.minOfOrNull { it.inicio }

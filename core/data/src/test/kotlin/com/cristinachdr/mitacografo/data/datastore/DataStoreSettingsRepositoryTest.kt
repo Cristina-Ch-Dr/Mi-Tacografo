@@ -65,6 +65,14 @@ class DataStoreSettingsRepositoryTest {
                     antelacionDespertador = Duration.ofMinutes(45),
                     tonoDespertador = "content://media/internal/audio/media/12",
                     despertador = java.time.Instant.ofEpochMilli(1_800_000_000_000),
+                    salario =
+                        com.cristinachdr.mitacografo.domain.model.ConfigSalario(
+                            diaInicio = 1,
+                            modo = com.cristinachdr.mitacografo.domain.model.ModoCobro.KM,
+                            nomina = java.math.BigDecimal("1500"),
+                            porKm = java.math.BigDecimal("0.045"),
+                            porDia = java.math.BigDecimal("55.5"),
+                        ),
                 )
 
             repo.actualizar { nuevos }

@@ -2,20 +2,25 @@ package com.cristinachdr.mitacografo.data.backup
 
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
+import com.cristinachdr.mitacografo.domain.model.ConfigSalario
 import com.cristinachdr.mitacografo.domain.model.Continente
 import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
+import com.cristinachdr.mitacografo.domain.model.Gasto
 import com.cristinachdr.mitacografo.domain.model.Jornada
+import com.cristinachdr.mitacografo.domain.model.ModoCobro
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.Viaje
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -76,6 +81,14 @@ class JsonBackupTest {
                     zonaReferencia = madrid,
                     paisesHabituales = setOf("DE", "FR"),
                     continentes = setOf(Continente.EUROPA),
+                    salario =
+                        ConfigSalario(
+                            diaInicio = 15,
+                            modo = ModoCobro.DIETA_Y_KM,
+                            nomina = BigDecimal("1200.00"),
+                            porKm = BigDecimal("0.045"),
+                            porDia = BigDecimal("60"),
+                        ),
                 ),
             descansos =
                 listOf(
@@ -100,6 +113,15 @@ class JsonBackupTest {
                         zonaInicio = madrid,
                         fin = hora(3, 19, kyiv),
                         zonaFin = kyiv,
+                    ),
+                ),
+            gastos =
+                listOf(
+                    Gasto(
+                        id = 4,
+                        fecha = LocalDate.of(2026, 11, 2),
+                        descripcion = "Parking",
+                        importe = BigDecimal("12.50"),
                     ),
                 ),
         )

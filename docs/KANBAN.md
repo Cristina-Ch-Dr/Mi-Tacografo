@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-58, MT-59, MT-33, MT-33B | MT-57, hecha en `feature/MT-57-despertador` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-49, MT-51 · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-60, MT-59, MT-61, MT-33, MT-33B | MT-58, hecha en `feature/MT-58-salario` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-57 (MT-50 dentro de MT-53) · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -391,7 +391,7 @@ Leyenda de tamaño: **S** ≤ 1 h · **M** 1–3 h · **L** 3–5 h · **XL** > 
 
 ## E8 · Lo que piden el conductor y Cristina (23 nov 2026) → **sin versión**
 
-Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Van **antes que MT-33 y MT-33B** (decidido el 23 nov 2026). Casi todo sale de su app de ejemplo (versión b20), que ha crecido: es lo que tiene y aquí falta. En su descripción dice que quiere pasar su lógica **al estilo de nuestra app** (la «0.1.0 de cabecera azul con el botón redondo»).
+Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Van **antes que MT-33 y MT-33B** (decidido el 23 nov 2026). Casi todo sale de su app de ejemplo (versión b20, y desde el 28 nov la **b30**: MT-60 y MT-61), que ha crecido: es lo que tiene y aquí falta. En su descripción dice que quiere pasar su lógica **al estilo de nuestra app** (la «0.1.0 de cabecera azul con el botón redondo»).
 
 ### MT-52 · Añadir jornadas desde Inicio y viajes pasados desde Viajes · M · deps: MT-47, MT-51 · *(propuesta de Cristina)*
 - [x] Quitar el botón «Añadir jornada» de Historial (y el hueco que deja abajo) y ponerlo en **Inicio**, debajo de la jornada: «Añadir una jornada pasada». Abre la misma pantalla de ahora (`RutaJornada(0)`).
@@ -447,17 +447,36 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Probado en el emulador API 33 con la app en segundo plano y el móvil bloqueado: sonó a su hora exacta (15:04:03, volumen de alarma) y se paró con «Apagar».
 
 ### MT-58 · Salario · L · *(petición del conductor)*
-- [ ] Pestaña o pantalla «Salario». Periodo «del día N al N» (él elige el día de inicio, de 1 a 28) y flechas para ir al anterior y al siguiente.
-- [ ] Modo de cobro: **por km**, **dieta por día** o **dieta + km**. Con: nómina base (€), € por km y € de dieta por día.
-- [ ] Cuentan los viajes que **empiezan y terminan dentro** del periodo. Días = de la fecha de salida a la de vuelta, las dos incluidas. Km = suma de las jornadas del viaje.
-- [ ] Gastos de su bolsillo (descripción, importe y fecha), que se suman. Total = nómina + dieta y/o km + gastos, con el desglose y la lista de viajes.
-- [ ] Datos nuevos en la base de datos (migración) y en la copia de seguridad (que siga leyendo las antiguas).
+- [x] Pestaña o pantalla «Salario». Periodo «del día N al N» (él elige el día de inicio, de 1 a 28) y flechas para ir al anterior y al siguiente.
+- [x] Modo de cobro: **por km**, **dieta por día** o **dieta + km**. Con: nómina base (€), € por km y € de dieta por día.
+- [x] Cuentan los viajes que **empiezan y terminan dentro** del periodo. Días = de la fecha de salida a la de vuelta, las dos incluidas. Km = suma de las jornadas del viaje.
+- [x] Gastos de su bolsillo (descripción, importe y fecha), que se suman. Total = nómina + dieta y/o km + gastos, con el desglose y la lista de viajes.
+- [x] Datos nuevos en la base de datos (migración) y en la copia de seguridad (que siga leyendo las antiguas).
   - Un viaje que cruza el día de corte no cuenta en ningún periodo: así lo hace su app (lo confirma su descripción de la b20). Día de corte por defecto: el 20.
+- Pantalla «Salario», desde Viajes («€ Salario del periodo»): periodo con flechas (no pasa del de hoy), el total en grande con el desglose (nómina, dietas «7 días × 60 €», km «4.707 km × 0,045 €» y gastos), los viajes que cuentan, los gastos (con fecha, borrar y añadir) y «Cómo cobras» (modo, día de inicio, nómina y tarifas), que se guarda al escribir.
+- **El periodo va del día N al día anterior del mes siguiente** (del 20 al 19): en su app el día N entraba en dos periodos y un gasto de ese día contaba dos veces.
+- Dominio puro: `periodoSalario()` y `calcularSalario()` con `BigDecimal` (tarifas como 0,045 €/km sin errores de redondeo; importes a céntimos). Lo que cobra va en Ajustes (y en la copia); los gastos, en la tabla nueva `gasto` (base de datos 4 → 5) y en la copia. Las copias antiguas se siguen leyendo.
+- Probado en el emulador con la copia real del conductor: periodo del 20 oct al 19 nov, su viaje del 13 al 19 nov (7 días, 4.707 km), con 60 €/día y 0,045 €/km → 631,82 €.
+
+### MT-60 · Detalles de su app b30 · S · deps: MT-57, MT-55 · *(de su app, b30, 28 nov 2026)*
+- [ ] «Cuándo salir»: tocar la hora de salida de una opción para cambiarla a mano (p. ej. salir a las 05:00 en vez de a las 04:40); el despertador la sigue. Un ↺ vuelve a la calculada. Si con esa hora el descanso no llega a 9 h, en rojo.
+  - Solo vale para la última jornada terminada: al terminar otra, se vuelve a las calculadas (en su app, `dep` y `depFor`).
+- [ ] «Hora propia» para el despertador: ponerlo a cualquier hora, sin salir de una de las dos opciones.
+- [ ] Pestaña Descanso: en cada descanso entre jornadas, dónde fue, con la comunidad si es en España (en su app, «E-CAT»; aquí «ES (CAT)», como en Historial).
+- Lo demás nuevo de la b30 ya lo tiene esta app de otra forma: los tonos (aquí, los de alarma del móvil) y guardar el archivo de la copia (aquí, con el selector de Android).
 
 ### MT-59 · Ajuste de semanas · M · deps: MT-30 · *(petición del conductor)*
 - [ ] Para quien empieza a usar la app a mitad de semana: horas de conducción que ya llevaba esta semana y la anterior, ampliaciones a 10 h, reducidos y fin del último descanso semanal.
 - [ ] Botón «?» que lo explica: se rellena una vez antes de la primera salida; luego solo lo que falte, porque lo de las jornadas ya lo cuenta la app.
 - [ ] El motor de reglas lo usa como dato conocido (menos «No verificado» al empezar).
+
+### MT-61 · Copias de seguridad automáticas · M · deps: MT-17 · *(de su app, b30, 28 nov 2026)* · (con dos ideas del backlog)
+- [ ] Copia automática **una vez al día** en una carpeta que el conductor elige una vez (Documentos, o una que se sincronice con su nube), como hace su app en el servidor. Se guardan las de los **últimos 14 días**; las más viejas se borran solas.
+- [ ] Freno de seguridad, como en su app: si en el móvil hay **mucho menos de la mitad** de jornadas que en la última copia, no se copia (para no pisar una buena con datos perdidos) y se avisa: «Restaura la copia».
+- [ ] En Ajustes → «Copia de seguridad»: «Última copia automática: …», y «Restaurar» con la lista de las copias por día y cuántas jornadas tiene cada una.
+- [ ] *(antes en el backlog)* «Copiar la copia como texto» para pegarla en Telegram, notas o correo, y «Restaurar desde texto» pegándola. La tiene su app desde la b20.
+- [ ] *(antes en el backlog)* Si la copia automática está apagada, recordatorio de hacer copia cada 30 días.
+- Sin permiso de internet, como hasta ahora: la copia va a una carpeta del móvil (el conductor puede sincronizarla con Google Drive u otra). Su app la guarda en un servidor porque es una página web.
 
 ---
 
@@ -466,12 +485,10 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Lectura de ficheros `.DDD` de la tarjeta del conductor y comparar con lo apuntado. *El conductor ya probó a leerlos: registro de actividades en TLV, FID 0504, por días y en UTC. Hace falta un archivo reciente que coincida con lo apuntado.*
 - Rellenar país y comunidad autónoma con la ubicación al finalizar (idea del conductor). Ojo: `Geocoder` suele necesitar internet y la app no tiene ese permiso a propósito; habría que usar una tabla de fronteras sin conexión.
 - Conexión por Bluetooth al tacógrafo VDO (idea del conductor). Investigar antes: no se sabe si admite otro cliente además de VDO Driver.
-- Copia de seguridad como texto para pegar en Telegram o en notas (la tiene su app).
 - Widget de la jornada en curso.
 - Pasar de una pestaña a otra deslizando el dedo (la tiene su app, b20).
 - En Viajes, el descanso entre un viaje y el siguiente (la tiene su app, b20).
 - Art. 9 (ferri/tren) y art. 12 (excepciones) completos.
 - Multi-manning (30 h).
 - Gráficas mensuales.
-- Recordatorio de copia de seguridad cada 30 días.
 - Google Play (prueba cerrada).

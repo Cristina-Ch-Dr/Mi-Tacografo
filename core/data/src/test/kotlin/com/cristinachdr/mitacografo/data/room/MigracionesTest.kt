@@ -7,6 +7,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.cristinachdr.mitacografo.data.room.gasto.RoomGastoRepository
 import com.cristinachdr.mitacografo.data.room.jornada.RoomJornadaRepository
 import com.cristinachdr.mitacografo.data.room.viaje.RoomViajeRepository
 import com.cristinachdr.mitacografo.domain.model.Viaje
@@ -188,6 +189,43 @@ class MigracionesTest {
                 assertNull(antigua.ciudadInicio)
                 assertNull(antigua.regionFin)
                 assertEquals("CAT", antigua.ciudadFin)
+            } finally {
+                database.close()
+            }
+        }
+
+    @Test
+    fun `de la version 4 a la 5 se conservan las jornadas y ya se pueden guardar gastos`() =
+        runTest {
+            val nombre = ruta("migracion-4-a-5.db")
+            helper.createDatabase(nombre, 4).use { db ->
+                db.execSQL(
+                    "INSERT INTO jornada (id, inicio_epoch_ms, zona_inicio, km_inicio, pais_inicio, region_inicio) " +
+                        "VALUES (1, 1000, 'Europe/Madrid', 250000, 'ES', 'NA')",
+                )
+            }
+
+            helper.runMigrationsAndValidate(nombre, 5, true).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java, nombre)
+                    .allowMainThreadQueries()
+                    // Sin WAL, por lo mismo que en la migración de 2 a 3.
+                    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+                    .build()
+            try {
+                assertEquals("NA", RoomJornadaRepository(database.jornadaDao()).obtenerPorId(1)?.regionInicio)
+
+                val gastos = RoomGastoRepository(database.gastoDao())
+                val gasto =
+                    com.cristinachdr.mitacografo.domain.model.Gasto(
+                        fecha = java.time.LocalDate.of(2026, 11, 22),
+                        descripcion = "Parking",
+                        importe = java.math.BigDecimal("12.50"),
+                    )
+                val id = gastos.guardar(gasto)
+                assertEquals(listOf(gasto.copy(id = id)), gastos.obtenerTodos())
             } finally {
                 database.close()
             }

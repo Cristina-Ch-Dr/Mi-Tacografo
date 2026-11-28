@@ -49,6 +49,7 @@ import com.cristinachdr.mitacografo.feature.home.HomeScreen
 import com.cristinachdr.mitacografo.feature.report.InformeSemanaScreen
 import com.cristinachdr.mitacografo.feature.rests.DescansosScreen
 import com.cristinachdr.mitacografo.feature.rests.EditarDescansoScreen
+import com.cristinachdr.mitacografo.feature.salary.SalarioScreen
 import com.cristinachdr.mitacografo.feature.settings.SettingsScreen
 import com.cristinachdr.mitacografo.feature.stats.StatsScreen
 import com.cristinachdr.mitacografo.feature.trips.EditarViajeScreen
@@ -101,6 +102,10 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
 
             destinoActual?.hasRoute(RutaResumen::class) == true -> {
                 R.string.nav_resumen
+            }
+
+            destinoActual?.hasRoute(RutaSalario::class) == true -> {
+                R.string.nav_salario
             }
 
             destinoActual?.hasRoute(RutaViaje::class) == true -> {
@@ -215,6 +220,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 TripsScreen(
                     onViaje = { navController.navigate(RutaViaje(it)) },
                     onNuevo = { navController.navigate(RutaViaje()) },
+                    onSalario = { navController.navigate(RutaSalario) { launchSingleTop = true } },
                 )
             }
             composable<RutaViaje> {
@@ -224,6 +230,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
                 )
             }
             composable<RutaResumen> { StatsScreen() }
+            composable<RutaSalario> { SalarioScreen() }
             composable<RutaAjustes> { SettingsScreen() }
             composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
             composable<RutaDescansos> {

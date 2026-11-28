@@ -7,6 +7,8 @@ import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.cristinachdr.mitacografo.data.room.descanso.DescansoDao
 import com.cristinachdr.mitacografo.data.room.descanso.DescansoEntity
+import com.cristinachdr.mitacografo.data.room.gasto.GastoDao
+import com.cristinachdr.mitacografo.data.room.gasto.GastoEntity
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaDao
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaEntity
 import com.cristinachdr.mitacografo.data.room.viaje.ViajeDao
@@ -24,8 +26,8 @@ import com.cristinachdr.mitacografo.domain.model.REGIONES_ESPANA
 @Database(
     // La tabla `descanso` se creó vacía en la versión 1 para no tener que migrar
     // la base de datos del conductor; desde MT-20 se usa (el DAO no cambia el esquema).
-    entities = [JornadaEntity::class, DescansoEntity::class, ViajeEntity::class],
-    version = 4,
+    entities = [JornadaEntity::class, DescansoEntity::class, ViajeEntity::class, GastoEntity::class],
+    version = 5,
     exportSchema = true,
     // 1 → 2 (MT-18): tabla `viaje` y clave ajena `jornada.viaje_id`. Room la genera comparando
     // `schemas/1.json` y `2.json`: rehace la tabla `jornada` copiando todas sus filas.
@@ -36,6 +38,8 @@ import com.cristinachdr.mitacografo.domain.model.REGIONES_ESPANA
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4, spec = AppDatabase.ComunidadDesdeCiudad::class),
+        // 4 → 5 (MT-58): tabla nueva `gasto` (gastos de su bolsillo para el salario).
+        AutoMigration(from = 4, to = 5),
     ],
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -44,6 +48,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun descansoDao(): DescansoDao
 
     abstract fun viajeDao(): ViajeDao
+
+    abstract fun gastoDao(): GastoDao
 
     /**
      * 3 → 4 (MT-55): antes el conductor apuntaba la comunidad en «Ciudad» («NA», «CAT»…). En España, si la

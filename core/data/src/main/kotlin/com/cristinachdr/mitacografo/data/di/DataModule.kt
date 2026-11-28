@@ -11,12 +11,15 @@ import com.cristinachdr.mitacografo.data.datastore.DataStoreSettingsRepository
 import com.cristinachdr.mitacografo.data.room.AppDatabase
 import com.cristinachdr.mitacografo.data.room.descanso.DescansoDao
 import com.cristinachdr.mitacografo.data.room.descanso.RoomDescansoRepository
+import com.cristinachdr.mitacografo.data.room.gasto.GastoDao
+import com.cristinachdr.mitacografo.data.room.gasto.RoomGastoRepository
 import com.cristinachdr.mitacografo.data.room.jornada.JornadaDao
 import com.cristinachdr.mitacografo.data.room.jornada.RoomJornadaRepository
 import com.cristinachdr.mitacografo.data.room.viaje.RoomViajeRepository
 import com.cristinachdr.mitacografo.data.room.viaje.ViajeDao
 import com.cristinachdr.mitacografo.domain.port.BackupPort
 import com.cristinachdr.mitacografo.domain.port.DescansoRepository
+import com.cristinachdr.mitacografo.domain.port.GastoRepository
 import com.cristinachdr.mitacografo.domain.port.JornadaRepository
 import com.cristinachdr.mitacografo.domain.port.SettingsRepository
 import com.cristinachdr.mitacografo.domain.port.ViajeRepository
@@ -51,6 +54,10 @@ internal abstract class DataModule {
 
     @Binds
     @Singleton
+    abstract fun bindGastoRepository(impl: RoomGastoRepository): GastoRepository
+
+    @Binds
+    @Singleton
     abstract fun bindSettingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
 
     @Binds
@@ -78,5 +85,8 @@ internal abstract class DataModule {
 
         @Provides
         fun provideViajeDao(database: AppDatabase): ViajeDao = database.viajeDao()
+
+        @Provides
+        fun provideGastoDao(database: AppDatabase): GastoDao = database.gastoDao()
     }
 }

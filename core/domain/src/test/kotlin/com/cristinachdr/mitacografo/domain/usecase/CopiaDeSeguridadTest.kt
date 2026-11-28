@@ -2,6 +2,7 @@ package com.cristinachdr.mitacografo.domain.usecase
 
 import com.cristinachdr.mitacografo.domain.fake.FakeAlarmScheduler
 import com.cristinachdr.mitacografo.domain.fake.FakeDescansoRepository
+import com.cristinachdr.mitacografo.domain.fake.FakeGastoRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeJornadaRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeSettingsRepository
 import com.cristinachdr.mitacografo.domain.fake.FakeViajeRepository
@@ -10,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.CopiaInvalidaException
 import com.cristinachdr.mitacografo.domain.model.CopiaSeguridad
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.ErrorCopia
+import com.cristinachdr.mitacografo.domain.model.Gasto
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.Viaje
@@ -18,8 +20,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -73,11 +77,14 @@ class CopiaDeSeguridadTest {
                     tipo = TipoDescanso.DESCANSO,
                     pais = "FR",
                 )
+            val gasto =
+                Gasto(id = 3, fecha = LocalDate.of(2026, 11, 2), descripcion = "Parking", importe = BigDecimal("12.50"))
             val texto =
                 ExportarCopia(
                     origen,
                     FakeDescansoRepository(listOf(descanso)),
                     FakeViajeRepository(listOf(viaje)),
+                    FakeGastoRepository(listOf(gasto)),
                     FakeSettingsRepository(ajustes),
                     backup,
                     reloj,
@@ -87,6 +94,7 @@ class CopiaDeSeguridadTest {
             val destino = FakeJornadaRepository()
             val descansosDestino = FakeDescansoRepository()
             val viajesDestino = FakeViajeRepository()
+            val gastosDestino = FakeGastoRepository()
             val settingsDestino = FakeSettingsRepository()
             val alarmas = FakeAlarmScheduler()
             val copia = (LeerCopia(backup)(texto) as ResultadoLectura.Ok).copia
@@ -94,6 +102,7 @@ class CopiaDeSeguridadTest {
                 destino,
                 descansosDestino,
                 viajesDestino,
+                gastosDestino,
                 settingsDestino,
                 GestorAvisos(destino, settingsDestino, alarmas, reloj),
             )(
@@ -103,6 +112,7 @@ class CopiaDeSeguridadTest {
             assertEquals(listOf(lunes.copy(viajeId = 5), enCurso), destino.guardadas.sortedBy { it.id })
             assertEquals(listOf(viaje), viajesDestino.guardados)
             assertEquals(listOf(descanso), descansosDestino.guardados)
+            assertEquals(listOf(gasto), gastosDestino.guardados)
             assertEquals(ajustes, settingsDestino.actuales)
             assertEquals(hora(3, 20), copia.creada)
             // La jornada en curso empezó a las 19:00: los avisos de 12 h 30… vuelven a estar programados.
@@ -124,6 +134,7 @@ class CopiaDeSeguridadTest {
                 repo,
                 FakeDescansoRepository(),
                 FakeViajeRepository(),
+                FakeGastoRepository(),
                 settings,
                 gestor,
             )(CopiaSeguridad(hora(3, 20), listOf(lunes), Ajustes()))

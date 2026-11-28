@@ -51,6 +51,7 @@ import java.time.ZoneId
 fun TripsScreen(
     onViaje: (Long) -> Unit,
     onNuevo: () -> Unit = {},
+    onSalario: () -> Unit = {},
     viewModel: ViajesViewModel = hiltViewModel(),
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
@@ -62,6 +63,7 @@ fun TripsScreen(
             AccionesViajes(
                 onViaje = onViaje,
                 onNuevo = onNuevo,
+                onSalario = onSalario,
                 onPedirIniciar = { viewModel.onPedirIniciar { hoy -> propuesto.format(hoy.format(formato)) } },
                 onNombreNuevo = viewModel::onNombreNuevo,
                 onCancelarIniciar = viewModel::onCancelarIniciar,
@@ -77,6 +79,8 @@ data class AccionesViajes(
     val onViaje: (Long) -> Unit = {},
     /** «Añadir viaje pasado» (MT-52). */
     val onNuevo: () -> Unit = {},
+    /** «Salario» (MT-58): lo que gana con los viajes del periodo. */
+    val onSalario: () -> Unit = {},
     val onPedirIniciar: () -> Unit = {},
     val onNombreNuevo: (String) -> Unit = {},
     val onCancelarIniciar: () -> Unit = {},
@@ -99,6 +103,11 @@ fun ViajesContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        item(key = "salario") {
+            OutlinedButton(onClick = acciones.onSalario, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.accion_salario))
+            }
+        }
         item(key = "explicacion") {
             Text(
                 stringResource(R.string.viajes_explicacion),
