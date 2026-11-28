@@ -1,5 +1,6 @@
 package com.cristinachdr.mitacografo.domain.rules
 
+import com.cristinachdr.mitacografo.domain.model.AjusteSemanas
 import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.DescansoClasificado
 import com.cristinachdr.mitacografo.domain.model.Jornada
@@ -30,6 +31,8 @@ data class ContextoReglas(
      * y, sin jornada en curso, desde el fin de la última también se está descansando.
      */
     val descansoEntreJornadas: Boolean = false,
+    /** Lo que ya llevaba antes de empezar a usar la app (MT-59): se usa como dato conocido. */
+    val ajuste: AjusteSemanas? = null,
 ) {
     /** Los descansos con su clase (diario, fraccionado, semanal…), en orden. Se calculan una vez. */
     val clasificados: List<DescansoClasificado> by lazy { clasificarDescansos(descansos) }
@@ -164,7 +167,15 @@ class MotorReglas {
                     jornadas = semanaDeInicio[lunes].orEmpty().filterNot { it.abierta },
                     ahora = contexto.ahora,
                     contexto = contexto,
-                    desconocido = if (lunes == primera) Intervalo(Duration.ZERO, antes) else Intervalo.CERO,
+                    desconocido =
+                        when {
+                            lunes != primera -> Intervalo.CERO
+
+                            // Con el ajuste de semanas (MT-59), lo de antes de la app ya se sabe.
+                            contexto.ajuste?.semana == primera -> Intervalo.exacto(contexto.ajuste.conduccionSemana)
+
+                            else -> Intervalo(Duration.ZERO, antes)
+                        },
                 )
             }
 

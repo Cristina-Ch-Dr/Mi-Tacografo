@@ -1,6 +1,7 @@
 package com.cristinachdr.mitacografo.data.backup
 
 import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
+import com.cristinachdr.mitacografo.domain.model.AjusteSemanas
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.ConfigSalario
@@ -197,6 +198,16 @@ private fun Ajustes.aDto() =
         salarioNomina = salario.nomina.toPlainString(),
         salarioPorKm = salario.porKm.toPlainString(),
         salarioPorDia = salario.porDia.toPlainString(),
+        ajusteSemanas =
+            ajusteSemanas?.let {
+                AjusteSemanasDto(
+                    semana = it.semana.toString(),
+                    conduccionSemanaMinutos = it.conduccionSemana.toMinutes(),
+                    conduccionSemanaAnteriorMinutos = it.conduccionSemanaAnterior.toMinutes(),
+                    ampliaciones = it.ampliaciones,
+                    reducidos = it.reducidos,
+                )
+            },
     )
 
 private fun AjustesDto.aDominio() =
@@ -222,6 +233,16 @@ private fun AjustesDto.aDominio() =
                 porKm = salarioPorKm?.let(::BigDecimal) ?: BigDecimal.ZERO,
                 porDia = salarioPorDia?.let(::BigDecimal) ?: BigDecimal.ZERO,
             ),
+        ajusteSemanas =
+            ajusteSemanas?.let {
+                AjusteSemanas(
+                    semana = LocalDate.parse(it.semana),
+                    conduccionSemana = Duration.ofMinutes(it.conduccionSemanaMinutos),
+                    conduccionSemanaAnterior = Duration.ofMinutes(it.conduccionSemanaAnteriorMinutos),
+                    ampliaciones = it.ampliaciones,
+                    reducidos = it.reducidos,
+                )
+            },
     )
 
 private fun Gasto.aDto() =

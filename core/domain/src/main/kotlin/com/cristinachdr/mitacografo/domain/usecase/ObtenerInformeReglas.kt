@@ -38,6 +38,7 @@ class ObtenerInformeReglas
                         ahora = clock.instant(),
                         paisEmpresa = ajustes.paisEmpresa,
                         paisResidencia = ajustes.paisResidencia,
+                        ajuste = ajustes.ajusteSemanas,
                     ),
                 )
             }

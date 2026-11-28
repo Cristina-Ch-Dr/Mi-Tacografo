@@ -231,7 +231,7 @@ fun MiTacografoNavHost(modifier: Modifier = Modifier) {
             }
             composable<RutaResumen> { StatsScreen() }
             composable<RutaSalario> { SalarioScreen() }
-            composable<RutaAjustes> { SettingsScreen() }
+            composable<RutaAjustes> { SettingsScreen(onAnadirDescanso = { navController.navigate(RutaDescanso()) }) }
             composable<RutaJornada> { EditarJornadaScreen(onTerminado = { navController.popBackStack() }) }
             composable<RutaDescansos> {
                 DescansosScreen(

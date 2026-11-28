@@ -78,6 +78,14 @@ class DataStoreSettingsRepositoryTest {
                             fin = java.time.Instant.ofEpochMilli(1_800_000_000_000),
                             salidas = mapOf(Duration.ofHours(9) to java.time.Instant.ofEpochMilli(1_800_030_000_000)),
                         ),
+                    ajusteSemanas =
+                        com.cristinachdr.mitacografo.domain.model.AjusteSemanas(
+                            semana = java.time.LocalDate.of(2026, 11, 2),
+                            conduccionSemana = Duration.ofMinutes(1620),
+                            conduccionSemanaAnterior = Duration.ofHours(50),
+                            ampliaciones = 2,
+                            reducidos = 1,
+                        ),
                 )
 
             repo.actualizar { nuevos }

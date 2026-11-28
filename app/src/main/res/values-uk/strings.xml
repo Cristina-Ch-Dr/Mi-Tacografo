@@ -476,4 +476,19 @@
     <string name="cuando_salir_descanso_real">Відпочинок %1$s</string>
     <string name="cuando_salir_toca_salida">Натисніть час виїзду, щоб змінити його; ↺ повертає розрахований.</string>
     <string name="accion_hora_propia">⏰ Будильник на свій час</string>
+    <!-- MT-59: ajuste de semanas -->
+    <string name="ajustes_seccion_ajuste_semanas">Поправка тижнів</string>
+    <string name="ajuste_semana_de">Тиждень з %1$s (перший із робочими днями)</string>
+    <string name="ajuste_que_es">Що таке поправка тижнів?</string>
+    <string name="ajuste_ayuda">Заповнюється лише один раз, перед першим виїздом, якщо починаєте користуватися програмою посеред тижня: те, що вже було до цього. Потім не потрібно, бо те, що записуєте в програмі, вона рахує сама: не дублюйте. З цим правила перестають показувати «Не перевірено» на початку.</string>
+    <string name="ajuste_conduccion_semana">Керування за той тиждень до програми</string>
+    <string name="ajuste_conduccion_anterior">Керування за попередній тиждень</string>
+    <string name="ajuste_ampliaciones">Подовжень до 10 год уже використано того тижня</string>
+    <string name="ajuste_reducidos">Скорочених добових відпочинків від останнього тижневого</string>
+    <string name="ajuste_apuntar_semanal">Записати останній тижневий відпочинок</string>
+    <string name="ajuste_guardar">Зберегти поправку</string>
+    <string name="ajuste_guardar_cambios">Зберегти зміни поправки</string>
+    <string name="ajuste_quitar">Прибрати поправку</string>
+    <string name="ajuste_de_otra_semana">Збережена поправка — за тиждень з %1$s, але тепер перший тиждень з робочими днями інший: перевірте й збережіть знову.</string>
+    <string name="error_mas_de_56_horas">Не більше 56 год на тиждень</string>
 </resources>
