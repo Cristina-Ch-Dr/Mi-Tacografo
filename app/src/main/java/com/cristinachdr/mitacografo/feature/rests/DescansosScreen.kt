@@ -42,6 +42,7 @@ import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.DescansoClasificado
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.calculado
+import com.cristinachdr.mitacografo.domain.model.lugar
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.CampoFechaHora
 import com.cristinachdr.mitacografo.ui.components.ListaErroresDescanso
@@ -242,7 +243,7 @@ private fun FilaDescanso(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
                 )
-                descanso.pais?.let { Text(it, style = MaterialTheme.typography.titleMedium) }
+                lugar(descanso.pais, descanso.region)?.let { Text(it, style = MaterialTheme.typography.titleMedium) }
             }
             val horas =
                 when {

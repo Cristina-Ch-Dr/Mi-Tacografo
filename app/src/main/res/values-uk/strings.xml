@@ -472,4 +472,8 @@
     <string name="salario_campo_nomina">Ставка (база), €</string>
     <string name="salario_campo_por_dia">Добові, € за день</string>
     <string name="salario_campo_por_km">€ за км</string>
+    <!-- MT-60: detalles de su app b30 -->
+    <string name="cuando_salir_descanso_real">Відпочинок %1$s</string>
+    <string name="cuando_salir_toca_salida">Натисніть час виїзду, щоб змінити його; ↺ повертає розрахований.</string>
+    <string name="accion_hora_propia">⏰ Будильник на свій час</string>
 </resources>

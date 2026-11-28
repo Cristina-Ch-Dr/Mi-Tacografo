@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -40,8 +41,11 @@ import com.cristinachdr.mitacografo.domain.model.ANTELACIONES_DESPERTADOR
 import com.cristinachdr.mitacografo.platform.PermisosAvisos
 import com.cristinachdr.mitacografo.ui.FormatoHora
 import com.cristinachdr.mitacografo.ui.components.CampoNumero
+import com.cristinachdr.mitacografo.ui.components.DialogoHora
 import com.cristinachdr.mitacografo.ui.formatoDiaSemana
+import com.cristinachdr.mitacografo.ui.textoDuracion
 import java.time.Duration
+import java.time.LocalTime
 import java.time.ZonedDateTime
 
 /** Las acciones de «Cuándo salir» y el despertador (MT-57). */
@@ -49,6 +53,11 @@ data class AccionesDespertador(
     val onPoner: (ZonedDateTime) -> Unit = {},
     val onQuitar: () -> Unit = {},
     val onAntelacion: (Duration) -> Unit = {},
+    /** Cambiar a mano la hora de salida de una opción (MT-60). */
+    val onSalida: (Duration, LocalTime) -> Unit = { _, _ -> },
+    val onRestaurarSalida: (Duration) -> Unit = {},
+    /** «⏰ Hora propia»: el despertador a cualquier hora (MT-60). */
+    val onHoraPropia: (LocalTime) -> Unit = {},
 )
 
 /**
@@ -75,7 +84,13 @@ fun TarjetaCuandoSalir(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
             )
-            state.salidas.forEach { salida -> FilaSalida(salida, acciones.onPoner) }
+            state.salidas.forEach { salida -> FilaSalida(salida, acciones) }
+            Text(
+                stringResource(R.string.cuando_salir_toca_salida),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            HoraPropia(state.despertador, acciones.onHoraPropia)
             state.despertador?.let { DespertadorPuesto(it, acciones.onQuitar) }
             HorizontalDivider()
             Text(stringResource(R.string.cuando_salir_antelacion), style = MaterialTheme.typography.bodyLarge)
@@ -115,23 +130,41 @@ fun TarjetaCuandoSalir(
     }
 }
 
-/** «Con 9 h de descanso · Salida mié 04:40 · Despertar 03:40» y el ⏰. */
+/**
+ * «Con 9 h de descanso · Salida mié 04:40 · Despertar 03:40» y el ⏰. La salida se toca para cambiarla a mano
+ * (MT-60); entonces sale ↺ para volver a la calculada y, si no llega a 9 h de descanso, en rojo.
+ */
 @Composable
 private fun FilaSalida(
     salida: SalidaUi,
-    onPoner: (ZonedDateTime) -> Unit,
+    acciones: AccionesDespertador,
 ) {
+    var eligiendo by remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(
-                stringResource(R.string.cuando_salir_descanso, salida.descanso.toHours()),
+                if (salida.manual) {
+                    stringResource(R.string.cuando_salir_descanso_real, textoDuracion(salida.descansoReal))
+                } else {
+                    stringResource(R.string.cuando_salir_descanso, salida.descanso.toHours())
+                },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
+                color = if (salida.corto) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
             )
-            Text(
-                stringResource(R.string.cuando_salir_salida, textoDiaYHora(salida.salida)),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { eligiendo = true }, contentPadding = PaddingValues(0.dp)) {
+                    Text(
+                        stringResource(R.string.cuando_salir_salida, textoDiaYHora(salida.salida)) + " ✎",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+                if (salida.manual) {
+                    TextButton(onClick = { acciones.onRestaurarSalida(salida.descanso) }) {
+                        Text("↺", style = MaterialTheme.typography.titleLarge)
+                    }
+                }
+            }
             Text(
                 stringResource(R.string.cuando_salir_despertar, textoDiaYHora(salida.despertar)),
                 style = MaterialTheme.typography.bodyLarge,
@@ -139,12 +172,44 @@ private fun FilaSalida(
             )
         }
         FilledTonalButton(
-            onClick = { onPoner(salida.despertar) },
+            onClick = { acciones.onPoner(salida.despertar) },
             enabled = !salida.pasada,
             modifier = Modifier.heightIn(min = 48.dp),
         ) {
             Text(stringResource(R.string.accion_poner_despertador))
         }
+    }
+    if (eligiendo) {
+        DialogoHora(
+            inicial = salida.salida.toLocalTime(),
+            onAceptar = {
+                acciones.onSalida(salida.descanso, it)
+                eligiendo = false
+            },
+            onCancelar = { eligiendo = false },
+        )
+    }
+}
+
+/** «⏰ Hora propia» (MT-60): el despertador a la hora que quiera, aunque no sea la de una de las dos salidas. */
+@Composable
+private fun HoraPropia(
+    despertador: ZonedDateTime?,
+    onHora: (LocalTime) -> Unit,
+) {
+    var eligiendo by remember { mutableStateOf(false) }
+    OutlinedButton(onClick = { eligiendo = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+        Text(stringResource(R.string.accion_hora_propia))
+    }
+    if (eligiendo) {
+        DialogoHora(
+            inicial = despertador?.toLocalTime() ?: LocalTime.of(5, 0),
+            onAceptar = {
+                onHora(it)
+                eligiendo = false
+            },
+            onCancelar = { eligiendo = false },
+        )
     }
 }
 

@@ -32,6 +32,8 @@ data class Ajustes(
     val despertador: Instant? = null,
     /** Lo que cobra, para la pantalla Salario (MT-58). */
     val salario: ConfigSalario = ConfigSalario(),
+    /** Horas de salida cambiadas a mano en «Cuándo salir» (MT-60). Son de este móvil y de una jornada. */
+    val salidasManuales: SalidasManuales? = null,
 )
 
 /**

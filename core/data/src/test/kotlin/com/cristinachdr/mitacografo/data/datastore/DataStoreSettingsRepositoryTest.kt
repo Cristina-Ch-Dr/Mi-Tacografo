@@ -73,6 +73,11 @@ class DataStoreSettingsRepositoryTest {
                             porKm = java.math.BigDecimal("0.045"),
                             porDia = java.math.BigDecimal("55.5"),
                         ),
+                    salidasManuales =
+                        com.cristinachdr.mitacografo.domain.model.SalidasManuales(
+                            fin = java.time.Instant.ofEpochMilli(1_800_000_000_000),
+                            salidas = mapOf(Duration.ofHours(9) to java.time.Instant.ofEpochMilli(1_800_030_000_000)),
+                        ),
                 )
 
             repo.actualizar { nuevos }

@@ -103,22 +103,37 @@ fun CampoFechaHora(
         }
 
         Paso.HORA -> {
-            val estado = rememberTimePickerState(valor.hour, valor.minute, is24Hour = true)
-            AlertDialog(
-                onDismissRequest = { paso = Paso.NINGUNO },
-                confirmButton = {
-                    TextButton(onClick = {
-                        onCambio(LocalDateTime.of(fechaElegida, LocalTime.of(estado.hour, estado.minute)))
-                        paso = Paso.NINGUNO
-                    }) { Text(stringResource(R.string.accion_aceptar)) }
+            DialogoHora(
+                inicial = valor.toLocalTime(),
+                onAceptar = {
+                    onCambio(LocalDateTime.of(fechaElegida, it))
+                    paso = Paso.NINGUNO
                 },
-                dismissButton = {
-                    TextButton(onClick = { paso = Paso.NINGUNO }) { Text(stringResource(R.string.accion_cancelar)) }
-                },
-                text = { TimePicker(state = estado) },
+                onCancelar = { paso = Paso.NINGUNO },
             )
         }
     }
+}
+
+/** Elegir una hora (en formato de 24 h), con «Aceptar» y «Cancelar». */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogoHora(
+    inicial: LocalTime,
+    onAceptar: (LocalTime) -> Unit,
+    onCancelar: () -> Unit,
+) {
+    val estado = rememberTimePickerState(inicial.hour, inicial.minute, is24Hour = true)
+    AlertDialog(
+        onDismissRequest = onCancelar,
+        confirmButton = {
+            TextButton(onClick = { onAceptar(LocalTime.of(estado.hour, estado.minute)) }) {
+                Text(stringResource(R.string.accion_aceptar))
+            }
+        },
+        dismissButton = { TextButton(onClick = onCancelar) { Text(stringResource(R.string.accion_cancelar)) } },
+        text = { TimePicker(state = estado) },
+    )
 }
 
 private fun Long.comoFechaUtc(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()

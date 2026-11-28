@@ -30,6 +30,11 @@ data class Descanso(
     /** País donde se descansa (ISO alfa-2). Lo necesita la regla de semanales reducidos fuera de casa. */
     val pais: String? = null,
     val observaciones: String? = null,
+    /**
+     * Comunidad autónoma, si el país es España (MT-60). Solo la tienen los calculados entre jornadas (la del final
+     * de la anterior); no se guarda en la base de datos.
+     */
+    val region: String? = null,
 ) {
     val enCurso: Boolean get() = fin == null
 

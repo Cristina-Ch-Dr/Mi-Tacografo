@@ -11,6 +11,7 @@ import com.cristinachdr.mitacografo.domain.model.Descanso
 import com.cristinachdr.mitacografo.domain.model.Jornada
 import com.cristinachdr.mitacografo.domain.model.TipoDescanso
 import com.cristinachdr.mitacografo.domain.model.Viaje
+import com.cristinachdr.mitacografo.domain.usecase.CambiarSalida
 import com.cristinachdr.mitacografo.domain.usecase.GuardarDescanso
 import com.cristinachdr.mitacografo.domain.usecase.IniciarPausa
 import com.cristinachdr.mitacografo.domain.usecase.ObtenerDescansos
@@ -35,6 +36,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 
 class HomeViewModelTest {
@@ -69,6 +71,7 @@ class HomeViewModelTest {
             settings,
             PonerDespertador(settings, despertador, reloj),
             QuitarDespertador(settings, despertador),
+            CambiarSalida(settings, despertador, reloj),
             ObtenerInformeReglas(repo, descansos, settings, reloj),
             ObtenerDescansos(descansos, repo),
             reloj,
@@ -303,5 +306,46 @@ class HomeViewModelTest {
                     .despertar
                     .toInstant(),
             )
+        }
+
+    @Test
+    fun `la salida se cambia a mano y vuelve, y el despertador se pone a una hora propia`() =
+        runTest {
+            // Terminó a las 19:00; son las 20:00. Con 9 h sale a las 04:00.
+            val reloj = Clock.fixed(hora(20), madrid)
+            val terminada =
+                Jornada(
+                    id = 1,
+                    inicio = hora(8),
+                    zonaInicio = madrid,
+                    kmInicio = 0,
+                    fin = hora(19),
+                    zonaFin = madrid,
+                    kmFin = 500,
+                )
+            val vm = viewModel(reloj, terminada)
+            observar(vm)
+
+            // Prefiere salir a las 03:30: descansa 8 h 30, menos de 9 h.
+            vm.onSalida(Duration.ofHours(9), LocalTime.of(3, 30))
+            val cambiada =
+                vm.uiState.value.salidas
+                    .first()
+            assertTrue(cambiada.manual)
+            assertTrue(cambiada.corto)
+            assertEquals(LocalTime.of(3, 30), cambiada.salida.toLocalTime())
+
+            vm.onRestaurarSalida(Duration.ofHours(9))
+            assertEquals(
+                LocalTime.of(4, 0),
+                vm.uiState.value.salidas
+                    .first()
+                    .salida
+                    .toLocalTime(),
+            )
+
+            // Hora propia: las 22:15 de hoy, que aún no han pasado.
+            vm.onHoraPropia(LocalTime.of(22, 15))
+            assertEquals(hora(22, 15), despertador.puesto)
         }
 }
