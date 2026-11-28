@@ -164,7 +164,14 @@ internal object ReducidosEntreSemanales : ReglaSemana {
             validos
                 .filter { it.clase == ClaseDescanso.DIARIO_REDUCIDO }
                 .filter { ultimoSemanal == null || it.descanso.inicio > ultimoSemanal.descanso.inicio }
-        val detalle = Detalle(cuenta = reducidos.size, maximo = MAX_REDUCIDOS)
+        // Los que ya llevaba antes de la app (MT-59) cuentan si el tramo empieza antes de la primera jornada.
+        val primeraJornada = contexto.jornadas.minOfOrNull { it.inicio }
+        val ajuste =
+            contexto.ajuste?.takeIf {
+                primeraJornada != null && (ultimoSemanal == null || ultimoSemanal.descanso.fin!! <= primeraJornada)
+            }
+        val cuenta = reducidos.size + (ajuste?.reducidos ?: 0)
+        val detalle = Detalle(cuenta = cuenta, maximo = MAX_REDUCIDOS)
 
         // Jornadas del tramo (desde el último semanal hasta el final de la semana) con un hueco sin descanso detrás.
         val desde = ultimoSemanal?.descanso?.fin
@@ -181,11 +188,11 @@ internal object ReducidosEntreSemanales : ReglaSemana {
 
         val resultado =
             when {
-                reducidos.size > MAX_REDUCIDOS -> {
+                cuenta > MAX_REDUCIDOS -> {
                     Resultado.Excedido(ReglaId.REDUCIDOS_ENTRE_SEMANALES, detalle)
                 }
 
-                ultimoSemanal == null -> {
+                ultimoSemanal == null && ajuste == null -> {
                     Resultado.NoVerificado(
                         ReglaId.REDUCIDOS_ENTRE_SEMANALES,
                         MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO,

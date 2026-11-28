@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_MAXIMA
 import com.cristinachdr.mitacografo.domain.model.ANTELACION_DESPERTADOR_POR_DEFECTO
+import com.cristinachdr.mitacografo.domain.model.AjusteSemanas
 import com.cristinachdr.mitacografo.domain.model.Ajustes
 import com.cristinachdr.mitacografo.domain.model.AvisoConfig
 import com.cristinachdr.mitacografo.domain.model.ConfigSalario
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -54,6 +56,7 @@ internal class DataStoreSettingsRepository
                 preferencias.guardar(Claves.SALARIO_POR_KM, nuevos.salario.porKm.toPlainString())
                 preferencias.guardar(Claves.SALARIO_POR_DIA, nuevos.salario.porDia.toPlainString())
                 preferencias.guardar(Claves.SALIDAS_MANUALES, nuevos.salidasManuales?.let(::codificarSalidas))
+                preferencias.guardar(Claves.AJUSTE_SEMANAS, nuevos.ajusteSemanas?.let(::codificarAjuste))
             }
         }
 
@@ -74,6 +77,7 @@ internal class DataStoreSettingsRepository
             val SALARIO_POR_KM = stringPreferencesKey("salario_por_km")
             val SALARIO_POR_DIA = stringPreferencesKey("salario_por_dia")
             val SALIDAS_MANUALES = stringPreferencesKey("salidas_manuales")
+            val AJUSTE_SEMANAS = stringPreferencesKey("ajuste_semanas")
         }
 
         private fun Preferences.aAjustes(): Ajustes =
@@ -108,6 +112,7 @@ internal class DataStoreSettingsRepository
                         porDia = importe(this[Claves.SALARIO_POR_DIA]),
                     ),
                 salidasManuales = this[Claves.SALIDAS_MANUALES]?.let(::decodificarSalidas),
+                ajusteSemanas = this[Claves.AJUSTE_SEMANAS]?.let(::decodificarAjuste),
             )
 
         private fun androidx.datastore.preferences.core.MutablePreferences.guardar(
@@ -161,5 +166,28 @@ internal fun decodificarSalidas(texto: String): SalidasManuales? =
                     val (minutos, salida) = parte.split(":")
                     Duration.ofMinutes(minutos.toLong()) to Instant.ofEpochMilli(salida.toLong())
                 },
+        )
+    }.getOrNull()
+
+/** «2026-11-02|1620|3000|2|3»: semana, minutos de esa semana y de la anterior, ampliaciones y reducidos. */
+internal fun codificarAjuste(ajuste: AjusteSemanas): String =
+    listOf(
+        ajuste.semana,
+        ajuste.conduccionSemana.toMinutes(),
+        ajuste.conduccionSemanaAnterior.toMinutes(),
+        ajuste.ampliaciones,
+        ajuste.reducidos,
+    ).joinToString("|")
+
+/** Lo contrario de [codificarAjuste]. Si está estropeado, `null` (como si no se hubiera rellenado). */
+internal fun decodificarAjuste(texto: String): AjusteSemanas? =
+    runCatching {
+        val (semana, esta, anterior, ampliaciones, reducidos) = texto.split("|")
+        AjusteSemanas(
+            semana = LocalDate.parse(semana),
+            conduccionSemana = Duration.ofMinutes(esta.toLong()),
+            conduccionSemanaAnterior = Duration.ofMinutes(anterior.toLong()),
+            ampliaciones = ampliaciones.toInt(),
+            reducidos = reducidos.toInt(),
         )
     }.getOrNull()

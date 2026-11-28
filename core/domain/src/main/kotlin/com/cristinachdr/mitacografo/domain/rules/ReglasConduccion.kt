@@ -54,8 +54,13 @@ internal object Ampliaciones : ReglaSemana {
         primeraSemana: LocalDate,
     ): List<Resultado> {
         val conducciones = semana.jornadas.map { conduccionPosible(it, semana.ahora) }
-        val seguras = conducciones.count { it.min > NUEVE_HORAS }
-        val posibles = conducciones.count { it.max > NUEVE_HORAS }
+        // Las ya usadas antes de empezar a usar la app (MT-59), si es la semana del ajuste.
+        val antes =
+            semana.contexto.ajuste
+                ?.takeIf { it.semana == semana.lunes }
+                ?.ampliaciones ?: 0
+        val seguras = conducciones.count { it.min > NUEVE_HORAS } + antes
+        val posibles = conducciones.count { it.max > NUEVE_HORAS } + antes
         val detalle = Detalle(cuenta = seguras, maximo = AMPLIADAS_POR_SEMANA)
         val resultado =
             when {
@@ -118,15 +123,23 @@ internal object ConduccionBisemanal : ReglaSemana {
         primeraSemana: LocalDate,
     ): List<Resultado> {
         val lunesAnterior = semana.lunes.minusWeeks(1)
+        val ajuste = semana.contexto.ajuste?.takeIf { it.semana == semana.lunes }
         val anterior =
             when {
+                // Lo que condujo la semana antes de empezar a usar la app (MT-59).
+                lunesAnterior < primeraSemana && ajuste != null -> Intervalo.exacto(ajuste.conduccionSemanaAnterior)
+
                 lunesAnterior < primeraSemana -> Intervalo(Duration.ZERO, SEMANAL)
+
                 else -> todas[lunesAnterior]?.conduccion ?: Intervalo.CERO
             }
         // El motivo de la semana con más incertidumbre: es el que decide si no se puede saber.
         val estaSemana = semana.motivo to (semana.conduccion.max - semana.conduccion.min)
         val laAnterior =
-            (todas[lunesAnterior]?.motivo ?: MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO) to
+            (
+                todas[lunesAnterior]?.motivo
+                    ?: MotivoNoVerificado.DATOS_INSUFICIENTES_PERIODO.takeUnless { ajuste != null }
+            ) to
                 (anterior.max - anterior.min)
         val motivo =
             listOf(estaSemana, laAnterior)

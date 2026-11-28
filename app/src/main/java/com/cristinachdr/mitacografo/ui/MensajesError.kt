@@ -14,6 +14,9 @@ enum class ErrorCampo(
     OBLIGATORIO(R.string.error_obligatorio),
     NO_ES_NUMERO(R.string.error_no_numero),
     MINUTOS_INVALIDOS(R.string.error_minutos),
+
+    /** Más de 56 h de conducción en una semana (art. 6.2): no puede ser (MT-59). */
+    MAS_DE_56_HORAS(R.string.error_mas_de_56_horas),
 }
 
 /** El dominio no sabe de idiomas: aquí se traduce cada error a un texto de `strings.xml`. */

@@ -89,6 +89,14 @@ class JsonBackupTest {
                             porKm = BigDecimal("0.045"),
                             porDia = BigDecimal("60"),
                         ),
+                    ajusteSemanas =
+                        com.cristinachdr.mitacografo.domain.model.AjusteSemanas(
+                            semana = LocalDate.of(2026, 11, 2),
+                            conduccionSemana = Duration.ofMinutes(1620),
+                            conduccionSemanaAnterior = Duration.ofHours(50),
+                            ampliaciones = 1,
+                            reducidos = 2,
+                        ),
                 ),
             descansos =
                 listOf(

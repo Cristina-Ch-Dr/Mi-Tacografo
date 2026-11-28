@@ -9,7 +9,7 @@
 
 | 📥 Backlog | 📋 Por hacer | 🔨 En curso | 👀 Revisión | ✅ Hecho |
 |---|---|---|---|---|
-| E5 – E8 | MT-59, MT-61, MT-33, MT-33B | MT-60, hecha en `feature/MT-60-detalles-b30` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-58 (MT-50 dentro de MT-53) · MT-33B sin reglas · **v0.4.0 publicada** |
+| E5 – E8 | MT-61, MT-33, MT-33B | MT-59, hecha en `feature/MT-59-ajuste-semanas` | — | MT-01 … MT-18, MT-20, MT-22, MT-24, MT-27 … MT-30, MT-32, MT-41 … MT-58, MT-60 (MT-50 dentro de MT-53) · MT-33B sin reglas · **v0.4.0 publicada** |
 
 **Límite WIP:** 1 tarjeta en curso y 1 en revisión.
 **Definición de Hecho (DoD):** compila · tests en verde · ktlint y Android Lint sin errores · textos en `strings.xml` (ES y UK) · probado en el móvil o el emulador · PR fusionado en `develop`.
@@ -470,9 +470,13 @@ Ordenadas por prioridad: primero lo pequeño que más nota en el día a día. Va
 - Probado en el emulador: con la copia real del conductor salen «ES (NA)» y «ES (CV)» en Descanso; con una copia de prueba, la salida a las 22:00 da «Descanso de 8 h 05 min» en rojo, el despertar pasa a las 21:00 y ↺ vuelve a las 22:54.
 
 ### MT-59 · Ajuste de semanas · M · deps: MT-30 · *(petición del conductor)*
-- [ ] Para quien empieza a usar la app a mitad de semana: horas de conducción que ya llevaba esta semana y la anterior, ampliaciones a 10 h, reducidos y fin del último descanso semanal.
-- [ ] Botón «?» que lo explica: se rellena una vez antes de la primera salida; luego solo lo que falte, porque lo de las jornadas ya lo cuenta la app.
-- [ ] El motor de reglas lo usa como dato conocido (menos «No verificado» al empezar).
+- [x] Para quien empieza a usar la app a mitad de semana: horas de conducción que ya llevaba esta semana y la anterior, ampliaciones a 10 h, reducidos y fin del último descanso semanal.
+- [x] Botón «?» que lo explica: se rellena una vez antes de la primera salida; luego solo lo que falte, porque lo de las jornadas ya lo cuenta la app.
+- [x] El motor de reglas lo usa como dato conocido (menos «No verificado» al empezar).
+- Ajustes → «Ajuste de semanas» (dentro de las reglas), con «ⓘ» que lo explica: la semana (la primera con jornadas), la conducción de esa semana antes de usar la app y la de la anterior, y las ampliaciones y reducidos ya usados (con chips). Va en Ajustes y en la copia. Si después se añaden jornadas de antes y la primera semana cambia, avisa de que hay que revisarlo.
+- El motor (`ContextoReglas.ajuste`): la conducción de antes deja de ser un intervalo, la semana anterior para las 90 h es exacta, y las ampliaciones y reducidos de antes cuentan; así no sale «No verificado» al empezar.
+- El fin del último semanal no se guarda aparte: el botón «Apuntar el último descanso semanal» abre «Añadir descanso», y así el motor sabe si fue normal o reducido (y su deuda).
+- Probado en el emulador con la copia real del conductor (empezó el lunes 2 nov a las 16:10): sin ajuste, la semana del 2 «entre 49 h 50 y 66 h» y «No verificado»; con 0 h antes y 40 h la semana anterior, 49 h 50 y 89 h 50 exactas, y todo «Cumple» menos el descanso semanal (falta apuntar su último semanal).
 
 ### MT-61 · Copias de seguridad automáticas · M · deps: MT-17 · *(de su app, b30, 28 nov 2026)* · (con dos ideas del backlog)
 - [ ] Copia automática **una vez al día** en una carpeta que el conductor elige una vez (Documentos, o una que se sincronice con su nube), como hace su app en el servidor. Se guardan las de los **últimos 14 días**; las más viejas se borran solas.

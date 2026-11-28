@@ -28,7 +28,10 @@ import com.cristinachdr.mitacografo.ui.components.EstadoPermisosAvisos
 import com.cristinachdr.mitacografo.ui.theme.MiTacografoTheme
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onAnadirDescanso: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsContent(
         estado = estado,
@@ -54,6 +57,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
         permisos = { EstadoPermisosAvisos(soloSiFalta = false) },
         sonido = { SeccionSonido() },
         despertador = { SeccionDespertador() },
+        ajusteSemanas = { SeccionAjusteSemanas(onAnadirDescanso = onAnadirDescanso) },
         copia = { SeccionCopia() },
     )
 }
@@ -89,6 +93,7 @@ fun SettingsContent(
     permisos: @Composable () -> Unit = {},
     sonido: @Composable () -> Unit = {},
     despertador: @Composable () -> Unit = {},
+    ajusteSemanas: @Composable () -> Unit = {},
     copia: @Composable () -> Unit = {},
 ) {
     Column(
@@ -134,6 +139,10 @@ fun SettingsContent(
             etiqueta = stringResource(R.string.ajustes_pais_residencia),
             preferencias = estado.preferenciasPaises,
         )
+
+        HorizontalDivider()
+        Seccion(stringResource(R.string.ajustes_seccion_ajuste_semanas))
+        ajusteSemanas()
 
         HorizontalDivider()
         Seccion(stringResource(R.string.ajustes_seccion_paises))

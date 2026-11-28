@@ -98,6 +98,18 @@ internal data class AjustesDto(
     val salarioNomina: String? = null,
     val salarioPorKm: String? = null,
     val salarioPorDia: String? = null,
+    // Desde MT-59: lo que ya llevaba antes de empezar a usar la app.
+    val ajusteSemanas: AjusteSemanasDto? = null,
+)
+
+@Serializable
+internal data class AjusteSemanasDto(
+    /** "2026-11-02": el lunes de la semana. */
+    val semana: String,
+    val conduccionSemanaMinutos: Long = 0,
+    val conduccionSemanaAnteriorMinutos: Long = 0,
+    val ampliaciones: Int = 0,
+    val reducidos: Int = 0,
 )
 
 @Serializable

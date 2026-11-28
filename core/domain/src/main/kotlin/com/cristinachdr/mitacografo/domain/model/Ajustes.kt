@@ -34,6 +34,8 @@ data class Ajustes(
     val salario: ConfigSalario = ConfigSalario(),
     /** Horas de salida cambiadas a mano en «Cuándo salir» (MT-60). Son de este móvil y de una jornada. */
     val salidasManuales: SalidasManuales? = null,
+    /** Lo que ya llevaba antes de empezar a usar la app (MT-59). `null` = no se ha rellenado. */
+    val ajusteSemanas: AjusteSemanas? = null,
 )
 
 /**

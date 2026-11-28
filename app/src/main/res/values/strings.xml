@@ -471,4 +471,19 @@
     <string name="cuando_salir_descanso_real">Descanso de %1$s</string>
     <string name="cuando_salir_toca_salida">Toca la hora de salida para cambiarla; ↺ vuelve a la calculada.</string>
     <string name="accion_hora_propia">⏰ Despertador a otra hora</string>
+    <!-- MT-59: ajuste de semanas -->
+    <string name="ajustes_seccion_ajuste_semanas">Ajuste de semanas</string>
+    <string name="ajuste_semana_de">Semana del %1$s (la primera con jornadas)</string>
+    <string name="ajuste_que_es">¿Qué es el ajuste de semanas?</string>
+    <string name="ajuste_ayuda">Se rellena una sola vez, antes de la primera salida, si empiezas a usar la app a mitad de semana: lo que ya llevabas de antes. Después ya no hace falta, porque lo que apuntas en la app lo cuenta sola: no lo dupliques. Con esto, las reglas dejan de decir «No verificado» al empezar.</string>
+    <string name="ajuste_conduccion_semana">Conducción de esa semana antes de usar la app</string>
+    <string name="ajuste_conduccion_anterior">Conducción de la semana anterior</string>
+    <string name="ajuste_ampliaciones">Ampliaciones a 10 h ya usadas esa semana</string>
+    <string name="ajuste_reducidos">Diarios reducidos ya usados desde el último semanal</string>
+    <string name="ajuste_apuntar_semanal">Apuntar el último descanso semanal</string>
+    <string name="ajuste_guardar">Guardar el ajuste</string>
+    <string name="ajuste_guardar_cambios">Guardar los cambios del ajuste</string>
+    <string name="ajuste_quitar">Quitar el ajuste</string>
+    <string name="ajuste_de_otra_semana">El ajuste guardado es de la semana del %1$s, pero ahora la primera con jornadas es otra: revísalo y vuelve a guardarlo.</string>
+    <string name="error_mas_de_56_horas">Como mucho 56 h en una semana</string>
 </resources>
